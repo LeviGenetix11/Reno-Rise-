@@ -76,6 +76,22 @@
     '    <input type="text" id="af-type" name="renovation_type" placeholder="e.g., kitchen remodel, bathroom renovation, basement finishing" required>',
     '  </div>',
     '  <div class="field-full">',
+    '    <label for="af-start-timeframe">When would you like the renovation to start? <span class="required-mark" aria-hidden="true">*</span></label>',
+    '    <select id="af-start-timeframe" name="start_timeframe" required>',
+    '      <option value="" disabled selected>Select a timeframe</option>',
+    '      <option value="As soon as possible">As soon as possible</option>',
+    '      <option value="Within 1-3 months">Within 1-3 months</option>',
+    '      <option value="Within 3-6 months">Within 3-6 months</option>',
+    '      <option value="More than 6 months away">More than 6 months away</option>',
+    '      <option value="Just exploring">Just exploring</option>',
+    '    </select>',
+    '  </div>',
+    '  <div class="field-full">',
+    '    <label for="af-deadline">Do you have a target completion date or deadline? <span class="optional-mark">(optional)</span></label>',
+    '    <input type="text" id="af-deadline" name="completion_deadline" placeholder="For example: before we move in on December 1. Let us know if your date is flexible.">',
+    '  </div>',
+    '  <p class="form-note-inline field-full">Your preferred timeline helps us plan. Dates are subject to project scope and contractor availability.</p>',
+    '  <div class="field-full">',
     '    <label for="af-details">Project Details <span class="optional-mark">(optional)</span></label>',
     '    <textarea id="af-details" name="details" rows="4" placeholder="Anything else that would help us understand your project"></textarea>',
     '  </div>',
@@ -130,13 +146,16 @@
       emailInput.setCustomValidity('');
     });
 
-    mount.querySelectorAll('.assessment-form input[required], .assessment-form textarea[required]').forEach(function (field) {
+    mount.querySelectorAll('.assessment-form input[required], .assessment-form textarea[required], .assessment-form select[required]').forEach(function (field) {
       field.addEventListener('invalid', function () {
         if (field.validity.valueMissing) {
           field.setCustomValidity('This field is required.');
         }
       });
       field.addEventListener('input', function () {
+        field.setCustomValidity('');
+      });
+      field.addEventListener('change', function () {
         field.setCustomValidity('');
       });
     });
