@@ -40,6 +40,10 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
 
 body {
   margin: 0;
@@ -1097,9 +1101,10 @@ section { position: relative; }
 }
 .lead-form-wrap h3 { font-size: 20px; margin-bottom: 6px; }
 .lead-form-wrap .sub { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
-.lead-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.lead-form .field-full { grid-column: 1 / -1; }
-.lead-form label {
+.lead-form, .assessment-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lead-form .field-full, .assessment-form .field-full { grid-column: 1 / -1; }
+.lead-form label,
+.assessment-form label {
   display: block;
   font-size: 12.5px;
   font-weight: 700;
@@ -1107,7 +1112,11 @@ section { position: relative; }
   margin-bottom: 7px;
 }
 .lead-form input,
-.lead-form select {
+.lead-form select,
+.lead-form textarea,
+.assessment-form input,
+.assessment-form select,
+.assessment-form textarea {
   width: 100%;
   padding: 13px 16px;
   border: 1.5px solid var(--border);
@@ -1118,19 +1127,51 @@ section { position: relative; }
   background: var(--cream);
   transition: border-color 0.2s ease;
 }
+.lead-form textarea,
+.assessment-form textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
 .lead-form input:focus,
-.lead-form select:focus {
+.lead-form select:focus,
+.lead-form textarea:focus,
+.assessment-form input:focus,
+.assessment-form select:focus,
+.assessment-form textarea:focus {
   outline: none;
   border-color: var(--orange);
   background: #fff;
 }
-.lead-form .btn { width: 100%; justify-content: center; margin-top: 4px; }
+.lead-form .btn, .assessment-form .btn { width: 100%; justify-content: center; margin-top: 4px; }
+.assessment-form .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.required-mark { color: var(--orange-a11y); }
+.required-legend {
+  grid-column: 1 / -1;
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: -4px 0 0;
+}
+.optional-mark {
+  color: var(--muted-light);
+  font-weight: 500;
+  font-size: 11.5px;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+#assessment-form, #projects { scroll-margin-top: 120px; }
 .form-note {
   grid-column: 1 / -1;
   font-size: 12.5px;
   color: var(--muted-light);
   text-align: center;
   margin: 4px 0 0;
+}
+.form-note-inline {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: -6px 0 0;
 }
 .form-success {
   display: none;
@@ -1142,7 +1183,7 @@ section { position: relative; }
 .form-success h3 { margin-bottom: 8px; }
 .form-success p { color: var(--muted); margin: 0; }
 @media (max-width: 640px) {
-  .lead-form { grid-template-columns: 1fr; }
+  .lead-form, .assessment-form { grid-template-columns: 1fr; }
 }
 
 /* ---------- CTA microcopy ---------- */

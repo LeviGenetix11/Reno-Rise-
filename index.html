@@ -64,8 +64,8 @@
     </nav>
 
     <div class="header-cta">
-      <a href="contact.html" class="btn btn-primary">
-        Request A Quote
+      <a href="assessment/index.html" class="btn btn-primary">
+        Request Your Free Assessment
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <button class="nav-toggle" aria-label="Open menu">
@@ -93,7 +93,7 @@
   <a href="locations/index.html">Areas Served</a>
   <a href="blog/index.html">Blog</a>
   <a href="contact.html">Contact</a>
-  <a href="contact.html" class="btn btn-primary">Request A Quote</a>
+  <a href="assessment/index.html" class="btn btn-primary">Request Your Free Assessment</a>
 </div>
 
 <main>
@@ -111,11 +111,11 @@
     <h1>Transform Your Home With Expert Renovation Services</h1>
     <p>At Reno Rise, we specialize in transforming outdated spaces into beautiful, functional, and modern living environments.</p>
     <div class="hero-actions">
-      <a href="contact.html" class="btn btn-primary">
-        Book Your Free Assessment
+      <a href="assessment/index.html" class="btn btn-primary">
+        Request Your Free Assessment
         <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <a href="services/index.html" class="btn btn-outline">Get Started</a>
+      <a href="#projects" class="btn btn-outline">View Our Work</a>
     </div>
   </div>
 </section>
@@ -312,7 +312,7 @@
 </section>
 
 <!-- ========== PROJECTS / GALLERY ========== -->
-<section class="section">
+<section class="section" id="projects">
   <div class="container">
     <div class="section-head center">
       <span class="eyebrow">Our Projects</span>
@@ -378,6 +378,20 @@
   </div>
 </section>
 
+<!-- ========== FREE ASSESSMENT FORM ========== -->
+<section class="section section-cream" id="assessment-form">
+  <div class="container">
+    <div class="section-head center">
+      <span class="eyebrow">Free Assessment</span>
+      <h2>Request Your Free Assessment</h2>
+      <p style="color:var(--muted); max-width:560px; margin:14px auto 0; text-align:center;">Tell us about your renovation plans. We'll contact you to discuss your project and the next steps.</p>
+    </div>
+    <div class="lead-form-wrap" style="max-width:700px; margin-left:auto; margin-right:auto;">
+      <div data-assessment-form-mount data-source="homepage" data-thank-you-href="assessment/thank-you.html"></div>
+    </div>
+  </div>
+</section>
+
 <!-- ========== FOOTER ========== -->
 </main>
 
@@ -438,5 +452,6 @@
 </footer>
 
 <script src="js/script.js"></script>
+<script src="js/assessment-form.js"></script>
 </body>
 </html>
