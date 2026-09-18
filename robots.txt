@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /brand/
+Disallow: /SEO_brief/
+
+Sitemap: https://www.renosrise.com/sitemap.xml

@@ -1,0 +1,92 @@
+﻿wave,zipper_tier,opportunity_score,service_name,city,keyword,volume,kd,cpc_usd,landing_page_url,status
+1,A - full zipper row,1202.1,Basement Renovation,Ajax,basement renovation ajax,320,5,56.35,/services/basement-renovation-ajax/,BUILT
+1,A - full zipper row,1084.2,Basement Renovation,Pickering,basement renovation pickering,320,6,54.21,/services/basement-renovation-pickering/,not built
+1,A - full zipper row,1041.3,Basement Renovation,Oakville,basement renovation oakville,720,9,27.48,/services/basement-renovation-oakville/,not built
+1,A - full zipper row,814.5,Basement Renovation,Toronto,toronto basement renovation,320,9,48.36,/services/basement-renovation-toronto/,not built
+1,A - full zipper row,737.8,Basement Renovation,Vaughan,basement renovation vaughan,720,7,17.42,/services/basement-renovation-vaughan/,not built
+1,A - full zipper row,654.9,Basement Renovation,Richmond Hill,basement renovation richmond hill,590,6,17.76,/services/basement-renovation-richmond-hill/,not built
+1,A - full zipper row,560.8,Basement Renovation,Markham,basement renovation markham,720,7,13.24,/services/basement-renovation-markham/,not built
+1,A - full zipper row,529.6,Basement Renovation,Aurora,basement renovation aurora,390,10,27.16,/services/basement-renovation-aurora/,not built
+2,A - full zipper row,526.8,Basement Renovation,Newmarket,basement renovation newmarket,390,5,20.26,/services/basement-renovation-newmarket/,not built
+2,C - standalone (too narrow to zipper),468.7,Window Replacement,Brampton,window replacement brampton,480,16,25.39,/services/window-replacement-brampton/,not built
+2,A - full zipper row,417.6,Bathroom Renovation,Aurora,bathroom renovation aurora,720,6,9.28,/services/bathroom-renovation-aurora/,not built
+2,A - full zipper row,416.0,Bathroom Renovation,Markham,bathroom renovation markham,1300,12,7.04,/services/bathroom-renovation-markham/,not built
+2,A - full zipper row,390.7,Basement Renovation,Oshawa,basement renovation oshawa,390,14,24.04,/services/basement-renovation-oshawa/,not built
+2,A - full zipper row,383.3,Bathroom Renovation,Richmond Hill,bathroom renovation richmond hill,880,6,6.97,/services/bathroom-renovation-richmond-hill/,not built
+2,A - full zipper row,374.1,Basement Renovation,Brampton,basement renovation brampton,480,6,12.47,/services/basement-renovation-brampton/,not built
+2,A - full zipper row,348.9,Bathroom Renovation,Mississauga,bathroom renovation mississauga,1300,15,6.71,/services/bathroom-renovation-mississauga/,not built
+3,A - full zipper row,348.2,Bathroom Renovation,Oakville,bathroom renovation oakville,1300,13,6.16,/services/bathroom-renovation-oakville/,not built
+3,A - full zipper row,320.2,Bathroom Renovation,Newmarket,bathroom renovation newmarket,880,13,8.37,/services/bathroom-renovation-newmarket/,not built
+3,A - full zipper row,319.9,Bathroom Renovation,Burlington,bathroom renovation burlington,880,7,6.18,/services/bathroom-renovation-burlington/,not built
+3,C - standalone (too narrow to zipper),316.8,Window Installation,Etobicoke,window installation etobicoke,480,12,14.52,/services/window-installation-etobicoke/,not built
+3,A - full zipper row,310.3,Basement Renovation,Etobicoke,basement renovation etobicoke,390,8,14.32,/services/basement-renovation-etobicoke/,not built
+3,A - full zipper row,280.9,Bathroom Renovation,Vaughan,bathroom renovation vaughan,1000,13,6.46,/services/bathroom-renovation-vaughan/,not built
+3,A - full zipper row,279.5,Bathroom Renovation,Ajax,bathroom renovation ajax,880,7,5.40,/services/bathroom-renovation-ajax/,not built
+3,C - standalone (too narrow to zipper),273.4,Door Installation,Brampton,door installation brampton,480,15,14.24,/services/door-installation-brampton/,not built
+4,A - full zipper row,254.8,Bathroom Renovation,Scarborough,bathroom renovation scarborough,880,12,6.37,/services/bathroom-renovation-scarborough/,not built
+4,A - full zipper row,254.3,Basement Renovation,Whitby,basement renovation whitby,260,5,14.67,/services/basement-renovation-whitby/,not built
+4,B - partial zipper row,244.3,Basement Waterproofing,Brampton,basement waterproofing brampton,480,11,10.69,/services/basement-waterproofing-brampton/,not built
+4,C - standalone (too narrow to zipper),221.5,Window Replacement,Markham,window replacement markham,480,16,12.00,/services/window-replacement-markham/,not built
+4,C - standalone (too narrow to zipper),215.2,Door Installation,Toronto,door installation in toronto,320,11,14.12,/services/door-installation-toronto/,not built
+4,B - partial zipper row,213.5,General Contractor,Scarborough,general contractor scarborough,590,11,7.60,/services/general-contractor-scarborough/,not built
+4,C - standalone (too narrow to zipper),211.2,Window Replacement,Etobicoke,window replacement etobicoke,320,12,14.52,/services/window-replacement-etobicoke/,not built
+4,A - full zipper row,203.8,Bathroom Renovation,Whitby,bathroom renovation whitby,720,10,5.66,/services/bathroom-renovation-whitby/,not built
+5,A - full zipper row,203.5,Bathroom Renovation,Etobicoke,bathroom renovation etobicoke,720,9,5.37,/services/bathroom-renovation-etobicoke/,not built
+5,A - full zipper row,197.3,Bathroom Renovation,Brampton,bathroom renovation brampton,1000,12,4.34,/services/bathroom-renovation-brampton/,not built
+5,B - partial zipper row,183.1,Basement Waterproofing,North York,basement waterproofing north york,390,9,8.92,/services/basement-waterproofing-north-york/,not built
+5,B - partial zipper row,178.4,Home Renovation,North York,home renovation north york,480,7,6.32,/services/home-renovation-north-york/,not built
+5,B - partial zipper row,172.4,Basement Waterproofing,Markham,basement waterproofing markham,590,12,6.43,/services/basement-waterproofing-markham/,not built
+5,A - full zipper row,162.2,Bathroom Renovation,Oshawa,bathroom renovation oshawa,720,13,5.18,/services/bathroom-renovation-oshawa/,not built
+5,B - partial zipper row,145.3,Kitchen Renovation,Oakville,kitchen renovation oakville,590,14,5.91,/services/kitchen-renovation-oakville/,not built
+5,B - partial zipper row,137.4,Basement Waterproofing,Ajax,basement waterproofing ajax,260,11,11.10,/services/basement-waterproofing-ajax/,not built
+6,B - partial zipper row,134.4,Bathroom Remodeling,Oakville,bathroom remodeling oakville,480,12,6.16,/services/bathroom-remodeling-oakville/,not built
+6,B - partial zipper row,133.9,Home Renovation,Newmarket,home renovation newmarket,480,8,5.02,/services/home-renovation-newmarket/,not built
+6,A - full zipper row,118.9,Bathroom Renovation,North York,bathroom renovation north york,260,5,6.86,/services/bathroom-renovation-north-york/,not built
+6,C - standalone (too narrow to zipper),113.1,Door Repair,Etobicoke,door repair etobicoke,210,5,8.08,/services/door-repair-etobicoke/,not built
+6,A - full zipper row,112.4,Bathroom Renovation,Pickering,bathroom renovation contractor pickering,320,7,5.97,/services/bathroom-renovation-pickering/,not built
+6,B - partial zipper row,111.8,Kitchen Renovation,Vaughan,kitchen renovation vaughan,480,14,5.59,/services/kitchen-renovation-vaughan/,not built
+6,B - partial zipper row,107.2,Deck Builder,Markham,deck builder markham,260,8,7.42,/services/deck-builder-markham/,not built
+6,C - standalone (too narrow to zipper),104.8,Kitchen Remodeling,Oakville,kitchen remodeling oakville,390,12,5.91,/services/kitchen-remodeling-oakville/,not built
+7,C - standalone (too narrow to zipper),102.6,Door Replacement,Toronto,door replacement in toronto,90,10,22.79,/services/door-replacement-toronto/,not built
+7,B - partial zipper row,92.6,Bathroom Remodeling,Brampton,bathroom remodeling brampton,320,5,4.34,/services/bathroom-remodeling-brampton/,not built
+7,C - standalone (too narrow to zipper),83.9,Window Installation,Toronto,toronto window installation,140,24,20.38,/services/window-installation-toronto/,not built
+7,B - partial zipper row,73.1,General Contractor,Richmond Hill,general contractor richmond hill,320,10,4.57,/services/general-contractor-richmond-hill/,not built
+7,C - standalone (too narrow to zipper),73.0,Home Addition,Toronto,toronto home additions,390,16,4.87,/services/home-addition-toronto/,not built
+7,B - partial zipper row,72.9,Kitchen Renovation,Scarborough,kitchen renovation scarborough,320,9,4.33,/services/kitchen-renovation-scarborough/,not built
+7,B - partial zipper row,70.5,General Contractor,North York,general contractor north york,480,19,4.26,/services/general-contractor-north-york/,not built
+7,C - standalone (too narrow to zipper),64.4,Door Replacement,Brampton,door replacement brampton,70,9,17.47,/services/door-replacement-brampton/,not built
+8,B - partial zipper row,63.5,Deck Builder,Richmond Hill,deck builder richmond hill,140,8,8.16,/services/deck-builder-richmond-hill/,not built
+8,B - partial zipper row,58.7,General Contractor,Markham,general contractor markham,320,13,4.22,/services/general-contractor-markham/,not built
+8,A - full zipper row,54.2,Bathroom Renovation,Toronto,toronto bathroom renovation,320,20,5.08,/services/bathroom-renovation-toronto/,not built
+8,B - partial zipper row,51.0,Bathroom Remodeling,Richmond Hill,bathroom remodeling richmond hill,170,10,6.00,/services/bathroom-remodeling-richmond-hill/,not built
+8,B - partial zipper row,50.0,Kitchen Renovation,Etobicoke,kitchen renovation etobicoke,140,6,5.71,/services/kitchen-renovation-etobicoke/,not built
+8,B - partial zipper row,49.8,Kitchen Renovation,Newmarket,kitchen renovation newmarket,140,6,5.69,/services/kitchen-renovation-newmarket/,not built
+8,B - partial zipper row,47.2,Kitchen Renovation,Richmond Hill,kitchen renovation contractor richmond hill,170,10,5.55,/services/kitchen-renovation-richmond-hill/,not built
+8,B - partial zipper row,47.1,Kitchen Renovation,Oshawa,kitchen renovation oshawa,260,19,5.25,/services/kitchen-renovation-oshawa/,not built
+9,B - partial zipper row,43.4,Bathroom Remodeling,Vaughan,bathroom remodeling vaughan,110,7,6.70,/services/bathroom-remodeling-vaughan/,not built
+9,B - partial zipper row,40.7,Bathroom Remodeling,Aurora,bathroom remodeling aurora,90,8,8.13,/services/bathroom-remodeling-aurora/,not built
+9,C - standalone (too narrow to zipper),36.9,Condo Renovation,Toronto,condo renovation in toronto,210,17,4.75,/services/condo-renovation-toronto/,not built
+9,B - partial zipper row,33.3,Bathroom Remodeling,Toronto,toronto bathroom remodeling,210,22,5.08,/services/bathroom-remodeling-toronto/,not built
+9,B - partial zipper row,31.8,Bathroom Remodeling,Newmarket,bathroom remodeling newmarket,90,15,8.82,/services/bathroom-remodeling-newmarket/,not built
+9,C - standalone (too narrow to zipper),30.7,Custom Doors,Brampton,custom doors brampton,90,15,8.53,/services/custom-doors-brampton/,not built
+9,B - partial zipper row,30.0,Bathroom Remodeling,Scarborough,bathroom remodeling scarborough,110,13,6.27,/services/bathroom-remodeling-scarborough/,not built
+9,B - partial zipper row,28.7,Deck Builder,Brampton,deck builder brampton,170,20,5.06,/services/deck-builder-brampton/,not built
+10,C - standalone (too narrow to zipper),28.6,Renovation Contractor,Mississauga,renovation contractor mississauga,140,18,5.71,/services/renovation-contractor-mississauga/,not built
+10,C - standalone (too narrow to zipper),27.0,Garage Door Repair,Etobicoke,etobicoke garage door repair,70,8,6.94,/services/garage-door-repair-etobicoke/,not built
+10,B - partial zipper row,25.9,Deck Builder,Oakville,deck builder oakville,140,16,4.81,/services/deck-builder-oakville/,not built
+10,B - partial zipper row,24.0,Home Renovation,Mississauga,home renovation contractors mississauga,140,19,4.98,/services/home-renovation-mississauga/,not built
+10,B - partial zipper row,22.9,Bathroom Remodeling,Markham,bathroom remodeling markham,90,9,4.83,/services/bathroom-remodeling-markham/,not built
+10,B - partial zipper row,22.3,General Contractor,Oakville,general contractor oakville,140,21,4.93,/services/general-contractor-oakville/,not built
+10,B - partial zipper row,21.7,Deck Builder,Milton,deck builder milton,90,9,4.59,/services/deck-builder-milton/,not built
+10,C - standalone (too narrow to zipper),21.4,Flooring Installation,Scarborough,flooring installation scarborough,90,12,5.22,/services/flooring-installation-scarborough/,not built
+11,B - partial zipper row,19.3,Deck Builder,Scarborough,deck builder scarborough,70,9,5.25,/services/deck-builder-scarborough/,not built
+11,B - partial zipper row,17.0,Kitchen Renovation,Aurora,kitchen renovation aurora,90,5,2.83,/services/kitchen-renovation-aurora/,not built
+11,B - partial zipper row,16.4,Kitchen Renovation,Ajax,kitchen renovation ajax,70,10,4.69,/services/kitchen-renovation-ajax/,not built
+11,C - standalone (too narrow to zipper),14.9,Kitchen Remodeling,Scarborough,kitchen remodeling scarborough,90,8,2.98,/services/kitchen-remodeling-scarborough/,not built
+11,B - partial zipper row,13.5,Deck Builder,Burlington,deck builder burlington,50,8,4.87,/services/deck-builder-burlington/,not built
+11,C - standalone (too narrow to zipper),12.2,Custom Kitchen Cabinets,Oshawa,custom kitchen cabinets oshawa,70,18,4.88,/services/custom-kitchen-cabinets-oshawa/,not built
+11,C - standalone (too narrow to zipper),8.9,Flooring Installation,Oshawa,flooring installation oshawa,50,12,3.90,/services/flooring-installation-oshawa/,not built
+11,C - standalone (too narrow to zipper),8.7,Flooring Installation,Toronto,toronto flooring installation,70,22,3.99,/services/flooring-installation-toronto/,not built
+12,B - partial zipper row,8.5,Home Renovation,Brampton,home renovation contractors brampton,70,20,3.64,/services/home-renovation-brampton/,not built
+12,C - standalone (too narrow to zipper),4.5,Hardwood Floor Installation,Oakville,hardwood floor installation oakville,70,7,1.09,/services/hardwood-floor-installation-oakville/,not built
+12,C - standalone (too narrow to zipper),0.0,Home Addition,Markham,home additions markham,210,7,0.00,/services/home-addition-markham/,not built
