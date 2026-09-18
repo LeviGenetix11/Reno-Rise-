@@ -167,10 +167,25 @@
           throw new Error('submission-failed');
         });
       }).catch(function (err) {
-        if (err && err.message === 'rate-limited') {
+        // Log the real reason to the console for debugging — never shown
+        // to the visitor, but essential when diagnosing a failed submission.
+        if (window.console && console.error) {
+          console.error('Assessment form submission failed:', err);
+        }
+        var reason = err && err.message;
+        if (reason === 'rate-limited') {
           setStatus('We\'re receiving a high volume of requests right now. Please try again shortly, or call us at (289) 512-8112.', true);
         } else if (!navigator.onLine) {
           setStatus('You appear to be offline. Please check your connection and try again.', true);
+        } else if (reason && reason !== 'submission-failed') {
+          // A specific message from Formspree (e.g. a field it rejected) —
+          // show it directly so the visitor knows what to fix.
+          setStatus(reason, true);
+        } else if (err instanceof TypeError) {
+          // Fetch itself never reached Formspree — almost always a browser
+          // extension (ad/privacy blocker) or network-level block, not a
+          // problem with the form or the server.
+          setStatus('Your browser blocked this request before it was sent (often an ad blocker or privacy extension). Please try again with extensions disabled, or call us at (289) 512-8112.', true);
         } else {
           setStatus('Something went wrong sending your request. Please try again, or call us at (289) 512-8112.', true);
         }
