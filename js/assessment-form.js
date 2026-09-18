@@ -160,11 +160,16 @@
         if (response.status === 429) {
           throw new Error('rate-limited');
         }
-        return response.json().then(function (data) {
-          var msg = (data && data.errors && data.errors.length) ? data.errors.map(function (er) { return er.message; }).join(', ') : null;
+        return response.json().catch(function () {
+          return null; // body wasn't valid JSON — fall through to the generic message
+        }).then(function (data) {
+          var msg = null;
+          if (data && data.errors && data.errors.length) {
+            msg = data.errors.map(function (er) { return er.message; }).join(', ');
+          } else if (data && data.error) {
+            msg = data.error;
+          }
           throw new Error(msg || 'submission-failed');
-        }).catch(function () {
-          throw new Error('submission-failed');
         });
       }).catch(function (err) {
         // Log the real reason to the console for debugging — never shown
@@ -177,9 +182,11 @@
           setStatus('We\'re receiving a high volume of requests right now. Please try again shortly, or call us at (289) 512-8112.', true);
         } else if (!navigator.onLine) {
           setStatus('You appear to be offline. Please check your connection and try again.', true);
-        } else if (reason && reason !== 'submission-failed') {
-          // A specific message from Formspree (e.g. a field it rejected) —
-          // show it directly so the visitor knows what to fix.
+        } else if (reason && reason !== 'submission-failed' && !/recaptcha|custom key|api key/i.test(reason)) {
+          // A specific, visitor-relevant message from Formspree (e.g. a
+          // field it rejected) — show it directly. Configuration-sounding
+          // messages (reCAPTCHA/API key setup) stay in the console only;
+          // see js/assessment-form.js comments for the fix.
           setStatus(reason, true);
         } else if (err instanceof TypeError) {
           // Fetch itself never reached Formspree — almost always a browser
