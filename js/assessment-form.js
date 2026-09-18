@@ -3,39 +3,57 @@
 // Rendered identically wherever a [data-assessment-form-mount] element
 // exists (the homepage, the Contact page, and the dedicated /assessment/
 // page), so all three stay in sync from this one file instead of three
-// hand-copied forms drifting apart.
+// hand-copied forms drifting apart. All three submit to the same
+// Formspree form.
 //
 // Each mount point can set:
 //   data-source="homepage" | "contact" | "assessment"
-//     — sent to Formspree so you can tell where an inquiry came from.
+//     — sent to Formspree as an extra field so you can tell where an
+//     inquiry came from.
 //   data-thank-you-href="assessment/thank-you.html" (relative to the page)
-//     — where to redirect after Formspree accepts the submission.
+//     — where to redirect after Formspree confirms the submission.
 //
 // ---------------------------------------------------------------------
-// BACKEND: this site is fully static and has no server of its own, so
-// submissions are POSTed directly to Formspree (https://formspree.io) —
-// a hosted form-processing service that emails each submission to you.
-// No server code, database, or credentials are required. A Formspree
-// form endpoint is a public identifier, not a secret, so it's safe to
-// ship in this client-side file.
+// BACKEND: submissions go to Formspree (https://formspree.io) via their
+// official @formspree/ajax client library (loaded from a CDN below —
+// this site has no build step, so there's no npm install for it). This
+// replaced an earlier raw fetch() implementation on Formspree support's
+// recommendation: raw fetch requests were being rejected with a 403
+// ("...reCAPTCHA must be disabled...") because they didn't carry the
+// session/signing that the official client handles internally.
 //
-// STATUS: connected to a real Formspree endpoint (below). Before treating
-// this as ready for real inquiries, confirm in your Formspree dashboard
-// (Settings > verified recipients) that submission emails land at the
-// right address, and send one real test submission through each of the
-// three forms to confirm end-to-end delivery.
+// A Formspree form ID is a public identifier, not a secret — safe to
+// ship in this client-side file. No server code or credentials needed.
 // ---------------------------------------------------------------------
 
 (function () {
   'use strict';
 
-  var FORM_ENDPOINT = 'https://formspree.io/f/xqpaanag';
-  var ENDPOINT_CONFIGURED = FORM_ENDPOINT.indexOf('YOUR_FORM_ID') === -1;
+  var FORM_ID = 'xqpaanag';
+  var AJAX_LIB_URL = 'https://unpkg.com/@formspree/ajax@1';
   var PHONE_PATTERN = '[+]?1?[-.\\s]?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}';
   var SESSION_FLAG = 'renoriseAssessmentSubmitted';
 
+  // ---- Load @formspree/ajax exactly once per page ----------------------
+  // Official stub/queue pattern: formspree(...) can be called immediately,
+  // even before the real script has finished loading — calls queue up and
+  // replay once it has. Guards against double-loading if this file were
+  // ever included more than once on the same page.
+  if (!window.formspree) {
+    window.formspree = function () {
+      (window.formspree.q = window.formspree.q || []).push(arguments);
+    };
+  }
+  if (!document.querySelector('script[data-formspree-ajax]')) {
+    var fsScript = document.createElement('script');
+    fsScript.src = AJAX_LIB_URL;
+    fsScript.defer = true;
+    fsScript.setAttribute('data-formspree-ajax', '1');
+    document.head.appendChild(fsScript);
+  }
+
   var FORM_HTML = [
-    '<form class="assessment-form" novalidate>',
+    '<form class="assessment-form">',
     '  <p class="required-legend">Fields marked <span class="required-mark" aria-hidden="true">*</span> are required.</p>',
     '  <div>',
     '    <label for="af-name">Name <span class="required-mark" aria-hidden="true">*</span></label>',
@@ -72,20 +90,31 @@
     '</form>'
   ].join('\n');
 
+  // Formspree error/field messages that describe a dashboard/plan
+  // configuration problem, not something the visitor can fix. These stay
+  // in the console for you rather than being shown as a raw string.
+  var CONFIG_ERROR_PATTERN = /recaptcha|custom key|api key/i;
+
   function initForm(mount) {
     var source = mount.getAttribute('data-source') || 'unknown';
     var thankYouHref = mount.getAttribute('data-thank-you-href');
+    var elementId = 'assessment-form-' + source;
 
     mount.innerHTML = FORM_HTML;
 
     var form = mount.querySelector('.assessment-form');
+    form.id = elementId;
     var statusEl = mount.querySelector('.assessment-form-status');
     var submitBtn = form.querySelector('button[type="submit"]');
     var submitLabel = submitBtn.querySelector('.btn-label');
     var phoneInput = mount.querySelector('#af-phone');
     var emailInput = mount.querySelector('#af-email');
-    var isSubmitting = false;
 
+    // Native HTML5 validation (required / type=email / the phone pattern
+    // below) runs automatically before the browser ever dispatches this
+    // form's submit event — there's no novalidate here — so the AJAX
+    // client only ever sees submissions that already passed. These
+    // listeners just make the browser's validation messages friendlier.
     phoneInput.pattern = PHONE_PATTERN;
     phoneInput.addEventListener('invalid', function () {
       phoneInput.setCustomValidity('Please enter a valid phone number, e.g. (416) 555-0100.');
@@ -117,90 +146,88 @@
       statusEl.style.color = isError ? 'var(--orange-a11y)' : '';
     }
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (isSubmitting) return;
+    function showGenericFailure() {
+      setStatus('Something went wrong sending your request. Please try again, or call us at (289) 512-8112.', true);
+    }
 
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
+    function clearFieldFlags() {
+      mount.querySelectorAll('.assessment-form [aria-invalid]').forEach(function (el) {
+        el.removeAttribute('aria-invalid');
+      });
+    }
 
-      if (!ENDPOINT_CONFIGURED) {
-        setStatus('This form isn\'t connected to an email service yet. Please call us at (289) 512-8112 or email hello@renosrise.com instead.', true);
-        return;
-      }
+    // The official @formspree/ajax client attaches its own submit
+    // listener to this exact element (by ID) and owns the whole
+    // request/response lifecycle below — no separate fetch() or manual
+    // submit handler here, so there's only ever one listener sending
+    // one request per submit.
+    window.formspree('initForm', {
+      formElement: '#' + elementId,
+      formId: FORM_ID,
+      useDefaultStyles: false,
+      data: { source: source },
 
-      isSubmitting = true;
-      submitBtn.disabled = true;
-      submitLabel.textContent = 'Sending…';
-      setStatus('', false);
-
-      var formData = new FormData(form);
-      formData.append('source', source);
-      formData.append('_subject', 'New Renovation Assessment Request (' + source + ')');
-
-      fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      }).then(function (response) {
-        if (response.ok) {
-          // Formspree has accepted the submission. This confirms acceptance,
-          // not that an email has been delivered to your inbox.
-          try { sessionStorage.setItem(SESSION_FLAG, '1'); } catch (err) { /* storage unavailable — redirect still works */ }
-          if (thankYouHref) {
-            window.location.href = thankYouHref;
-          } else {
-            setStatus('Thanks — your request was received. We\'ll be in touch to discuss your renovation.', false);
-            form.reset();
-          }
-          return;
-        }
-        if (response.status === 429) {
-          throw new Error('rate-limited');
-        }
-        return response.json().catch(function () {
-          return null; // body wasn't valid JSON — fall through to the generic message
-        }).then(function (data) {
-          var msg = null;
-          if (data && data.errors && data.errors.length) {
-            msg = data.errors.map(function (er) { return er.message; }).join(', ');
-          } else if (data && data.error) {
-            msg = data.error;
-          }
-          throw new Error(msg || 'submission-failed');
-        });
-      }).catch(function (err) {
-        // Log the real reason to the console for debugging — never shown
-        // to the visitor, but essential when diagnosing a failed submission.
-        if (window.console && console.error) {
-          console.error('Assessment form submission failed:', err);
-        }
-        var reason = err && err.message;
-        if (reason === 'rate-limited') {
-          setStatus('We\'re receiving a high volume of requests right now. Please try again shortly, or call us at (289) 512-8112.', true);
-        } else if (!navigator.onLine) {
-          setStatus('You appear to be offline. Please check your connection and try again.', true);
-        } else if (reason && reason !== 'submission-failed' && !/recaptcha|custom key|api key/i.test(reason)) {
-          // A specific, visitor-relevant message from Formspree (e.g. a
-          // field it rejected) — show it directly. Configuration-sounding
-          // messages (reCAPTCHA/API key setup) stay in the console only;
-          // see js/assessment-form.js comments for the fix.
-          setStatus(reason, true);
-        } else if (err instanceof TypeError) {
-          // Fetch itself never reached Formspree — almost always a browser
-          // extension (ad/privacy blocker) or network-level block, not a
-          // problem with the form or the server.
-          setStatus('Your browser blocked this request before it was sent (often an ad blocker or privacy extension). Please try again with extensions disabled, or call us at (289) 512-8112.', true);
-        } else {
-          setStatus('Something went wrong sending your request. Please try again, or call us at (289) 512-8112.', true);
-        }
-      }).finally(function () {
-        isSubmitting = false;
+      disable: function () {
+        submitBtn.disabled = true;
+        submitLabel.textContent = 'Sending…';
+        setStatus('', false);
+      },
+      enable: function () {
         submitBtn.disabled = false;
         submitLabel.textContent = 'Submit Assessment Request';
-      });
+      },
+
+      onSuccess: function () {
+        // Formspree has confirmed acceptance of the submission. This
+        // confirms acceptance, not that a notification email has landed
+        // in your inbox — check Formspree's dashboard/verified recipient
+        // settings for that.
+        try { sessionStorage.setItem(SESSION_FLAG, '1'); } catch (err) { /* storage unavailable — redirect still works */ }
+        if (thankYouHref) {
+          window.location.href = thankYouHref;
+        } else {
+          setStatus('Thanks — your request was received. We\'ll be in touch to discuss your renovation.', false);
+          form.reset();
+        }
+      },
+
+      // Renders a SubmissionError (structured, e.g. a field Formspree
+      // rejected). Entered values are left untouched by the library, so
+      // a visitor can fix the message below and resubmit.
+      renderFormError: function (context, message) {
+        if (message && !CONFIG_ERROR_PATTERN.test(message)) {
+          setStatus(message, true);
+        } else {
+          if (message && window.console && console.error) {
+            console.error('Assessment form config error (see Formspree dashboard):', message);
+          }
+          showGenericFailure();
+        }
+      },
+      renderFieldErrors: function (context, error) {
+        clearFieldFlags();
+        if (!error) return;
+        error.getAllFieldErrors().forEach(function (pair) {
+          var field = mount.querySelector('[name="' + pair[0] + '"]');
+          if (field) field.setAttribute('aria-invalid', 'true');
+        });
+      },
+
+      // Anything that isn't a structured Formspree response at all —
+      // the request never completed (offline, blocked by a browser
+      // extension, DNS failure, Formspree unreachable, etc.).
+      onFailure: function (context, error) {
+        if (window.console && console.error) {
+          console.error('Assessment form submission failed:', error);
+        }
+        if (!navigator.onLine) {
+          setStatus('You appear to be offline. Please check your connection and try again.', true);
+        } else if (error instanceof TypeError) {
+          setStatus('Your browser blocked this request before it was sent (often an ad blocker or privacy extension). Please try again with extensions disabled, or call us at (289) 512-8112.', true);
+        } else {
+          showGenericFailure();
+        }
+      }
     });
   }
 
