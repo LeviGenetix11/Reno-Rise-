@@ -128,13 +128,13 @@ async function csrfFrom(path = '/leads/L-ALICE', jwt = goodJwt()) {
   ok(m, `no csrf token on ${path} (status ${r.status})`);
   return m[1];
 }
-async function post(path, fields = {}, { jwt = goodJwt(), csrf, origin = BASE, noOrigin = false } = {}) {
-  const token = csrf === undefined ? await csrfFrom('/leads/L-ALICE', jwt) : csrf;
+async function post(path, fields = {}, { jwt = goodJwt(), csrf, origin = BASE, noOrigin = false, headers: extraHeaders = {}, tokenJwt } = {}) {
+  const token = csrf === undefined ? await csrfFrom('/leads/L-ALICE', tokenJwt || jwt) : csrf;
   const body = new URLSearchParams({ ...(token === null ? {} : { csrf: token }), ...fields }).toString();
   return http(BASE, 'POST', path, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(body),
-      ...(jwt ? { 'Cf-Access-Jwt-Assertion': jwt } : {}), ...(noOrigin ? {} : { Origin: origin }),
+      ...(jwt ? { 'Cf-Access-Jwt-Assertion': jwt } : {}), ...(noOrigin ? {} : { Origin: origin }), ...extraHeaders,
     },
     body,
   });
@@ -159,7 +159,7 @@ async function startWorker(name, { cwd, wrangler, port, args = [], readyPath, re
 }
 const startDashboard = (vars) => {
   writeFileSync('.dev.vars', Object.entries(vars).map(([k, v]) => `${k}=${v}`).join('\n') + '\n');
-  return startWorker('dashboard', { cwd: '.', wrangler: WRANGLER, port: PORT, readyPath: '/', readyStatus: vars.ACCESS_AUD ? 401 : 503 });
+  return startWorker('dashboard', { cwd: '.', wrangler: WRANGLER, port: PORT, readyPath: '/', readyStatus: vars.ACCESS_AUD && vars.CSRF_SECRET ? 401 : 503 });
 };
 async function shutdown(code) {
   killProc('dashboard'); killProc('forms');
@@ -196,7 +196,7 @@ seed();
 await new Promise((r) => jwks.listen(JWKS_PORT, '127.0.0.1', r));
 await new Promise((r) => mockResend.listen(MOCK_RESEND_PORT, '127.0.0.1', r));
 
-const CONFIG = { ACCESS_TEAM_DOMAIN: TEAM, ACCESS_AUD: AUD, ADMIN_EMAILS: `${ADMIN}, second@example.test`, ACCESS_CERTS_URL: `http://127.0.0.1:${JWKS_PORT}/certs` };
+const CONFIG = { ACCESS_TEAM_DOMAIN: TEAM, ACCESS_AUD: AUD, ADMIN_EMAILS: `${ADMIN}, second@example.test`, ACCESS_CERTS_URL: `http://127.0.0.1:${JWKS_PORT}/certs`, CSRF_SECRET: 'test-csrf-secret-0123456789abcdef0123456789abcdef' };
 const SEED_NAMES = ['Alice Tremblay', 'Pending Person', 'Bulk Lead'];
 
 // ---- 0. Fail-closed when Access is not configured -------------------------------------
@@ -208,6 +208,12 @@ await test('with no Access settings, EVERY request is refused (503) even with a 
     eq(r.status, 503, p);
     ok(!SEED_NAMES.some((n) => r.text.includes(n)), `${p} leaked data`);
   }
+});
+killProc('dashboard');
+await sleep(1500);
+await startDashboard({ ...CONFIG, CSRF_SECRET: '' });
+await test('Access configured but CSRF secret missing -> still closed (503): writes can never run unprotected', async () => {
+  for (const p of ['/', '/leads', '/leads/L-ALICE']) eq((await get(p, goodJwt())).status, 503, p);
 });
 killProc('dashboard');
 await sleep(1500);
@@ -275,6 +281,32 @@ await test('POST without an Origin header -> 403, nothing changes', async () => 
 });
 await test('POST from another site (wrong Origin) -> 403, nothing changes', async () => {
   const s = snapshot(); const r = await post('/leads/L-ALICE/stage', { stage: 'won' }, { origin: 'https://evil.example' }); eq(r.status, 403); eq(snapshot(), s, 'db');
+});
+await test('POST with Origin "null" -> still 403 (a real browser sends this if Referrer-Policy is no-referrer; the check must not be loosened)', async () => {
+  const s = snapshot(); const r = await post('/leads/L-ALICE/stage', { stage: 'won' }, { origin: 'null' }); eq(r.status, 403); eq(snapshot(), s, 'db');
+});
+await test('POST with the right Origin but Sec-Fetch-Site: cross-site -> 403', async () => {
+  const s = snapshot(); const r = await post('/leads/L-ALICE/stage', { stage: 'won' }, { headers: { 'Sec-Fetch-Site': 'cross-site' } }); eq(r.status, 403); eq(snapshot(), s, 'db');
+});
+await test('a browser-style same-origin POST (right Origin + Sec-Fetch-Site: same-origin) succeeds', async () => {
+  const r = await post('/leads/L-ALICE/notes', { body: 'browser-style post' }, { headers: { 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'navigate' } });
+  eq(r.status, 303); eq(notice(r), 'note_saved'); sql("DELETE FROM lead_notes WHERE body='browser-style post'"); sql("DELETE FROM lead_activity WHERE lead_id='L-ALICE' AND type='note_added'");
+});
+await test('responses use Referrer-Policy: same-origin (root cause of the original "Request blocked": no-referrer makes browsers send Origin: null)', async () => {
+  for (const p of ['/', '/leads/L-ALICE']) eq((await get(p)).headers['referrer-policy'], 'same-origin', p);
+});
+await test('a token fetched with one Access token still works after Access re-issues the token (same person, new signature)', async () => {
+  const jwtA = makeJwt({ payload: { iat: Math.floor(Date.now() / 1000) - 60 } });
+  await sleep(1100);
+  const jwtB = makeJwt({ payload: { iat: Math.floor(Date.now() / 1000) } });
+  ok(jwtA.split('.')[2] !== jwtB.split('.')[2], 'test needs two different tokens');
+  const r = await post('/leads/L-ALICE/notes', { body: 'reissued-token note' }, { jwt: jwtB, tokenJwt: jwtA });
+  eq(r.status, 303); eq(notice(r), 'note_saved', 'form rendered under token A, posted under token B');
+  sql("DELETE FROM lead_notes WHERE body='reissued-token note'"); sql("DELETE FROM lead_activity WHERE lead_id='L-ALICE' AND type='note_added'");
+});
+await test('the CSRF token is not the same for two different admins, and is not a constant', async () => {
+  const a = await csrfFrom('/leads/L-ALICE', makeJwt()); const b = await csrfFrom('/leads/L-ALICE', makeJwt({ email: 'second@example.test' }));
+  ok(a !== b && /^[0-9a-f]{64}$/.test(a), 'per-admin token'); eq(a, await csrfFrom('/leads/L-ALICE', makeJwt()), 'stable for one admin within a day');
 });
 await test('POST with no CSRF token -> 403', async () => {
   const s = snapshot(); const r = await post('/leads/L-ALICE/stage', { stage: 'won' }, { csrf: null }); eq(r.status, 403); eq(snapshot(), s, 'db');
@@ -402,6 +434,18 @@ await test('follow-ups: add, appear as due today/overdue/upcoming, complete once
   eq([notice(a), notice(b)].sort(), ['followup_done', 'no_change'], 'exactly one completes');
   eq(one("SELECT COUNT(*) n FROM lead_activity WHERE type='follow_up_completed'").n, 1, 'one activity entry');
   ok(/Recently completed \(1\)/.test((await get('/follow-ups')).text), 'in completed');
+});
+await test('adding the SAME follow-up twice (double click / resubmit / retry) creates exactly one row and one activity entry', async () => {
+  const acts = () => one("SELECT COUNT(*) n FROM lead_activity WHERE lead_id='L-ALICE' AND type='follow_up_set'").n;
+  const before = acts();
+  const rs = await Promise.all([1, 2, 3].map(() => post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'dup check' })));
+  eq(rs.map(notice).sort(), ['followup_saved', 'no_change', 'no_change'], 'one saved, two no-ops');
+  eq(one("SELECT COUNT(*) n FROM follow_ups WHERE lead_id='L-ALICE' AND due_on='2031-01-15' AND note='dup check'").n, 1, 'rows');
+  eq(acts(), before + 1, 'activity entries');
+  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'dup check' })), 'no_change', 'sequential repeat');
+  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'a different note' })), 'followup_saved', 'a genuinely different follow-up is still allowed');
+  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-16', note: 'dup check' })), 'followup_saved', 'a different date is still allowed');
+  sql("DELETE FROM follow_ups WHERE due_on IN ('2031-01-15','2031-01-16')"); sql("DELETE FROM lead_activity WHERE lead_id='L-ALICE' AND type='follow_up_set' AND summary LIKE '%2031%'");
 });
 await test('assessment date: entered in Toronto time, stored UTC, shown back in Toronto (EST and EDT)', async () => {
   eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: '2026-11-05T09:00' })), 'assessment_saved');

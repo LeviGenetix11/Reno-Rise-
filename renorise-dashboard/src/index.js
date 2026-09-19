@@ -12,7 +12,7 @@
 // token, and answered with a 303 redirect (post/redirect/get).
 
 import { authenticate } from './auth.js';
-import { csrfToken, originOk, tokenOk, makeNonce, securityHeaders } from './security.js';
+import { csrfToken, originProblem, tokenOk, makeNonce, securityHeaders } from './security.js';
 import { layout, errorPage, toString } from './html.js';
 import * as db from './db.js';
 import * as v from './views.js';
@@ -48,7 +48,7 @@ export default {
       return respond(errorPage(title, msg, nonce), auth.status, nonce);
     }
 
-    const ctx = { env, db: env.DB, email: auth.email, jwt: auth.jwt, nonce, url };
+    const ctx = { env, db: env.DB, email: auth.email, nonce, url, csrf: () => csrfToken(env.CSRF_SECRET, auth.email) };
 
     try {
       if (request.method === 'GET' || request.method === 'HEAD') return await handleGet(request, ctx);
@@ -89,12 +89,12 @@ async function handleGet(request, ctx) {
   if ((m = /^\/leads\/([A-Za-z0-9-]+)$/.exec(path))) {
     const detail = await db.leadDetail(ctx.db, m[1]);
     if (!detail) return notFound(ctx);
-    const [contractors, csrf] = await Promise.all([db.listContractors(ctx.db, false), csrfToken(ctx.jwt)]);
+    const [contractors, csrf] = await Promise.all([db.listContractors(ctx.db, false), ctx.csrf()]);
     return page(ctx, { title: detail.lead.name, active: 'leads', body: v.leadPage({ detail, contractors, csrf, today: torontoToday() }) });
   }
 
   if (path === '/follow-ups') {
-    const [data, csrf] = await Promise.all([db.listFollowUps(ctx.db), csrfToken(ctx.jwt)]);
+    const [data, csrf] = await Promise.all([db.listFollowUps(ctx.db), ctx.csrf()]);
     return page(ctx, { title: 'Follow-ups', active: 'follow-ups', body: v.followUpsPage({ data, csrf }) });
   }
 
@@ -104,18 +104,18 @@ async function handleGet(request, ctx) {
   }
 
   if (path === '/contractors/new') {
-    return page(ctx, { title: 'Add contractor', active: 'contractors', body: v.contractorFormPage({ contractor: null, csrf: await csrfToken(ctx.jwt) }) });
+    return page(ctx, { title: 'Add contractor', active: 'contractors', body: v.contractorFormPage({ contractor: null, csrf: await ctx.csrf() }) });
   }
 
   if ((m = /^\/contractors\/([A-Za-z0-9-]+)$/.exec(path))) {
     const contractor = await db.getContractor(ctx.db, m[1]);
     if (!contractor) return notFound(ctx);
-    return page(ctx, { title: contractor.name, active: 'contractors', body: v.contractorFormPage({ contractor, csrf: await csrfToken(ctx.jwt) }) });
+    return page(ctx, { title: contractor.name, active: 'contractors', body: v.contractorFormPage({ contractor, csrf: await ctx.csrf() }) });
   }
 
   if (path === '/emails') {
     const filters = db.parseEmailFilters(url);
-    const [result, csrf] = await Promise.all([db.listEmailJobs(ctx.db, filters), csrfToken(ctx.jwt)]);
+    const [result, csrf] = await Promise.all([db.listEmailJobs(ctx.db, filters), ctx.csrf()]);
     return page(ctx, { title: 'Email activity', active: 'emails', body: v.emailsPage({ result, filters, csrf }) });
   }
 
@@ -151,7 +151,10 @@ async function exportCsv(ctx) {
 
 async function handlePost(request, ctx) {
   // CSRF: same-origin check, then per-session token.
-  if (!originOk(request)) return csrfFailure(ctx);
+  // Rejections log a reason code (never form contents) so a blocked request can
+  // be diagnosed from the Worker logs.
+  const problem = originProblem(request);
+  if (problem) return csrfFailure(ctx, problem, request);
   if (Number(request.headers.get('Content-Length') || '0') > MAX_FORM_BYTES) {
     return respond(errorPage('Too large', 'That request is too large.', ctx.nonce), 413, ctx.nonce);
   }
@@ -161,7 +164,7 @@ async function handlePost(request, ctx) {
   } catch {
     return back(ctx, '/', 'bad_request');
   }
-  if (!(await tokenOk(form, ctx.jwt))) return csrfFailure(ctx);
+  if (!(await tokenOk(form, ctx.env.CSRF_SECRET, ctx.email))) return csrfFailure(ctx, 'token_mismatch', request);
 
   const path = ctx.url.pathname.replace(/\/+$/, '');
   const actor = ctx.email;
@@ -218,7 +221,10 @@ async function handlePost(request, ctx) {
   return notFound(ctx);
 }
 
-function csrfFailure(ctx) {
+function csrfFailure(ctx, reason, request) {
+  console.log(
+    `CSRF rejected: ${reason} method=${request.method} path=${ctx.url.pathname.replace(/[A-Za-z0-9-]{20,}/g, ':id')} origin=${request.headers.get('Origin') ?? '(none)'} sec-fetch-site=${request.headers.get('Sec-Fetch-Site') ?? '(none)'}`
+  );
   return respond(errorPage('Request blocked', 'The session check for this action failed. Go back, reload the page, and try again.', ctx.nonce), 403, ctx.nonce);
 }
 

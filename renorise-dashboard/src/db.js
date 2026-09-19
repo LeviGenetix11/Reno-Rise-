@@ -213,11 +213,31 @@ export async function addFollowUp(db, leadId, dueOn, note, actor) {
   const text = String(note || '').trim();
   if (text.length > 500) return { ok: false, code: 'followup_note_long' };
   if (!(await getLead(db, leadId))) return { ok: false, code: 'not_found' };
-  await db.batch([
-    db.prepare('INSERT INTO follow_ups (id, lead_id, due_on, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(newId(), leadId, dueOn, text || null, nowIso()),
-    activityStmt(db, leadId, 'follow_up_set', `Follow-up set for ${formatDate(dueOn)}`, actor),
-    touchStmt(db, leadId),
+  // One atomic batch. The INSERT is skipped if an identical OPEN follow-up
+  // (same lead, date and note) already exists, so a double click, a resubmit,
+  // or a retry after a failed attempt cannot create a duplicate. The activity
+  // entry is only written if this call's own follow-up row actually exists.
+  const id = newId();
+  const now = nowIso();
+  const results = await db.batch([
+    db
+      .prepare(
+        `INSERT INTO follow_ups (id, lead_id, due_on, note, created_at)
+         SELECT ?, ?, ?, ?, ?
+         WHERE NOT EXISTS (
+           SELECT 1 FROM follow_ups WHERE lead_id = ? AND due_on = ? AND completed_at IS NULL AND COALESCE(note, '') = ?
+         )`
+      )
+      .bind(id, leadId, dueOn, text || null, now, leadId, dueOn, text),
+    db
+      .prepare(
+        `INSERT INTO lead_activity (id, lead_id, type, summary, actor_email, created_at)
+         SELECT ?, ?, 'follow_up_set', ?, ?, ? WHERE EXISTS (SELECT 1 FROM follow_ups WHERE id = ?)`
+      )
+      .bind(newId(), leadId, `Follow-up set for ${formatDate(dueOn)}`, actor, now, id),
+    db.prepare('UPDATE leads SET updated_at = ? WHERE id = ? AND EXISTS (SELECT 1 FROM follow_ups WHERE id = ?)').bind(now, leadId, id),
   ]);
+  if (!results[0].meta || results[0].meta.changes === 0) return { ok: true, code: 'no_change' };
   return { ok: true, code: 'followup_saved' };
 }
 

@@ -8,6 +8,8 @@
 // Fails CLOSED: if the Access settings are not configured, every request is
 // refused. Reaching this Worker's URL, or knowing it, grants nothing.
 
+import { csrfSecretOk } from './security.js';
+
 const KEY_CACHE_MS = 10 * 60 * 1000;
 let cache = { url: null, fetchedAt: 0, keys: new Map() };
 
@@ -39,7 +41,12 @@ export function adminEmails(env) {
 }
 
 export function isConfigured(env) {
-  return Boolean(normalizeTeamDomain(env.ACCESS_TEAM_DOMAIN) && String(env.ACCESS_AUD || '').trim() && adminEmails(env).length);
+  return Boolean(
+    normalizeTeamDomain(env.ACCESS_TEAM_DOMAIN) &&
+      String(env.ACCESS_AUD || '').trim() &&
+      adminEmails(env).length &&
+      csrfSecretOk(env.CSRF_SECRET)
+  );
 }
 
 async function loadKeys(certsUrl, force) {

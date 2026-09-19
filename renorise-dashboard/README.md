@@ -43,8 +43,9 @@ the dashboard would require moving DNS. Not needed.
    request returns 503. Unknown paths, the CSV export, and form posts are all
    behind the same check; there is no unauthenticated route.
 
-Other protections: writes are POST-only with a same-origin check **and** a
-per-session CSRF token; all customer text is HTML-escaped by default
+Other protections: writes are POST-only with an exact same-origin check **and**
+a CSRF token (HMAC of the signed-in email with `CSRF_SECRET`, rotated daily, so
+it does not depend on Access token internals); all customer text is HTML-escaped by default
 (`src/html.js`); strict Content-Security-Policy (no inline scripts, none used);
 `no-store` caching; `noindex`; per-version preview URLs are switched off so
 there is exactly one URL to protect.
@@ -84,8 +85,15 @@ Non-secret settings in `wrangler.toml` `[vars]` (committed):
 | `ACCESS_AUD` | Application Audience (AUD) tag of the Access app |
 | `ADMIN_EMAILS` | Comma-separated sign-in emails allowed to use the dashboard |
 
-Secrets: **none.** The dashboard does not send email and needs no API keys.
-(`RESEND_API_KEY` and `TURNSTILE_SECRET_KEY` stay on `renorise-forms` only.)
+Secret (set with `wrangler secret put`, never in Git; the dashboard stays closed
+(503) until it exists):
+
+| Name | Meaning |
+|---|---|
+| `CSRF_SECRET` | Random value (32+ characters) used to sign form tokens. Not related to any login. |
+
+The dashboard sends no email and needs no other keys. (`RESEND_API_KEY` and
+`TURNSTILE_SECRET_KEY` stay on `renorise-forms` only.)
 
 `ACCESS_CERTS_URL` is an optional override used only by the automated tests;
 leave it unset in production.
