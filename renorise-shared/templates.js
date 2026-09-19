@@ -1,4 +1,4 @@
-// Follow-up email copy for sequence v2 (three emails over 14 days).
+// Follow-up email copy for sequence v2 (three emails over 7 days).
 //
 // Structure of every email (in this order):
 //   greeting  ->  body sentences (fewer than eight; the LAST body sentence is the

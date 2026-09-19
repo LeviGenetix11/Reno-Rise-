@@ -1,4 +1,4 @@
-# Follow-up email sequence — three follow-ups over 14 days
+# Follow-up email sequence — three follow-ups over 7 days
 
 **Status: built and tested locally on branch `followup-sequence-v2`. Not deployed. The migration is not applied. The global sending switch is OFF. No customer is enrolled.**
 
@@ -9,17 +9,17 @@ exactly as before and are separate from this sequence.
 
 ## Schedule
 
-Three follow-ups, sent on **Day 1, Day 4 and Day 14** (delays of 1, 3 and 10
+Three follow-ups, sent on **Day 1, Day 3 and Day 7** (delays of 1, 2 and 4
 days), counted from the recorded call date (callers) or the inquiry date
 (website leads). Times are 9:00–17:00 America/Toronto; everything is stored in UTC.
 
 | For a website inquiry on Sep 19, 2026 | Planned |
 |---|---|
 | Email 1 (Day 1) | Sun Sep 20 |
-| Email 2 (Day 4) | Wed Sep 23 |
-| Email 3 (Day 14) | Sat Oct 3 |
+| Email 2 (Day 3) | Tue Sep 22 |
+| Email 3 (Day 7) | Sat Sep 26 |
 
-After email 3 the enrollment is marked **Completed**. Nothing is ever sent at Day 21 or Day 28.
+After email 3 the enrollment is marked **Completed**. Nothing is ever sent after Day 7 (no Day-14, Day-21 or Day-28 messages).
 A website lead therefore receives at most **5 emails in total**: 1 customer
 confirmation + 1 internal notification + 3 follow-ups.
 
@@ -87,7 +87,7 @@ Unsubscribe from these follow-up emails: https://renorise-forms.levi-gene-ous.wo
 You can also reply to this email with the word STOP.
 ```
 
-#### Email 2 (Day 4) — website inquiry and phone call
+#### Email 2 (Day 3) — website inquiry and phone call
 
 ```text
 Subject: Any questions about your home project?
@@ -110,7 +110,7 @@ Unsubscribe from these follow-up emails: https://renorise-forms.levi-gene-ous.wo
 You can also reply to this email with the word STOP.
 ```
 
-#### Email 3 (Day 14) — website inquiry and phone call
+#### Email 3 (Day 7) — website inquiry and phone call
 
 ```text
 Subject: Our last check-in—for now
@@ -228,8 +228,8 @@ deployed first).
 
 ## What is still needed from you
 
-1. Confirm the **three-email schedule (Day 1, Day 4, Day 14)** and the copy. I dropped the "Has the issue been taken care of?" email because it repeats Email 1; say so if you want a different pattern.
-2. The **legal business name and mailing address** for the footer (I will not invent them).
-3. Confirm you are on the Resend **Free** plan, and that webhooks are available on it.
-4. Approve the migration, the deploy, and (after tests and previews) turning the switch ON.
+Confirmed by you: the schedule (**Day 1, Day 3, Day 7**), the business name ("Reno Rise"), a business address, and that
+the Resend account is on the **Free** plan (the Usage page shows 3,000 a month and 100 a day) and includes Webhooks.
 
+1. The **complete mailing address** exactly as it should print in every email (street, city, province, postal code), and confirm that "Reno Rise" is the name you want in the footer (CASL asks for your business name). It is entered on the dashboard **Settings** page, stored in the database, and deliberately **not written into this Git repository** (the repository is public).
+2. Approve the migration, the deploy, and (after previews and tests) turning the switch ON.

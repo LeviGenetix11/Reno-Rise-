@@ -1,4 +1,4 @@
--- Follow-up email sequence (v2: three follow-ups over 14 days).
+-- Follow-up email sequence (v2: three follow-ups over 7 days).
 --
 -- Additive and non-destructive: creates NEW tables only. It does not alter,
 -- drop, or backfill leads, email_jobs (the immediate customer confirmation and
@@ -15,11 +15,11 @@
 CREATE TABLE IF NOT EXISTS sequence_versions (
   id           TEXT PRIMARY KEY,
   label        TEXT NOT NULL,
-  day_offsets  TEXT NOT NULL,   -- JSON array, e.g. [1,4,14]
+  day_offsets  TEXT NOT NULL,   -- JSON array, e.g. [1,3,7]
   created_at   TEXT NOT NULL
 );
 INSERT OR IGNORE INTO sequence_versions (id, label, day_offsets, created_at)
-VALUES ('v2', 'Three follow-ups over 14 days', '[1,4,14]', '2026-09-19T00:00:00.000Z');
+VALUES ('v2', 'Three follow-ups over 7 days', '[1,3,7]', '2026-09-19T00:00:00.000Z');
 
 CREATE TABLE IF NOT EXISTS sequence_settings (
   key         TEXT PRIMARY KEY,

@@ -1,4 +1,4 @@
-// Pages for the follow-up email sequence (three follow-ups over 14 days).
+// Pages for the follow-up email sequence (three follow-ups over 7 days).
 // All dynamic text is escaped by html.js; nothing here can inject markup.
 
 import { html, raw } from './html.js';
@@ -9,7 +9,11 @@ import { VERSIONS, CURRENT_VERSION, TEST_RECIPIENTS, SOURCE_KINDS, maxEmailsPerL
 import { CONSENT_METHODS } from './seq-db.js';
 
 const csrfField = (t) => html`<input type="hidden" name="csrf" value="${t}">`;
-const TEMPLATE_TITLES = { checkin: 'Email 1 (Day 1)', questions: 'Email 2 (Day 4)', last: 'Email 3 (Day 14)' };
+// Labels come from the schedule itself, so a schedule change can never leave a stale label behind.
+const STEPS = VERSIONS[CURRENT_VERSION].steps;
+const TEMPLATE_TITLES = Object.fromEntries(STEPS.map((s) => [s.template, `Email ${s.no} (Day ${s.day})`]));
+const LAST_DAY = STEPS[STEPS.length - 1].day;
+const DAYS_TEXT = STEPS.map((s) => `Day ${s.day}`).join(', ').replace(/, ([^,]*)$/, ' and $1');
 
 export const STEP_STATUS_LABEL = {
   planned: 'Planned — waiting for its date and your approval',
@@ -46,14 +50,14 @@ ${inboxReminder}
 <section class="card" aria-labelledby="sched-h">
   <h2 id="sched-h">The sequence (${v.label})</h2>
   <ul class="plain">${v.steps.map((st) => html`<li><strong>${TEMPLATE_TITLES[st.template]}</strong> — Day ${st.day} after the inquiry or call date, 9–5 Toronto time</li>`)}</ul>
-  <p class="hint">After the third email the sequence is complete. Nothing is sent at Day 21 or Day 28. Every follow-up needs your approval first. Enrollment is manual, from a lead’s page, and needs recorded permission.</p>
+  <p class="hint">After the third email the sequence is complete; nothing more is sent. Every follow-up needs your approval first. Enrollment is manual, from a lead’s page, and needs recorded permission.</p>
   <p><a class="btn secondary" href="/sequence/preview">Preview the emails</a> <a class="btn secondary" href="/sequence/settings">Settings and on/off switch</a></p>
 </section>
 <section class="card" aria-labelledby="use-h">
   <h2 id="use-h">Sending budget (Resend Free plan)</h2>
   <p>Today (UTC day ${ov.usage.day}): <strong>${ov.usage.day_all}</strong> of ${dayCap} emails used. This month: <strong>${ov.usage.month_all}</strong> of ${monthCap}. Follow-ups today: ${ov.usage.day_followups} of ${s.followup_daily_cap}.</p>
   <p class="hint">Everything counts toward one shared budget: confirmations, internal notifications, follow-ups, and test emails. Follow-ups keep ${s.confirmation_reserve} emails a day in reserve for confirmations and notifications, and wait when capacity is low. Resend’s daily limit resets at midnight UTC (8 p.m. Toronto time in summer).</p>
-  <p class="hint"><strong>Estimate:</strong> a website lead uses at most ${maxEmailsPerLead()} emails in total (1 confirmation, 1 internal notification, ${v.steps.length} follow-ups). Enrolling 20 leads adds at most ${20 * v.steps.length} follow-ups spread over 14 days.</p>
+  <p class="hint"><strong>Estimate:</strong> a website lead uses at most ${maxEmailsPerLead()} emails in total (1 confirmation, 1 internal notification, ${v.steps.length} follow-ups). Enrolling 20 leads adds at most ${20 * v.steps.length} follow-ups spread over ${LAST_DAY} days.</p>
 </section>
 </div>
 <section class="card" aria-labelledby="test-h">
@@ -158,7 +162,7 @@ export function enrollPage({ lead, plan, form, csrf, today }) {
   return html`
 <p><a href="/leads/${lead.id}">← ${lead.name}</a></p>
 <h1>Set up follow-up emails</h1>
-<div class="notice info" role="note">Three follow-ups on Day 1, Day 4 and Day 14. Enrollment needs <strong>recorded, explicit permission</strong> from the customer to receive these emails. A phone call or a website form alone is not permission.</div>
+<div class="notice info" role="note">Three follow-ups on ${DAYS_TEXT}. Enrollment needs <strong>recorded, explicit permission</strong> from the customer to receive these emails. A phone call or a website form alone is not permission.</div>
 <form class="card" method="get" action="/leads/${lead.id}/sequence"><h2>1. Where did this inquiry come from?</h2>
   <div class="row"><div class="field"><label for="kind">Source</label><select id="kind" name="kind"><option value="website" ${kind === 'website' ? raw('selected') : ''}>Website inquiry (uses the date they sent the form)</option><option value="call" ${kind === 'call' ? raw('selected') : ''}>Phone call (uses the recorded call date)</option></select></div>
   <div class="field"><label for="call_date">Recorded call date (calls only)</label><input id="call_date" name="call_date" type="date" value="${form.callDate || ''}" max="${today}"></div>

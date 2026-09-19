@@ -6,7 +6,7 @@
 // change the schedule or copy, ADD a new version below; never edit an old one,
 // so historical enrollments and sends keep their meaning.
 //
-// SCHEDULE (v2): THREE follow-ups over 14 days, on Day 1, Day 4 and Day 14,
+// SCHEDULE (v2): THREE follow-ups over 7 days, on Day 1, Day 3 and Day 7,
 // counted from the recorded call date (callers) or inquiry date (website leads).
 // This is separate from — and in addition to — the immediate customer
 // confirmation and internal notification, so a website lead completes the whole
@@ -17,12 +17,12 @@ import { addDays, torontoDateOf, torontoClock, torontoDateHourToUtcIso } from '.
 export const VERSIONS = {
   v2: {
     id: 'v2',
-    label: 'Three follow-ups over 14 days',
+    label: 'Three follow-ups over 7 days',
     // template keys are defined in templates.js
     steps: [
       { no: 1, day: 1, template: 'checkin' },
-      { no: 2, day: 4, template: 'questions' },
-      { no: 3, day: 14, template: 'last' },
+      { no: 2, day: 3, template: 'questions' },
+      { no: 3, day: 7, template: 'last' },
     ],
   },
 };

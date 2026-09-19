@@ -80,7 +80,7 @@ await test('overview, queue, preview, settings render; the switch shows OFF; nav
   const { env } = await fresh();
   const o = await (await get(env, '/sequence')).text();
   ok(/Sending is OFF/.test(o) && /Nothing is sent to customers/.test(o), 'OFF banner'); ok(/Follow-up emails<\/a>/.test(o), 'nav');
-  ok(/Day 1 after the inquiry/.test(o) && /Day 4 after/.test(o) && /Day 14 after/.test(o), 'three steps listed'); ok(!/Day 21|Day 28|Email 4/.test(o.replace('Nothing is sent at Day 21 or Day 28', '')), 'no fourth/day-21/day-28 email');
+  ok(/Day 1 after the inquiry/.test(o) && /Day 3 after/.test(o) && /Day 7 after/.test(o), 'three steps listed'); ok(!/Day 14|Day 21|Day 28|Email 4/.test(o), 'no fourth email and nothing after Day 7'); ok(/over 7 days/.test(o), 'estimate window');
   ok(/at most 5 emails/.test(o) && /1 confirmation, 1 internal notification, 3 follow-ups/.test(o), 'usage estimate');
   ok(/of 100 emails used/.test(o) && /of 3000/.test(o), 'free-plan budget shown');
   ok(/cannot detect replies automatically/.test(o), 'inbox reminder');
@@ -100,10 +100,10 @@ await test('preview greeting name is escaped (no markup injection)', async () =>
 });
 
 console.log('\n[enrolling: permission is required, dates are shown first]');
-await test('the enroll page shows the planned Day 1 / Day 4 / Day 14 dates BEFORE anything is saved, and requires a recorded call date for callers', async () => {
+await test('the enroll page shows the planned Day 1 / Day 3 / Day 7 dates BEFORE anything is saved, and requires a recorded call date for callers', async () => {
   const { db, env } = await fresh();
   const t = await (await get(env, '/leads/L1/sequence')).text();
-  ok(/Planned dates/.test(t) && /Day 1/.test(t) && /Day 4/.test(t) && /Day 14/.test(t), 'dates shown'); ok(/explicit agreed|explicitly agreed/.test(t), 'consent box'); eq(db.one('SELECT COUNT(*) n FROM enrollments').n, 0, 'nothing saved by viewing');
+  ok(/Planned dates/.test(t) && /Day 1/.test(t) && /Day 3/.test(t) && /Day 7/.test(t) && !/Day 14/.test(t), 'dates shown'); ok(/explicit agreed|explicitly agreed/.test(t), 'consent box'); eq(db.one('SELECT COUNT(*) n FROM enrollments').n, 0, 'nothing saved by viewing');
   ok(/Enter the recorded call date/.test(await (await get(env, '/leads/L1/sequence?kind=call')).text()), 'call needs a date');
   const c = await (await get(env, '/leads/L1/sequence?kind=call&call_date=2026-09-01')).text(); ok(/Skipped — that date has already passed/.test(c), 'late enrollment shows elapsed steps');
 });

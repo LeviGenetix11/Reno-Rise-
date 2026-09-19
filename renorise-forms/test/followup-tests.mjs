@@ -1,4 +1,4 @@
-// Follow-up sequence tests (three follow-ups over 14 days).
+// Follow-up sequence tests (three follow-ups over 7 days: Day 1, Day 3, Day 7).
 //
 // Runs the REAL production modules (renorise-shared/*, src/followups/*, and the
 // dashboard's seq-db.js) against an in-memory D1-compatible SQLite that has ALL
@@ -85,27 +85,27 @@ const approve = (db, eid, n, now) => approveStep(db, stepId(db, eid, n), { inbox
 const run = (env, db, now) => runFollowups(env, db, { now: at(now) });
 const sentCount = (db) => db.one("SELECT COUNT(*) n FROM followup_sends WHERE kind = 'followup' AND status = 'sent'").n;
 
-console.log('Follow-up sequence: 3 follow-ups over 14 days — Days 1, 4, 14');
+console.log('Follow-up sequence: 3 follow-ups over 7 days — Days 1, 3, 7');
 
 // =============================== schedule =========================================
 console.log('\n[schedule]');
 const S = { ...DEFAULT_SETTINGS };
-await test('exactly THREE follow-ups, on Day 1, Day 4 and Day 14 (delays 1, 3, 10 days); nothing at Day 21/28', async () => {
+await test('exactly THREE follow-ups, on Day 1, Day 3 and Day 7 (delays 1, 2, 4 days); nothing after Day 7', async () => {
   const v = VERSIONS[CURRENT_VERSION];
-  eq(v.steps.map((s) => s.day), [1, 4, 14], 'days'); eq(v.steps.length, 3, 'count');
-  ok(!v.steps.some((s) => s.day > 14), 'no step after day 14');
+  eq(v.steps.map((s) => s.day), [1, 3, 7], 'days'); eq(v.steps.length, 3, 'count');
+  ok(!v.steps.some((s) => s.day > 7), 'no step after day 7');
   eq(maxEmailsPerLead(), 5, 'max per website lead: 1 confirmation + 1 internal + 3 follow-ups');
 });
-await test('planned dates for a Sep 19 inquiry: Sep 20, Sep 23, Oct 3 at 9:00 Toronto (13:00 UTC in summer)', async () => {
+await test('planned dates for a Sep 19 inquiry: Sep 20, Sep 22, Sep 26 at 9:00 Toronto (13:00 UTC in summer)', async () => {
   const p = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-19T16:00:00.000Z'), settings: S });
-  eq(p.map((s) => s.planned_date), ['2026-09-20', '2026-09-23', '2026-10-03'], 'dates');
-  eq(p.map((s) => s.planned_for), ['2026-09-20T13:00:00.000Z', '2026-09-23T13:00:00.000Z', '2026-10-03T13:00:00.000Z'], 'UTC storage');
+  eq(p.map((s) => s.planned_date), ['2026-09-20', '2026-09-22', '2026-09-26'], 'dates');
+  eq(p.map((s) => s.planned_for), ['2026-09-20T13:00:00.000Z', '2026-09-22T13:00:00.000Z', '2026-09-26T13:00:00.000Z'], 'UTC storage');
   eq(p.map((s) => s.status), ['planned', 'planned', 'planned'], 'status');
 });
 await test('the schedule follows Toronto local time across the daylight-saving change (9:00 is 14:00 UTC in winter)', async () => {
   const p = planEnrollment({ anchorIso: '2026-10-30T15:00:00.000Z', now: at('2026-10-30T16:00:00.000Z'), settings: S });
-  eq(p.map((s) => s.planned_date), ['2026-10-31', '2026-11-03', '2026-11-13'], 'dates');
-  eq(p[0].planned_for, '2026-10-31T13:00:00.000Z', 'EDT'); eq(p[1].planned_for, '2026-11-03T14:00:00.000Z', 'EST'); eq(p[2].planned_for, '2026-11-13T14:00:00.000Z', 'EST');
+  eq(p.map((s) => s.planned_date), ['2026-10-31', '2026-11-02', '2026-11-06'], 'dates');
+  eq(p[0].planned_for, '2026-10-31T13:00:00.000Z', 'EDT'); eq(p[1].planned_for, '2026-11-02T14:00:00.000Z', 'EST'); eq(p[2].planned_for, '2026-11-06T14:00:00.000Z', 'EST');
 });
 await test('the anchor day is the TORONTO date: an inquiry at 11 p.m. Toronto (03:00 UTC next day) counts as that Toronto day', async () => {
   const p = planEnrollment({ anchorIso: '2026-09-20T03:00:00.000Z', now: at('2026-09-20T04:00:00.000Z'), settings: S });
@@ -114,16 +114,16 @@ await test('the anchor day is the TORONTO date: an inquiry at 11 p.m. Toronto (0
 await test('late enrollment: elapsed steps are shown as skipped, never sent as a batch', async () => {
   const day5 = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-24T15:00:00.000Z'), settings: S });
   eq(day5.map((s) => s.status), ['skipped_elapsed', 'skipped_elapsed', 'planned'], 'enrolled on day 5');
-  const sameDay = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-23T15:00:00.000Z'), settings: S });
+  const sameDay = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-22T15:00:00.000Z'), settings: S });
   eq(sameDay.map((s) => s.status), ['skipped_elapsed', 'planned', 'planned'], 'a step dated TODAY is still on while the window is open');
-  const afterWindow = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-23T22:30:00.000Z'), settings: S });
+  const afterWindow = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-22T22:30:00.000Z'), settings: S });
   eq(afterWindow.map((s) => s.status), ['skipped_elapsed', 'skipped_elapsed', 'planned'], 'today\'s window already over');
 });
 await test('planned dates are shown BEFORE enrolling (preview) and enrolling with nothing left is refused', async () => {
   const { db } = await setup();
   const lead = db.one("SELECT * FROM leads WHERE id = 'L1'");
   const preview = await planFor(db, lead, { sourceKind: 'website' }, at('2026-09-19T16:00:00.000Z'));
-  eq(preview.steps.map((s) => s.planned_date), ['2026-09-20', '2026-09-23', '2026-10-03'], 'preview dates');
+  eq(preview.steps.map((s) => s.planned_date), ['2026-09-20', '2026-09-22', '2026-09-26'], 'preview dates');
   const r = await createEnrollment(db, 'L1', CONSENT, 'admin@test', at('2026-10-10T15:00:00.000Z'));
   eq(r, { ok: false, code: 'all_steps_elapsed' }, 'all elapsed');
   eq(db.one('SELECT COUNT(*) n FROM enrollments').n, 0, 'nothing saved');
@@ -132,7 +132,7 @@ await test('re-projection after a late send: later steps move out to keep the OR
   const base = planEnrollment({ anchorIso: '2026-09-19T15:00:00.000Z', now: at('2026-09-19T16:00:00.000Z'), settings: S }).map((s) => ({ ...s, status: 'planned' }));
   const late = base.map((s, i) => (i === 0 ? { ...s, status: 'sent', sent_at: '2026-09-22T14:00:00.000Z' } : s));
   const r = reproject(late, S);
-  eq(r[1].planned_for, '2026-09-25T13:00:00.000Z', 'step 2: sent Sep 22 + 3 days'); eq(r[2].planned_for, '2026-10-05T13:00:00.000Z', 'step 3: Sep 25 + 10 days');
+  eq(r[1].planned_for, '2026-09-24T13:00:00.000Z', 'step 2: sent Sep 22 + 2 days'); eq(r[2].planned_for, '2026-09-28T13:00:00.000Z', 'step 3: Sep 24 + 4 days');
   const onTime = reproject(base.map((s, i) => (i === 0 ? { ...s, status: 'sent', sent_at: '2026-09-20T13:15:00.000Z' } : s)), S);
   eq([onTime[1].planned_for, onTime[2].planned_for], [base[1].planned_for, base[2].planned_for], 'on-time send changes nothing');
 });
@@ -226,10 +226,10 @@ await test('two simultaneous enroll requests create exactly one enrollment', asy
 
 // =============================== sending journey ============================================
 console.log('\n[sending: approval, switches, window, journey]');
-await test('FULL JOURNEY on a simulated clock: emails go out on Day 1, 4 and 14 only; then the sequence is complete; 5 emails total per website lead', async () => {
+await test('FULL JOURNEY on a simulated clock: emails go out on Day 1, 3 and 7 only; then the sequence is complete; 5 emails total per website lead', async () => {
   const { db, env } = await setup();
   const eid = await enroll(db);
-  for (const [n, day, now] of [[1, 'Sep 20', '2026-09-20T13:15:00.000Z'], [2, 'Sep 23', '2026-09-23T13:15:00.000Z'], [3, 'Oct 3', '2026-10-03T13:15:00.000Z']]) {
+  for (const [n, day, now] of [[1, 'Sep 20', '2026-09-20T13:15:00.000Z'], [2, 'Sep 22', '2026-09-22T13:15:00.000Z'], [3, 'Sep 26', '2026-09-26T13:15:00.000Z']]) {
     eq(mail.length, n - 1, `nothing extra before ${day}`);
     eq((await approve(db, eid, n, now)).code, 'step_approved', `approve ${n}`);
     const sum = await run(env, db, now);
@@ -239,7 +239,7 @@ await test('FULL JOURNEY on a simulated clock: emails go out on Day 1, 4 and 14 
   eq(db.one('SELECT status FROM enrollments').status, 'completed', 'completed after email 3');
   eq(db.rows('SELECT status FROM enrollment_steps ORDER BY step_no').map((r) => r.status), ['sent', 'sent', 'sent'], 'steps');
   eq(db.one('SELECT COUNT(*) n FROM enrollment_steps').n, 3, 'exactly three steps exist');
-  eq(db.one('SELECT COUNT(*) n FROM enrollment_steps WHERE day_offset > 14').n, 0, 'no Day 21/28 steps');
+  eq(db.one('SELECT COUNT(*) n FROM enrollment_steps WHERE day_offset > 7').n, 0, 'no steps after Day 7');
   await run(env, db, '2026-10-20T13:15:00.000Z'); await run(env, db, '2026-11-20T13:15:00.000Z');
   eq(mail.length, 3, 'nothing after completion');
   eq(db.one("SELECT COUNT(*) n FROM email_jobs").n + db.one("SELECT COUNT(*) n FROM followup_sends WHERE status='sent'").n, 5, '2 confirmations + 3 follow-ups');
@@ -255,7 +255,7 @@ await test('email content on the wire: sender, reply-to, unsubscribe headers, re
 });
 await test('a caller enrolled with a recorded call date gets the caller copy, anchored to the CALL date', async () => {
   const { db, env } = await setup(); const eid = await enroll(db, 'L1', '2026-09-19T16:00:00.000Z', { sourceKind: 'call', callDate: '2026-09-18' });
-  eq(steps(db, eid).map((s) => s.planned_for.slice(0, 10)), ['2026-09-19', '2026-09-22', '2026-10-02'], 'call-date anchored');
+  eq(steps(db, eid).map((s) => s.planned_for.slice(0, 10)), ['2026-09-19', '2026-09-21', '2026-09-25'], 'call-date anchored');
   eq((await createEnrollment((await setup()).db, 'L1', { ...CONSENT, sourceKind: 'call' }, 'a', at('2026-09-19T16:00:00.000Z'))).code, 'call_date_required', 'call needs a recorded date');
   await approve(db, eid, 1, '2026-09-19T13:15:00.000Z'); await run(env, db, '2026-09-19T13:15:00.000Z');
   ok(mail[0].payload.text.includes('Thanks for calling RenoRise recently.'), 'call variant');
@@ -303,7 +303,7 @@ await test('long pause: only ONE email goes out when it resumes, then dates are 
   for (let i = 0; i < 4; i++) await run(env, db, `2026-10-04T13:${15 + i * 15}:00.000Z`.replace('13:60', '14:00'));
   eq(mail.length, 1, 'one email only');
   const st = steps(db, eid);
-  eq(st[0].status, 'sent', 'step 1 sent'); eq(st[1].planned_for, '2026-10-07T13:00:00.000Z', 'step 2 revised: Oct 4 + 3'); eq(st[2].planned_for, '2026-10-17T13:00:00.000Z', 'step 3 revised: Oct 7 + 10');
+  eq(st[0].status, 'sent', 'step 1 sent'); eq(st[1].planned_for, '2026-10-06T13:00:00.000Z', 'step 2 revised: Oct 4 + 2'); eq(st[2].planned_for, '2026-10-10T13:00:00.000Z', 'step 3 revised: Oct 6 + 4');
   eq((await approve(db, eid, 2, '2026-10-04T13:20:00.000Z')).code, 'not_due_yet', 'the next email is not due the same day');
 });
 
@@ -477,7 +477,7 @@ await test('deferred (not lost): the same follow-up goes out the next UTC day wh
   const s = await ready(); seedUsage(s.db, 95, '2026-09-20T12:00:00.000Z');
   await run(s.env, s.db, '2026-09-20T13:15:00.000Z'); eq(mail.length, 0, 'held today');
   eq((await run(s.env, s.db, '2026-09-21T13:15:00.000Z')).sent, 1, 'next day'); eq(mail.length, 1);
-  eq(steps(s.db, s.eid)[1].planned_for, '2026-09-24T13:00:00.000Z', 'step 2 moved to Sep 21 + 3');
+  eq(steps(s.db, s.eid)[1].planned_for, '2026-09-23T13:00:00.000Z', 'step 2 moved to Sep 21 + 2');
 });
 await test('quota delay never causes a catch-up burst: after 3 days of delay only ONE email goes out, and the next is re-dated', async () => {
   const s = await ready();
@@ -485,7 +485,7 @@ await test('quota delay never causes a catch-up burst: after 3 days of delay onl
   eq(mail.length, 0, 'held for three days');
   await run(s.env, s.db, '2026-09-23T13:15:00.000Z'); await run(s.env, s.db, '2026-09-23T13:30:00.000Z'); eq(mail.length, 1, 'exactly one on Sep 23');
   eq((await approve(s.db, s.eid, 2, '2026-09-23T14:00:00.000Z')).code, 'not_due_yet', 'email 2 is NOT due the same day it was originally planned');
-  eq(steps(s.db, s.eid)[1].planned_for.slice(0, 10), '2026-09-26', 'revised date is shown');
+  eq(steps(s.db, s.eid)[1].planned_for.slice(0, 10), '2026-09-25', 'revised date is shown');
 });
 await test('follow-up daily cap (default 50, configurable): the cap holds and the remainder waits for the next UTC day', async () => {
   const s = await setup({ settings: { followup_daily_cap: '2' } }); const ids = [];
