@@ -5,7 +5,7 @@ form submissions to D1, then sends a customer acknowledgement and an
 internal notification via Resend. Replaces Formspree for the
 homepage, Contact page, and `/assessment/` page forms.
 
-Status: **switched to production; final live test pending.** The site's forms submit to this Worker
+Status: **live in production; migration complete (2026-09-19).** The site's forms submit to this Worker
 (Formspree was replaced after the checks below passed). Migration applied,
 Worker deployed, production CORS origins = renosrise.com + www only.
 
@@ -280,6 +280,7 @@ Production switch:
 - [x] Real Resend delivery confirmed (customer + internal emails received)
 - [x] Real preview submission: exactly one lead, two email jobs, both sent on the first attempt within ~0.6 s (immediate send; cron is retry-only)
 - [x] Preview origin removed from ALLOWED_ORIGINS before the production switch
+- [x] Final live test on www.renosrise.com/assessment/: one new lead in D1, both email jobs sent on the first attempt, thank-you redirect and both emails confirmed
 
 ## 6. Rollback
 
