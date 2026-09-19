@@ -111,6 +111,7 @@ ${card({ icon: 'foundation', title: 'Underpinning: When It Is Needed', text: 'Ce
   </div>
 </section>
 
+${L.customerQuotes(['kaylyn', 'reliance', 'marco', 'priya'])}
 <!-- ========== INSPIRATION (STOCK) ========== -->
 <section class="section-tight">
   <div class="container">

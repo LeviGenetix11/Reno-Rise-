@@ -178,7 +178,7 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
     title: 'About Reno Rise | Toronto Basement Project Matching',
     description: 'Reno Rise is an independent project-enquiry and contractor-matching service for Toronto basement renovations and legal secondary suites.',
     hero: PG.pageHero({ depth, h1: 'About Reno Rise', crumbs: [['Home', ''], ['About', '']], variant: 'hero-dark' }),
-    main,
+    main: main + L.customerQuotes(['kaylyn', 'reliance', 'marco', 'priya']),
   }));
 })();
 

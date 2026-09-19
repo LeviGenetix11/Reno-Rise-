@@ -1679,3 +1679,14 @@ body.nav-open { overflow: hidden; }
 .post-hero figcaption { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
 .post-card .thumb img { width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 720px) { .stock-gallery { grid-template-columns: 1fr; } }
+
+/* ---------- Customer comments (owner-supplied, real feedback) ---------- */
+.quote-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.quote-grid.single { grid-template-columns: minmax(0, 720px); }
+.customer-quote { margin: 0; background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 26px; display: flex; flex-direction: column; gap: 18px; }
+.customer-quote blockquote { margin: 0; font-size: 15px; line-height: 1.65; color: var(--text); }
+.customer-quote figcaption { display: flex; align-items: center; gap: 12px; }
+.cq-initials { width: 42px; height: 42px; border-radius: 50%; background: var(--dark); color: #fff; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cq-who { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); line-height: 1.3; }
+.cq-who b { color: var(--text); font-size: 14.5px; }
+@media (max-width: 720px) { .quote-grid { grid-template-columns: 1fr; } }

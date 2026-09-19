@@ -277,9 +277,51 @@ function diagramCard({ id = 'dg', caption = true } = {}) {
     </figure>`;
 }
 
+// Comments supplied by the owner as real feedback from past customers (September 2026). They were not Google
+// reviews, so there is no Google badge, no star rating and no stock avatar: just the words, name and place.
+const CUSTOMER_QUOTES = {
+  kaylyn: { name: 'Kaylyn Beatty', where: 'Homeowner', initials: 'KB', text: '&ldquo;Saved my a$!. Butt lot outstanding service, affordable, and not to mention very quick to get &lsquo;er done!!! They offer all sorts of services, mine was plumbing and they truly saved the day. My heroes. 10/10 would recommend.&rdquo;' },
+  reliance: { name: 'Reliance Janitorial', where: 'Commercial client', initials: 'RJ', text: '&ldquo;Amazing work and an outstanding crew. Very professional, energetic, and a pleasure to work with from start to finish. They communicate openly throughout the entire project, show up reliably, and get the job done right.&rdquo;' },
+  marco: { name: 'Marco DiFranco', where: 'Oakville, ON', initials: 'MD', text: '&ldquo;We needed underpinning done before finishing the basement and most contractors wouldn&rsquo;t even quote it properly. Reno Rise walked us through the whole process and pulled every permit themselves.&rdquo;' },
+  priya: { name: 'Priya Nandakumar', where: 'Markham, ON', initials: 'PN', text: '&ldquo;Got a quote within a day and the crew showed up when they said they would, every single time. Our kitchen went from 1998 to something we actually want to cook in.&rdquo;' },
+};
+
+/** A single quote figure (for use inside articles). */
+function quoteFigure(k) {
+  const q = CUSTOMER_QUOTES[k];
+  return `<figure class="customer-quote">
+        <blockquote>${q.text}</blockquote>
+        <figcaption><span class="cq-initials" aria-hidden="true">${q.initials}</span><span class="cq-who"><b>${q.name}</b><span>${q.where}</span></span></figcaption>
+      </figure>`;
+}
+
+/** Customer comments section. `keys` selects and orders quotes from CUSTOMER_QUOTES. */
+function customerQuotes(keys, { heading = 'What Past Customers Have Said', cream = true } = {}) {
+  const cards = keys.map((k) => {
+    const q = CUSTOMER_QUOTES[k];
+    return `      <figure class="customer-quote">
+        <blockquote>${q.text}</blockquote>
+        <figcaption><span class="cq-initials" aria-hidden="true">${q.initials}</span><span class="cq-who"><b>${q.name}</b><span>${q.where}</span></span></figcaption>
+      </figure>`;
+  }).join('\n');
+  return `<!-- ========== CUSTOMER COMMENTS ========== -->
+<section class="section-tight${cream ? ' section-cream' : ''}" data-customer-comments>
+  <div class="container">
+    <div class="section-head left-stack" style="margin-bottom:28px;">
+      <span class="eyebrow">Customer comments</span>
+      <h2>${heading}</h2>
+    </div>
+    <div class="quote-grid${keys.length === 1 ? ' single' : ''}">
+${cards}
+    </div>
+  </div>
+</section>
+`;
+}
+
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 module.exports = {
   SITE, PHONE_DISPLAY, PHONE_TEL, EMAIL, DISCLOSURE, POSITIONING, P, BASEMENT_MENU, ICON,
-  up, href, header, footer, ctaBand, howItWorks, disclosure, diagramCard, escapeHtml,
+  up, href, header, footer, ctaBand, howItWorks, disclosure, diagramCard, customerQuotes, quoteFigure, CUSTOMER_QUOTES, escapeHtml,
 };

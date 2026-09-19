@@ -71,6 +71,8 @@ const body = `
       <li><strong>Finishes and close-out</strong><span>Flooring, trim, fixtures and paint, followed by final inspections and a walkthrough.</span></li>
     </ol>
 
+    <div class="quote-grid single" style="margin:8px 0 30px;">${L.quoteFigure('marco')}</div>
+
     <h2>Common Mistakes to Avoid</h2>
     ${U.checkList([
       'Finishing over a basement that is damp but &ldquo;has not leaked in a while.&rdquo; Drywall hides moisture; it does not stop it.',
