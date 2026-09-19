@@ -23,6 +23,7 @@ export function callsPage({ result, counts, filters }) {
   const pagerParams = { f: filters.f === 'all' ? '' : filters.f, q: filters.q };
   return html`<h1>Calls</h1>
 <p class="hint">Calls to the business number. The customer's call and the forwarded call to your cellphone are shown as one call. “Answered” means you pressed 1 to accept, not just that a phone picked up. Times are Toronto time.</p>
+<p class="hint"><a href="/calls/playback-check">Check voicemail playback setup</a></p>
 <nav class="stage-tabs" aria-label="Filter calls">
   ${CALL_FILTERS.map(([key, label]) => html`<a class="tab" href="/calls${key === 'all' ? '' : `?f=${key}`}" ${filters.f === key ? raw('aria-current="true"') : ''}>${label} <span class="count">${counts[countKey[key]]}</span></a>`)}
 </nav>
@@ -151,4 +152,18 @@ export function callPage({ detail, csrf, playback, results, q, today }) {
   </section>
 </div>
 </div>`;
+}
+
+// ------------------------------------------------------------------ voicemail playback setup check
+
+export function playbackCheckPage({ steps }) {
+  const problems = steps.filter((s) => s.status === 'fail').length;
+  const skipped = steps.filter((s) => s.status === 'skip').length;
+  const badge = (s) => (s.status === 'ok' ? html`<span class="badge b-ok">OK</span>` : s.status === 'fail' ? html`<span class="badge b-err">Problem</span>` : html`<span class="badge">Not checked yet</span>`);
+  return html`<p><a href="/calls">← All calls</a></p>
+<h1>Voicemail playback check</h1>
+<p class="hint">A read-only check that this dashboard can fetch voicemail recordings from Twilio securely. It uses the saved credentials on the server, fetches at most one byte of one recording, and shows only pass or fail: no credentials, recording ids or audio.</p>
+<div class="banner ${problems ? '' : 'info'}" role="status">${problems ? html`<strong>${problems} problem${problems === 1 ? '' : 's'} found.</strong> Fix the first one below, then reload this page.` : skipped ? html`<strong>No problems so far.</strong> ${skipped} check${skipped === 1 ? '' : 's'} can only run after a first voicemail exists.` : html`<strong>Everything checks out.</strong> Voicemails can be played securely from each call page.`}</div>
+<section class="card" aria-labelledby="pc-h"><h2 id="pc-h">Checks</h2>
+<ul class="plain">${steps.map((s) => html`<li>${badge(s)} <strong>${s.label}</strong><br><span class="hint">${s.detail}</span></li>`)}</ul></section>`;
 }

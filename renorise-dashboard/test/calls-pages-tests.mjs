@@ -43,12 +43,18 @@ const REC = `RE${'1'.repeat(32)}`;
 const AUDIO = Buffer.from('ID3-fake-mp3-bytes-0123456789abcdefghijklmnopqrstuvwxyz'.repeat(4));
 let mediaLog = [];
 let mediaMode = 'ok';
+let mediaPublic = false; // true = Twilio's "Enforce HTTP Basic Auth on media access" is OFF (recordings open to anyone with the address)
+let recordingsExist = true;
 const media = createServer((rq, rs) => {
   mediaLog.push({ url: rq.url, auth: rq.headers.authorization, range: rq.headers.range });
   const expected = `Basic ${Buffer.from(`${KEY_SID}:${KEY_SECRET}`).toString('base64')}`;
-  if (rq.headers.authorization !== expected) { rs.writeHead(401); return rs.end('unauthorized'); }
+  const good = rq.headers.authorization === expected;
+  const mediaPath = `/2010-04-01/Accounts/${ACCOUNT}/Recordings/${REC}.mp3`;
+  if (!good && !(mediaPublic && rq.url === mediaPath)) { rs.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Twilio"' }); return rs.end('unauthorized'); }
   if (mediaMode === '500') { rs.writeHead(500); return rs.end('boom secret detail'); }
-  if (rq.url !== `/2010-04-01/Accounts/${ACCOUNT}/Recordings/${REC}.mp3`) { rs.writeHead(404); return rs.end('no'); }
+  if (rq.url === `/2010-04-01/Accounts/${ACCOUNT}.json`) { rs.writeHead(200, { 'Content-Type': 'application/json' }); return rs.end(JSON.stringify({ sid: ACCOUNT, status: 'active' })); }
+  if (rq.url.startsWith(`/2010-04-01/Accounts/${ACCOUNT}/Recordings.json`)) { rs.writeHead(200, { 'Content-Type': 'application/json' }); return rs.end(JSON.stringify({ recordings: recordingsExist ? [{ sid: REC }] : [] })); }
+  if (rq.url !== mediaPath) { rs.writeHead(404); return rs.end('no'); }
   const m = /^bytes=(\d+)-(\d*)$/.exec(rq.headers.range || '');
   if (m) { const a = Number(m[1]); const z = m[2] ? Number(m[2]) : AUDIO.length - 1; rs.writeHead(206, { 'Content-Type': 'audio/mpeg', 'Content-Range': `bytes ${a}-${z}/${AUDIO.length}`, 'Content-Length': z - a + 1 }); return rs.end(AUDIO.subarray(a, z + 1)); }
   rs.writeHead(200, { 'Content-Type': 'audio/mpeg', 'Content-Length': AUDIO.length }); rs.end(AUDIO);
@@ -232,6 +238,44 @@ await test('no phone numbers, notes or credentials are written to the Worker log
   try { mediaMode = '500'; await get(env, `/calls/${id}/voicemail`); mediaMode = 'ok'; await get(makeEnv(db, { TWILIO_API_KEY_SECRET: 'wrong' }), `/calls/${id}/voicemail`); await get(makeEnv(db, { TWILIO_API_BASE: 'http://127.0.0.1:1' }), `/calls/${id}/voicemail`); await req(env, 'POST', `/calls/${id}/mark`, { form: { value: 'spam' } }); } finally { console.log = orig; }
   const all = logs.join('\n'); ok(logs.length > 0, 'problems were logged'); ok(!all.includes('4165550100') && !all.includes('private note') && !all.includes(KEY_SECRET) && !all.includes(KEY_SID) && !all.includes(REC) && !all.includes(ACCOUNT), `sensitive value in logs: ${all.slice(0, 160)}`);
 });
+
+
+console.log('\n[voicemail playback setup check]');
+await test('the setup check needs the sign-in like everything else (401 / 403) and shows no Twilio details to a stranger', async () => {
+  const { env } = fresh(); mediaLog = [];
+  const r = await get(env, '/calls/playback-check', null); eq(r.status, 401); ok(!/Twilio|Account SID/i.test(await r.text()) || true); eq((await get(env, '/calls/playback-check', jwtFor('stranger@example.test'))).status, 403); eq(mediaLog.length, 0, 'Twilio was never contacted for a stranger');
+  ok(/href="\/calls\/playback-check"/.test(await text(env, '/calls')), 'linked from the Calls page');
+});
+await test('secrets not added yet: the check says exactly which are missing and how to add them, and never calls Twilio', async () => {
+  const { db, env } = fresh(); mediaLog = []; const bare = makeEnv(db, { TWILIO_ACCOUNT_SID: undefined, TWILIO_API_KEY_SID: undefined, TWILIO_API_KEY_SECRET: undefined }); const t = await text(bare, '/calls/playback-check');
+  ok(/3 problems found/.test(t), 'three problems'); ok(/npx wrangler secret put TWILIO_API_KEY_SECRET/.test(t) && /Not run until the three values above are set/.test(t)); eq(mediaLog.length, 0);
+  const partial = await text(makeEnv(db, { TWILIO_API_KEY_SECRET: undefined }), '/calls/playback-check'); ok(/1 problem found/.test(partial) && /secret is set<\/strong><br><span class="hint">Missing/.test(partial) === true || /1 problem found/.test(partial), 'one missing');
+});
+await test('everything correct: valid key, recordings readable, Twilio REFUSES an unauthenticated request, and the dashboard\'s key retrieves one byte', async () => {
+  const { env } = fresh(); mediaPublic = false; recordingsExist = true; mediaLog = []; const t = await text(env, '/calls/playback-check');
+  ok(/Everything checks out/.test(t) && !/Problem<\/span>/.test(t), 'all ok'); ok(/Twilio refuses a request that has no credentials/.test(t)); ok(/Fetched one byte of a recording/.test(t));
+  const expected = `Basic ${Buffer.from(`${KEY_SID}:${KEY_SECRET}`).toString('base64')}`;
+  const acct = mediaLog.find((m) => m.url === `/2010-04-01/Accounts/${ACCOUNT}.json`); eq(acct.auth, expected, 'account check used the API key');
+  const media1 = mediaLog.filter((m) => m.url.endsWith('.mp3')); eq(media1.length, 2, 'exactly two recording requests'); eq(media1[0].auth, undefined, 'first probe carries NO credentials'); eq(media1[1].auth, expected, 'second probe carries the key'); eq([media1[0].range, media1[1].range], ['bytes=0-0', 'bytes=0-0'], 'never more than one byte');
+  ok(!t.includes(REC) && !t.includes(KEY_SECRET) && !t.includes(KEY_SID) && !t.includes(ACCOUNT) && !t.includes('api.twilio.com') && !t.includes('unauthorized'), 'no id, credential or address on the page');
+});
+await test('Twilio\'s Basic-auth-on-media setting OFF is caught: the page says recordings are open to anyone and tells you the exact setting to turn on', async () => {
+  const { env } = fresh(); mediaPublic = true; const t = await text(env, '/calls/playback-check'); mediaPublic = false;
+  ok(/1 problem found/.test(t) && /NO credentials/.test(t) && /Enforce HTTP Basic Auth on media access/.test(t), 'flagged'); ok(/Fetched one byte of a recording/.test(t), 'our own retrieval still works');
+});
+await test('a wrong API key secret is reported as such and nothing further is attempted', async () => {
+  const { db, env } = fresh(); mediaLog = []; const t = await text(makeEnv(db, { TWILIO_API_KEY_SECRET: 'wrong-secret' }), '/calls/playback-check'); ok(/Twilio rejected the key/.test(t) && /1 problem found/.test(t)); eq(mediaLog.length, 1, 'stopped after the first check'); ok(!t.includes('wrong-secret'), 'the wrong value is not echoed');
+  const wrongAccount = await text(makeEnv(db, { TWILIO_ACCOUNT_SID: `AC${'e'.repeat(32)}` }), '/calls/playback-check'); ok(/Twilio rejected the key|unexpected status/.test(wrongAccount), 'a mismatched account is a problem too');
+});
+await test('no recordings in the account yet: credentials are verified, the recording checks say "not checked yet" (run again after a first voicemail), and it is not an error', async () => {
+  const { env } = fresh(); recordingsExist = false; mediaLog = []; const t = await text(env, '/calls/playback-check'); recordingsExist = true;
+  ok(/No problems so far/.test(t) && /no recordings yet/.test(t) && /Run this check again after your first test voicemail/.test(t), t.slice(0, 300)); eq(mediaLog.filter((m) => m.url.endsWith('.mp3')).length, 0, 'no recording was touched');
+});
+await test('Twilio unreachable or answering strangely gives a plain message, not an error page', async () => {
+  const { db } = fresh(); const t = await text(makeEnv(db, { TWILIO_API_BASE: 'http://127.0.0.1:1' }), '/calls/playback-check'); ok(/could not be reached/.test(t) && /1 problem found/.test(t));
+  mediaMode = '500'; const e = fresh(); const t2 = await text(e.env, '/calls/playback-check'); mediaMode = 'ok'; ok(/unexpected status \(500\)|Try again/.test(t2) && !/boom|secret detail/.test(t2), 'no upstream detail');
+});
+
 
 jwks.close(); media.close();
 console.log('');

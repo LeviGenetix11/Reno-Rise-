@@ -31,7 +31,7 @@ import * as q from './crm-query.js';
 import * as cv from './crm-views.js';
 import * as cdb from './calls-db.js';
 import * as clv from './calls-views.js';
-import { streamVoicemail, voicemailConfigured } from './voicemail.js';
+import { streamVoicemail, voicemailConfigured, checkPlayback } from './voicemail.js';
 import { getCallById } from '../../renorise-shared/calls-db.js';
 import { STAGE_LABEL, SOURCE_LABEL, QUALIFICATION_LABEL, PRIORITY_LABEL, MARKETING_SOURCE_LABEL } from './crm-constants.js';
 import { loadSettings } from '../../renorise-shared/followup-db.js';
@@ -198,6 +198,11 @@ async function handleGet(request, ctx) {
     const filters = cdb.parseCallFilters(url);
     const [result, counts] = await Promise.all([cdb.listCalls(ctx.db, filters), cdb.callCounts(ctx.db)]);
     return page(ctx, { title: 'Calls', active: 'calls', body: clv.callsPage({ result, counts, filters }) });
+  }
+
+  if (path === '/calls/playback-check') {
+    // Read-only setup check: runs on the server with the saved credentials and shows pass / fail only.
+    return page(ctx, { title: 'Voicemail playback check', active: 'calls', body: clv.playbackCheckPage({ steps: await checkPlayback(ctx.env) }) });
   }
 
   if ((m = /^\/calls\/([A-Za-z0-9-]+)\/voicemail$/.exec(path))) {
