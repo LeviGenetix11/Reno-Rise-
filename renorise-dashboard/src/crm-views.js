@@ -7,6 +7,7 @@ import { html, raw, icon } from './html.js';
 import { csrfField, qs, pager, emailBadgeShort, splitDateTime, telHref, emailJobItem } from './views.js';
 import { formatDate, formatDateTime, utcIsoToTorontoInput } from './time.js';
 import { PROVENANCE_LABEL } from './crm-query.js';
+import { formatPhoneDisplay, formatDuration, OUTCOME_LABEL as CALL_OUTCOME_TEXT } from '../../renorise-shared/calls.js';
 import {
   STAGES,
   STAGE_KEYS,
@@ -77,7 +78,7 @@ export function timelineList(items, { showProject = false } = {}) {
 <ul class="timeline">${items.map((i) => html`<li class="tl-item tl-${['manual', 'provider'].includes(i.provenance) ? i.provenance : 'system'}">
   <div class="tl-head"><strong>${i.title}</strong> ${provenanceBadge(i.provenance)}</div>
   ${i.body ? html`<div class="tl-body pre">${i.body}</div>` : ''}
-  <div class="hint">${formatDateTime(i.at)}${i.actor && i.provenance === 'manual' ? ` · ${i.actor}` : ''}${i.note ? ` · ${i.note}` : ''}${showProject && i.opportunityId ? html` · <a href="/leads/${i.opportunityId}">project</a>` : ''}</div>
+  <div class="hint">${formatDateTime(i.at)}${i.actor && i.provenance === 'manual' ? ` · ${i.actor}` : ''}${i.note && !i.href ? ` · ${i.note}` : ''}${i.href ? html` · <a href="${i.href}">${i.note || 'Open'}</a>` : ''}${showProject && i.opportunityId ? html` · <a href="/leads/${i.opportunityId}">project</a>` : ''}</div>
 </li>`)}</ul>`;
 }
 
@@ -119,7 +120,7 @@ export function todayPage({ data, csrf, staleForm }) {
     <div class="hint">${late ? html`<span class="late">Due ${formatDate(t.due_on)}</span>` : `Due ${formatDate(t.due_on)}`}${t.due_at ? ` · ${splitDateTime(t.due_at)[1]}` : ''}</div></div>${doneForm(t)}</div>`;
   const card = (id, title, rows, render, empty) => html`<section class="card" aria-labelledby="${id}"><h2 id="${id}">${title} (${rows.length})</h2>${rows.length ? rows.map(render) : html`<p class="empty">${empty}</p>`}</section>`;
 
-  const hasAttention = data.needsStage.length + data.newInquiries.length + data.overdueTasks.length + data.consultations.length + data.holdReviews.length + data.failedEmails.length + data.noNextAction.length + data.quotesNeedFollowUp.length + data.quiet.length + data.tasksToday.length;
+  const hasAttention = data.callsToReturn.length + data.needsStage.length + data.newInquiries.length + data.overdueTasks.length + data.consultations.length + data.holdReviews.length + data.failedEmails.length + data.noNextAction.length + data.quotesNeedFollowUp.length + data.quiet.length + data.tasksToday.length;
   return html`
 <h1>Today</h1>
 <p class="hint">${formatDate(today)} (Toronto time). Everything here comes from real records. ${data.testRecordsHidden ? html`${data.testRecordsHidden} test record${data.testRecordsHidden === 1 ? ' is' : 's are'} left out. <a href="/leads?test=only">Show them</a>.` : ''}</p>
@@ -127,6 +128,7 @@ ${hasAttention === 0 ? html`<div class="card"><p class="empty">Nothing needs att
 <div class="today-grid">
   ${data.needsStage.length ? card('t-review', 'Existing records that need a stage', data.needsStage, (r) => html`<div class="item-row"><div class="item-main">${who(r)}<div class="hint">Older status “${r.legacy_status || ''}” could mean more than one thing. Open it and choose a stage.</div></div></div>`, '') : ''}
   ${data.newInquiries.length ? card('t-new', 'New inquiries with no recorded contact', data.newInquiries, (r) => html`<div class="item-row"><div class="item-main">${who(r)}<div class="hint">${r.past_threshold ? html`<span class="late">Waiting since ${formatDateTime(r.created_at)}</span>` : `Received ${formatDateTime(r.created_at)}`}${r.contact_phone ? html` · <a href="${telHref(r.contact_phone)}">${r.contact_phone}</a>` : ''}</div></div></div>`, '') : ''}
+  ${data.callsToReturn.length ? card('t-calls', 'Phone calls to return', data.callsToReturn, (c) => html`<div class="item-row"><div class="item-main"><a href="/calls/${c.id}">${c.caller_withheld || !c.from_number ? 'Withheld number' : formatPhoneDisplay(c.from_number)}</a>${c.contact_name ? html` <span class="hint">${c.contact_name}</span>` : ''}<div class="hint">${CALL_OUTCOME_TEXT[c.outcome] || c.outcome}${c.outcome === 'voicemail' && c.recording_duration_seconds ? ` (${formatDuration(c.recording_duration_seconds)})` : ''} · ${formatDateTime(c.started_at)}</div></div></div>`, '') : ''}
   ${card('t-over', 'Overdue tasks', data.overdueTasks, (t) => taskRow(t, true), 'No overdue tasks.')}
   ${card('t-today', 'Tasks due today', data.tasksToday, (t) => taskRow(t, false), 'No tasks due today.')}
   ${card('t-appt', 'Consultations and assessments today', data.consultations, (a) => html`<div class="item-row"><div class="item-main"><a href="/leads/${a.opp_id}">${a.contact_name}</a> <span class="hint">${a.title}</span><div>${APPOINTMENT_KIND_LABEL[a.kind] || a.kind} · <strong>${splitDateTime(a.starts_at)[1]}</strong></div></div></div>`, 'Nothing booked for today.')}

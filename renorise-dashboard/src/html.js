@@ -79,6 +79,7 @@ const NAV = [
   ['/today', 'Today', 'today', 'clock'],
   ['/leads', 'Leads', 'leads', 'users'],
   ['/contacts', 'Contacts', 'contacts', 'user'],
+  ['/calls', 'Calls', 'calls', 'phone'],
   ['/follow-ups', 'Follow-ups', 'follow-ups', 'calendar'],
   ['/contractors', 'Contractors', 'contractors', 'tool'],
   ['/sequence', 'Follow-up emails', 'sequence', 'send'],

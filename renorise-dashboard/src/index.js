@@ -29,6 +29,10 @@ import * as crm from './crm-db.js';
 import * as work from './crm-work.js';
 import * as q from './crm-query.js';
 import * as cv from './crm-views.js';
+import * as cdb from './calls-db.js';
+import * as clv from './calls-views.js';
+import { streamVoicemail, voicemailConfigured } from './voicemail.js';
+import { getCallById } from '../../renorise-shared/calls-db.js';
 import { STAGE_LABEL, SOURCE_LABEL, QUALIFICATION_LABEL, PRIORITY_LABEL, MARKETING_SOURCE_LABEL } from './crm-constants.js';
 import { loadSettings } from '../../renorise-shared/followup-db.js';
 
@@ -72,7 +76,7 @@ export default {
         await crm.ensureCrmRecords(env.DB);
       } catch (err) {
         if (/no such (table|column)/i.test(String(err.message))) {
-          return respond(errorPage('Database update needed', 'This dashboard version needs the CRM database update (migration 0004). Apply it, then reload. Nothing has been lost.', nonce), 503, nonce);
+          return respond(errorPage('Database update needed', 'This dashboard version needs the database updates (migrations 0004 and 0005). Apply them, then reload. Nothing has been lost.', nonce), 503, nonce);
         }
         throw err;
       }
@@ -188,6 +192,26 @@ async function handleGet(request, ctx) {
     const filters = work.parseTaskFilters(url);
     const [data, csrf] = await Promise.all([work.listTasks(ctx.db, filters), ctx.csrf()]);
     return page(ctx, { title: 'Follow-ups', active: 'follow-ups', body: cv.tasksPage({ data, filters, csrf, assignees: ctx.staff }) });
+  }
+
+  if (path === '/calls') {
+    const filters = cdb.parseCallFilters(url);
+    const [result, counts] = await Promise.all([cdb.listCalls(ctx.db, filters), cdb.callCounts(ctx.db)]);
+    return page(ctx, { title: 'Calls', active: 'calls', body: clv.callsPage({ result, counts, filters }) });
+  }
+
+  if ((m = /^\/calls\/([A-Za-z0-9-]+)\/voicemail$/.exec(path))) {
+    // Private playback: fetched from Twilio server-side with our credentials and streamed; there is no public link.
+    const call = await getCallById(ctx.db, m[1]);
+    return streamVoicemail(request, ctx.env, call, securityHeaders(ctx.nonce));
+  }
+
+  if ((m = /^\/calls\/([A-Za-z0-9-]+)$/.exec(path))) {
+    const detail = await cdb.callDetail(ctx.db, m[1]);
+    if (!detail) return notFound(ctx);
+    const q = (url.searchParams.get('q') || '').trim().slice(0, 60);
+    const [csrf, results] = await Promise.all([ctx.csrf(), q && !detail.call.contact_id ? cdb.searchContactsToLink(ctx.db, q) : []]);
+    return page(ctx, { title: 'Call', active: 'calls', body: clv.callPage({ detail, csrf, playback: voicemailConfigured(ctx.env), results, q, today: torontoToday() }) });
   }
 
   if (path === '/contractors') {
@@ -334,6 +358,30 @@ async function handlePost(request, ctx) {
   if (path === '/sequence/switch') {
     const res = await sdb.setGlobalSwitch(ctx.db, form.get('on') === '1', form.get('confirm'), actor);
     return back(ctx, '/sequence/settings', res.code);
+  }
+
+  // ---- phone calls (recorded by the voice Worker; these are YOUR actions on them)
+  if ((m = /^\/calls\/([A-Za-z0-9-]+)\/(notes|link|unlink|project|new-lead|callback|task|mark)$/.exec(path))) {
+    const call = await getCallById(ctx.db, m[1]);
+    if (!call) return back(ctx, '/calls', 'not_found');
+    const here = `/calls/${call.id}`;
+    let res;
+    if (m[2] === 'notes') res = await cdb.saveCallNotes(ctx.db, call.id, form.get('notes'), actor);
+    else if (m[2] === 'link') res = await cdb.linkCall(ctx.db, call.id, String(form.get('contact_id') || ''), actor);
+    else if (m[2] === 'unlink') res = await cdb.unlinkCall(ctx.db, call.id, actor);
+    else if (m[2] === 'project') res = await cdb.attachCallToProject(ctx.db, call.id, String(form.get('opportunity_id') || ''), actor);
+    else if (m[2] === 'callback') res = await cdb.setCallback(ctx.db, call.id, String(form.get('action') || ''), actor);
+    else if (m[2] === 'task') res = await cdb.createCallbackTask(ctx.db, call.id, actor);
+    else if (m[2] === 'mark') res = await cdb.setDisposition(ctx.db, call.id, String(form.get('value') || ''), actor);
+    else {
+      const contact = crm.readContactForm(form);
+      if (!contact.ok) return back(ctx, here, contact.code);
+      const project = crm.readOpportunityForm(form);
+      if (!project.ok) return back(ctx, here, project.code);
+      res = await cdb.createLeadFromCall(ctx.db, call.id, contact.value, project.value, actor);
+      if (res.ok) return back(ctx, `/leads/${res.opportunityId}`, res.code);
+    }
+    return back(ctx, here, res.code);
   }
 
   // ---- CRM: reminder thresholds

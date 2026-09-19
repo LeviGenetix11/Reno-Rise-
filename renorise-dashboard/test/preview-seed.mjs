@@ -51,4 +51,24 @@ export async function seedPreviewData(db) {
     db.prepare("UPDATE opportunities SET stage_changed_at = ?, updated_at = ? WHERE id = 'op-L08'").run(isoDaysAgo(9), isoDaysAgo(9));
     const manual = await crm.createManualProject(fdb, { contactValue: crm.readContactForm(form({ display_name: 'Pat Caller', phone: '(647) 555-0142' })).value, projectValue: crm.readOpportunityForm(form({ title: '', renovation_type: 'Basement suite' })).value, channel: 'phone' }, A); void manual;
   }
+
+
+  // Sample phone calls (made-up numbers; the recording id is fake, so playback shows the "not set up" message in the preview).
+  const at = (minsAgo) => new Date(Date.now() - minsAgo * 60000).toISOString();
+  const call = (o) => {
+    const started = o.started || at(o.ago);
+    db.prepare(
+      `INSERT INTO calls (id, call_sid, from_number, from_norm, caller_withheld, to_number, started_at, ended_at, duration_seconds, parent_status, forward_status, forward_answered_at, screen_outcome, accepted_at, voicemail_offered_at,
+        recording_sid, recording_status, recording_duration_seconds, recording_confirmed_at, outcome, hangup_stage, match_status, contact_id, disposition, notes, created_at, updated_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+    ).run(o.id, 'CA' + o.id.padStart(32, '0'), o.withheld ? null : o.from, o.withheld ? null : o.from.replace(/\D/g, '').slice(-10), o.withheld ? 1 : 0, '+12895128112', started, new Date(Date.parse(started) + (o.secs || 30) * 1000).toISOString(), o.secs || 30, 'completed',
+      o.forward || null, o.answered ? started : null, o.screen || null, o.accepted ? started : null, o.vm ? started : null, o.rec || null, o.recStatus || null, o.recSecs ?? null, o.recStatus === 'completed' ? started : null, o.outcome, o.stage || null,
+      o.contact ? 'matched' : o.withheld ? 'withheld' : 'unmatched', o.contact || null, o.disposition || 'open', o.notes || null, started, started);
+  };
+  call({ id: '101', ago: 25, from: '+14165550110', outcome: 'voicemail', vm: true, rec: 'RE' + '1'.repeat(32), recStatus: 'completed', recSecs: 42, contact: 'ct-L01', secs: 70, forward: 'no-answer', notes: 'Asked about the kitchen quote.' });
+  call({ id: '102', ago: 190, from: '+14165550188', outcome: 'missed', stage: 'ringing', secs: 14 });
+  call({ id: '103', ago: 300, from: '+14165550111', outcome: 'accepted', accepted: true, answered: true, screen: 'accepted', forward: 'completed', contact: 'ct-L02', secs: 412 });
+  call({ id: '104', ago: 600, withheld: true, from: '', outcome: 'no_message', stage: 'voicemail', vm: true, recStatus: 'absent', recSecs: 0, secs: 22 });
+  call({ id: '105', ago: 1500, from: '+19055550177', outcome: 'missed', stage: 'screening', answered: true, forward: 'completed', secs: 9, disposition: 'spam' });
+  db.prepare("INSERT INTO call_events (id, call_id, kind, summary, actor, created_at) VALUES ('e1','101','call_received','Call received','twilio',?),('e2','101','voicemail_confirmed','Voicemail recording confirmed by Twilio (42 seconds)','twilio',?),('e3','101','match','Matched to one existing contact by phone number','system',?)").run(at(25), at(24), at(24));
 }

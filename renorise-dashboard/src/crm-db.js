@@ -673,10 +673,12 @@ export async function recordPermission(db, contactId, input, actor) {
  * phone-only caller gets NO email address made up for them. It sends nothing:
  * no confirmation or notification email jobs are created.
  */
-export async function createManualProject(db, { contactId, contactValue, projectValue, channel, receivedLocal }, actor) {
+export async function createManualProject(db, { contactId, contactValue, projectValue, channel, receivedLocal, receivedAtIso }, actor) {
   if (!MANUAL_SOURCE_KEYS.includes(channel)) return { ok: false, code: 'bad_channel' };
   let receivedAt = nowIso();
-  if (receivedLocal) {
+  if (receivedAtIso) {
+    receivedAt = receivedAtIso; // an exact instant supplied by the system (for example when a call arrived)
+  } else if (receivedLocal) {
     receivedAt = torontoInputToUtcIso(receivedLocal);
     if (!receivedAt) return { ok: false, code: 'bad_datetime' };
     if (Date.parse(receivedAt) > Date.now() + 5 * 60 * 1000) return { ok: false, code: 'received_future' };

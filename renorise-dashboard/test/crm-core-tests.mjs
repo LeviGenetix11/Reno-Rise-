@@ -241,7 +241,7 @@ await test('assigning a contractor is an internal record: it sends nothing and c
   const jobs = db.one('SELECT COUNT(*) n FROM email_jobs').n; const sends = db.one('SELECT COUNT(*) n FROM followup_sends').n;
   eq((await crm.assignContractor(db, 'op-L1', 'K1', A)).code, 'contractor_saved'); await crm.assignContractor(db, 'op-L1', 'K2', A);
   eq(db.one('SELECT COUNT(*) n FROM email_jobs').n, jobs, 'no email job'); eq(db.one('SELECT COUNT(*) n FROM followup_sends').n, sends, 'no send'); eq(db.one("SELECT contractor_id c FROM leads WHERE id='L1'").c, 'K2', 'kept in step');
-  const hist = db.rows("SELECT summary FROM crm_events WHERE kind='contractor_assigned' ORDER BY occurred_at, id"); eq(hist.length, 2); ok(/nothing was sent/.test(hist[0].summary) && /was Kay/.test(hist[1].summary), 'history names the previous contractor');
+  const hist = db.rows("SELECT summary FROM crm_events WHERE kind='contractor_assigned' ORDER BY occurred_at, rowid"); eq(hist.length, 2); ok(/nothing was sent/.test(hist[0].summary) && /was Kay/.test(hist[1].summary), 'history names the previous contractor');
   eq((await crm.assignContractor(db, 'op-L1', 'nope; DROP TABLE leads', A)).code, 'bad_contractor');
 });
 

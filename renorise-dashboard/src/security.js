@@ -86,6 +86,8 @@ export function securityHeaders(nonce) {
       `style-src 'nonce-${nonce}' https://fonts.googleapis.com`,
       "font-src https://fonts.gstatic.com",
       "img-src data:",
+      // The private voicemail player: audio may only come from this dashboard itself (never from Twilio directly).
+      "media-src 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
       "base-uri 'none'",

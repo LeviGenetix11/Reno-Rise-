@@ -21,6 +21,7 @@ import {
   TASK_TYPE_LABEL,
 } from './crm-constants.js';
 import { ID_RE, loadCrmSettings } from './crm-db.js';
+import { formatPhoneDisplay, formatDuration, OUTCOME_LABEL as CALL_OUTCOME_TEXT } from '../../renorise-shared/calls.js';
 
 const keys = (list) => list.map(([k]) => k);
 const likeOf = (s) => `%${String(s).replace(/[\\%_]/g, (m) => `\\${m}`)}%`;
@@ -254,7 +255,7 @@ function provenanceOfActor(actor) {
 export const PROVENANCE_LABEL = {
   manual: 'Recorded by staff',
   system: 'Automatic (RenoRise)',
-  provider: 'Confirmed by the email provider',
+  provider: 'Reported by the provider (Resend or Twilio)',
 };
 
 const EVENT_KIND_TITLE = {
@@ -293,7 +294,7 @@ export async function buildTimeline(db, { opportunityId, contactId }, limit = 30
   const scopeVal = byOpp ? opportunityId : contactId;
   const leadIn = `(SELECT id FROM leads l WHERE ${leadScope})`;
 
-  const [leads, notes, activity, events, calls, tasks, jobs, sends] = await Promise.all([
+  const [leads, notes, activity, events, calls, tasks, jobs, sends, phoneCalls] = await Promise.all([
     db.prepare(`SELECT * FROM leads l WHERE ${leadScope} ORDER BY l.created_at`).bind(scopeVal).all(),
     db.prepare(`SELECT * FROM lead_notes WHERE lead_id IN ${leadIn}`).bind(scopeVal).all(),
     db.prepare(`SELECT * FROM lead_activity WHERE lead_id IN ${leadIn} AND type NOT IN ('note_added', 'follow_up_completed')`).bind(scopeVal).all(),
@@ -308,6 +309,7 @@ export async function buildTimeline(db, { opportunityId, contactId }, limit = 30
       )
       .bind(scopeVal)
       .all(),
+    db.prepare(`SELECT * FROM calls WHERE ${byOpp ? 'opportunity_id' : 'contact_id'} = ?`).bind(scopeVal).all(),
   ]);
 
   for (const l of leads.results || []) {
@@ -361,6 +363,12 @@ export async function buildTimeline(db, { opportunityId, contactId }, limit = 30
     if (s.delivered_at) items.push({ at: s.delivered_at, kind: 'email_delivered', title: `${label}: delivery confirmed by Resend`, body: '', provenance: 'provider' });
   }
 
+  for (const c of phoneCalls.results || []) {
+    const who = c.caller_withheld || !c.from_number ? 'a withheld number' : formatPhoneDisplay(c.from_number);
+    const bits = [`From ${who}`, c.duration_seconds ? `lasted ${formatDuration(c.duration_seconds)}` : null, c.outcome === 'voicemail' && c.recording_duration_seconds ? `voicemail ${formatDuration(c.recording_duration_seconds)}` : null, c.accepted_at ? 'you pressed 1 to accept' : null, c.disposition !== 'open' ? `marked ${c.disposition}` : null].filter(Boolean);
+    items.push({ at: c.started_at, kind: 'phone_call', title: `Phone call: ${CALL_OUTCOME_TEXT[c.outcome] || c.outcome}`, body: bits.join(' · '), provenance: 'provider', href: `/calls/${c.id}`, note: 'Open the call record' });
+  }
+
   items.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
   return items.slice(0, limit);
 }
@@ -394,7 +402,7 @@ export async function todayData(db, now = new Date()) {
                  FROM tasks t LEFT JOIN contacts c ON c.id = t.contact_id LEFT JOIN opportunities o ON o.id = t.opportunity_id LEFT JOIN contractors k ON k.id = t.contractor_id
                  WHERE t.status = 'open' AND (o.id IS NULL OR (o.archived_at IS NULL AND o.is_test = 0))`;
 
-  const [needsStage, newInquiries, overdue, dueToday, consultations, noNext, holds, quiet, quotes, failedJobs, failedSends, testHidden] = await Promise.all([
+  const [needsStage, newInquiries, overdue, dueToday, consultations, noNext, holds, quiet, quotes, failedJobs, failedSends, testHidden, callbacks] = await Promise.all([
     db.prepare(`${OPP} WHERE ${ACTIVE} AND o.stage_needs_review = 1 ORDER BY o.created_at`).all(),
     db.prepare(`${OPP} WHERE ${ACTIVE} AND o.stage = 'new_inquiry' AND o.first_contact_at IS NULL ORDER BY o.created_at`).all(),
     db.prepare(`${TASKS} AND t.due_on < ? ORDER BY t.due_on, CASE t.priority WHEN 'high' THEN 0 WHEN 'normal' THEN 1 ELSE 2 END LIMIT 100`).bind(today).all(),
@@ -419,6 +427,7 @@ export async function todayData(db, now = new Date()) {
     db.prepare("SELECT j.id, j.email_type, j.attempts, j.updated_at, l.name AS lead_name, l.opportunity_id FROM email_jobs j JOIN leads l ON l.id = j.lead_id WHERE j.status = 'failed' ORDER BY j.updated_at DESC LIMIT 20").all(),
     db.prepare("SELECT f.id, f.updated_at, l.name AS lead_name, l.opportunity_id FROM followup_sends f LEFT JOIN leads l ON l.id = f.lead_id WHERE f.status = 'failed' AND f.kind = 'followup' ORDER BY f.updated_at DESC LIMIT 20").all(),
     db.prepare('SELECT COUNT(*) AS n FROM opportunities WHERE is_test = 1 AND archived_at IS NULL').first(),
+    db.prepare("SELECT c.id, c.from_number, c.caller_withheld, c.outcome, c.started_at, c.recording_duration_seconds, ct.display_name AS contact_name FROM calls c LEFT JOIN contacts ct ON ct.id = c.contact_id WHERE c.outcome IN ('missed','no_message','voicemail') AND c.disposition = 'open' AND c.callback_done_at IS NULL AND c.ended_at IS NOT NULL ORDER BY c.started_at DESC LIMIT 20").all(),
   ]);
 
   const newRows = (newInquiries.results || []).map((r) => ({ ...r, past_threshold: r.created_at <= newCutoff }));
@@ -436,6 +445,7 @@ export async function todayData(db, now = new Date()) {
     quotesNeedFollowUp: quotes.results || [],
     failedEmails: [...(failedJobs.results || []).map((j) => ({ ...j, kind: 'confirmation' })), ...(failedSends.results || []).map((s) => ({ ...s, kind: 'follow-up' }))],
     testRecordsHidden: testHidden.n,
+    callsToReturn: callbacks.results || [],
   };
 }
 

@@ -19,6 +19,8 @@ import { verifyTurnstile } from './turnstile.js';
 import { isRateLimited, recordRequest, pruneOldEvents } from './ratelimit.js';
 import { sendViaResend, customerAckEmail, internalNotificationEmail } from './email.js';
 import { runFollowups } from './followups/processor.js';
+import { runCallAlerts } from './calls/alerts.js';
+import { finalizeStaleCalls } from '../../renorise-shared/calls-db.js';
 import { handleUnsubscribe } from './followups/unsubscribe.js';
 import { handleResendWebhook } from './followups/webhook.js';
 
@@ -119,6 +121,14 @@ export default {
     ctx.waitUntil((async () => {
       await pruneOldEvents(db);
       await retryPendingEmailJobs(env, db);
+      // Phone-call alerts (missed calls and finished voicemails) come next, ahead of follow-ups, and can never break the
+      // confirmations above or the follow-ups below.
+      try {
+        await finalizeStaleCalls(db);
+        await runCallAlerts(env, db);
+      } catch (err) {
+        console.log('Call alert job error:', err.message);
+      }
       // Follow-ups run AFTER confirmations/notifications, and can never break them.
       try {
         await runFollowups(env, db);

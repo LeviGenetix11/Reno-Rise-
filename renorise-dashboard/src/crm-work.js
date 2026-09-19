@@ -108,6 +108,10 @@ export async function completeTask(db, taskId, note, actor) {
     .run();
   if (!res.meta || res.meta.changes === 0) return { ok: true, code: 'no_change' };
   if (task.opportunity_id) await db.prepare('UPDATE opportunities SET updated_at = ? WHERE id = ?').bind(now, task.opportunity_id).run();
+  // Finishing a callback task also closes the callback on the phone call it came from.
+  if (task.source === 'call_callback') {
+    await db.prepare("UPDATE calls SET callback_result = 'done', callback_done_at = ?, callback_done_by = ?, updated_at = ? WHERE task_id = ? AND callback_done_at IS NULL").bind(now, actor, now, task.id).run();
+  }
   return { ok: true, code: 'task_done' };
 }
 

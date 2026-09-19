@@ -74,6 +74,7 @@ fieldset.reasons legend{padding:0 6px;font-size:13.5px;font-weight:800;color:var
 .banner.info{border-color:#b9cff0;background:var(--info-bg);color:#163d70}
 .banner a{font-weight:800}
 .jump{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px}
+@media(max-width:900px){table.stack td .badge{white-space:normal;text-align:left}}
 .sec-note{margin:8px 0 0;color:var(--muted);font-size:13.5px}
 
 /* ---------- Today ---------- */

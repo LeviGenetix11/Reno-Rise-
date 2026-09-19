@@ -32,6 +32,21 @@ export const CRM_NOTICES = {
   test_marked: ['ok', 'Marked as a test record. It is left out of business counts and Today; nothing was deleted.'],
   test_unmarked: ['ok', 'Test-record mark removed.'],
 
+  // --- phone calls
+  call_linked: ['ok', 'Call linked to the contact.'],
+  call_unlinked: ['ok', 'Call unlinked. Nothing was deleted.'],
+  call_attached: ['ok', 'Call saved.'],
+  call_lead_created: ['ok', 'Lead created from the call. Nothing was emailed to anyone.'],
+  call_marked: ['ok', 'Call marked. It will not get callback tasks or email alerts. Nothing was deleted.'],
+  call_reopened: ['ok', 'Marked as a real call again.'],
+  call_notes_saved: ['ok', 'Notes saved.'],
+  callback_done: ['ok', 'Callback marked done.'],
+  callback_not_needed: ['ok', 'Marked as no callback needed.'],
+  callback_reopened: ['ok', 'Callback reopened.'],
+  callback_task_saved: ['ok', 'Callback task created.'],
+  call_needs_contact: ['error', 'Link this call to a contact first.'],
+  call_already_linked: ['error', 'This call is already linked to a contact.'],
+
   // --- refused
   contact_name: ['error', 'A name is required.'],
   contact_email: ['error', 'That email address does not look valid.'],

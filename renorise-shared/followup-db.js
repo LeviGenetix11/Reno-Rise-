@@ -183,12 +183,14 @@ export async function usage(db, now = new Date()) {
     .prepare(
       `SELECT
         (SELECT COUNT(*) FROM email_jobs WHERE status IN ('sent','sending') AND substr(updated_at,1,10) = ?)
-        + (SELECT COUNT(*) FROM followup_sends WHERE status IN ('sent','sending') AND substr(updated_at,1,10) = ?) AS day_all,
+        + (SELECT COUNT(*) FROM followup_sends WHERE status IN ('sent','sending') AND substr(updated_at,1,10) = ?)
+        + (SELECT COUNT(*) FROM call_alerts WHERE status IN ('sent','sending') AND substr(updated_at,1,10) = ?) AS day_all,
         (SELECT COUNT(*) FROM email_jobs WHERE status IN ('sent','sending') AND substr(updated_at,1,7) = ?)
-        + (SELECT COUNT(*) FROM followup_sends WHERE status IN ('sent','sending') AND substr(updated_at,1,7) = ?) AS month_all,
+        + (SELECT COUNT(*) FROM followup_sends WHERE status IN ('sent','sending') AND substr(updated_at,1,7) = ?)
+        + (SELECT COUNT(*) FROM call_alerts WHERE status IN ('sent','sending') AND substr(updated_at,1,7) = ?) AS month_all,
         (SELECT COUNT(*) FROM followup_sends WHERE kind = 'followup' AND status IN ('sent','sending') AND substr(updated_at,1,10) = ?) AS day_followups`
     )
-    .bind(day, day, month, month, day)
+    .bind(day, day, day, month, month, month, day)
     .first();
   return { day, month, day_all: row.day_all, month_all: row.month_all, day_followups: row.day_followups };
 }

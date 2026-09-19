@@ -131,3 +131,9 @@ Limits today: delivery reports exist only for follow-up emails (the two immediat
 ## 9. Possible paid services
 
 Stage A needs none: it uses the existing Worker, D1 database and Resend account, and sends no new email. Volume is far inside the free allowances; check Cloudflare's pricing page if it grows. Private uploads (Stage C) would need Cloudflare R2, which must be enabled on the account and asks for billing details even though it has a free allowance. It has **not** been enabled.
+
+---
+
+## Phone calls (Twilio) — branch `twilio-calls`
+
+Call tracking and business voicemail are built on top of this CRM: a **Calls** section, calls in each contact’s timeline, callback tasks and Today entries, private voicemail playback, and email alerts. Everything is documented in [../renorise-voice/README.md](../renorise-voice/README.md) (setup, exact Twilio Console settings, secrets, rollout, rollback, tests, what still needs a real phone call). Not deployed; Twilio has not been switched.

@@ -104,7 +104,7 @@ await test('the CSRF token belongs to the signed-in person: another admin\'s tok
 });
 await test('until the database update is applied, the dashboard says so (503) and touches nothing instead of failing oddly', async () => {
   const db = new ShimDb(); for (const f of readdirSync(new URL('../../renorise-forms/migrations/', import.meta.url)).filter((x) => /^000[123]/.test(x)).sort()) db.exec(readFileSync(new URL(`../../renorise-forms/migrations/${f}`, import.meta.url), 'utf8'));
-  seed(db); const r = await get(makeEnv(db), '/leads'); eq(r.status, 503); const t = await r.text(); ok(/migration 0004/.test(t), 'tells the operator what to do'); eq(db.one('SELECT COUNT(*) n FROM leads').n, 4, 'nothing lost');
+  seed(db); const r = await get(makeEnv(db), '/leads'); eq(r.status, 503); const t = await r.text(); ok(/migrations 0004 and 0005/.test(t), 'tells the operator what to do'); eq(db.one('SELECT COUNT(*) n FROM leads').n, 4, 'nothing lost');
 });
 
 console.log('\n[pages]');
