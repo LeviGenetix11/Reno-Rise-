@@ -1,22 +1,55 @@
 // Reno Rise — shared interactions
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile nav toggle
+  // ---------- Mobile nav ----------
   const toggle = document.querySelector('.nav-toggle');
   const mobileNav = document.querySelector('.mobile-nav');
   const closeBtn = document.querySelector('.mobile-nav-close');
 
-  if (toggle && mobileNav) {
-    toggle.addEventListener('click', () => mobileNav.classList.add('open'));
-  }
-  if (closeBtn && mobileNav) {
-    closeBtn.addEventListener('click', () => mobileNav.classList.remove('open'));
-  }
-  mobileNav?.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => mobileNav.classList.remove('open'));
+  const setMobileNav = (open) => {
+    if (!mobileNav) return;
+    mobileNav.classList.toggle('open', open);
+    document.body.classList.toggle('nav-open', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    if (open) closeBtn?.focus();
+    else if (document.activeElement && mobileNav.contains(document.activeElement)) toggle?.focus();
+  };
+
+  toggle?.addEventListener('click', () => setMobileNav(true));
+  closeBtn?.addEventListener('click', () => setMobileNav(false));
+  mobileNav?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMobileNav(false)));
+
+  // ---------- Desktop "Basement Services" dropdown ----------
+  const dropdowns = document.querySelectorAll('.nav-dropdown');
+  const closeDropdown = (dd, returnFocus) => {
+    dd.classList.remove('open');
+    const btn = dd.querySelector('.nav-dropdown-toggle');
+    btn?.setAttribute('aria-expanded', 'false');
+    if (returnFocus) btn?.focus();
+  };
+  dropdowns.forEach((dd) => {
+    const btn = dd.querySelector('.nav-dropdown-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const open = !dd.classList.contains('open');
+      dropdowns.forEach((other) => closeDropdown(other, false));
+      dd.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    dd.addEventListener('focusout', (e) => {
+      if (!dd.contains(e.relatedTarget)) closeDropdown(dd, false);
+    });
+  });
+  document.addEventListener('click', (e) => {
+    dropdowns.forEach((dd) => { if (!dd.contains(e.target)) closeDropdown(dd, false); });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    dropdowns.forEach((dd) => { if (dd.classList.contains('open')) closeDropdown(dd, true); });
+    if (mobileNav?.classList.contains('open')) setMobileNav(false);
   });
 
-  // Sticky header shadow on scroll
+  // ---------- Sticky header shadow on scroll ----------
   const header = document.querySelector('.site-header');
   if (header && header.classList.contains('solid')) {
     window.addEventListener('scroll', () => {
@@ -24,60 +57,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Services carousel arrows
-  const track = document.querySelector('.services-track');
-  const prevBtn = document.querySelector('[data-carousel="prev"]');
-  const nextBtn = document.querySelector('[data-carousel="next"]');
-  if (track && prevBtn && nextBtn) {
-    const scrollAmount = () => track.querySelector('.service-card')?.offsetWidth + 24 || 300;
-    prevBtn.addEventListener('click', () => track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
-    nextBtn.addEventListener('click', () => track.scrollBy({ left: scrollAmount(), behavior: 'smooth' }));
-  }
-
-  // Testimonial dots (simple fade cycle if more than one group is added later)
-  const dots = document.querySelectorAll('.dots span');
-  dots.forEach((dot, i) => {
-    dot.addEventListener('click', () => {
-      dots.forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-    });
-  });
-
-  // Lead / quote forms — client-side confirmation only.
-  // NOTE: this site has no backend. Submitting here does not send an email,
-  // SMS, or CRM notification anywhere. Wire this up to a real form
-  // endpoint (Formspree, Netlify Forms, a serverless function, etc.)
-  // before relying on it to capture real leads.
-  document.querySelectorAll('form.lead-form').forEach(form => {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-      const successEl = document.getElementById(`${form.id}-success`);
-      if (successEl) {
-        form.style.display = 'none';
-        successEl.classList.add('show');
-      }
-    });
-  });
-
-  // Filter bar (blog/services/locations index pages)
+  // ---------- Filter bar (blog index) ----------
+  // A card can belong to several categories: data-category="costs permits".
   const filterButtons = document.querySelectorAll('.filter-bar button');
   const filterCards = document.querySelectorAll('[data-category]');
-  filterButtons.forEach(btn => {
+  const emptyNote = document.querySelector('[data-filter-empty]');
+  filterButtons.forEach((btn) => {
+    btn.setAttribute('aria-pressed', String(btn.classList.contains('active')));
     btn.addEventListener('click', () => {
-      filterButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      filterCards.forEach(card => {
-        if (filter === 'all' || card.dataset.category === filter) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
+      filterButtons.forEach((b) => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
       });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      const filter = btn.dataset.filter;
+      let visible = 0;
+      filterCards.forEach((card) => {
+        const match = filter === 'all' || card.dataset.category.split(/\s+/).includes(filter);
+        card.hidden = !match;
+        if (match) visible += 1;
+      });
+      if (emptyNote) emptyNote.hidden = visible > 0;
     });
   });
 });

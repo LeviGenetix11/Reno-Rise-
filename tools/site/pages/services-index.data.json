@@ -1,0 +1,606 @@
+[
+ {
+  "id": "basement-systems",
+  "title": "Basement Systems",
+  "chips": [
+   [
+    "underpinning",
+    "Underpinning"
+   ],
+   [
+    "bench-footing",
+    "Bench Footing"
+   ],
+   [
+    "walkout-construction",
+    "Walkout Construction"
+   ],
+   [
+    "crawl-space-conversion",
+    "Crawl Space Conversion"
+   ],
+   [
+    "egress-windows",
+    "Egress Windows"
+   ],
+   [
+    "basement-soundproofing",
+    "Soundproofing"
+   ]
+  ]
+ },
+ {
+  "id": "electrical",
+  "title": "Electrical",
+  "chips": [
+   [
+    "panel-upgrade",
+    "Panel Upgrade"
+   ],
+   [
+    "knob-and-tube-removal",
+    "Knob-and-Tube Removal"
+   ],
+   [
+    "aluminum-wiring-replacement",
+    "Aluminum Wiring Replacement"
+   ],
+   [
+    "pot-light-installation",
+    "Pot Lights"
+   ],
+   [
+    "ev-charger-installation",
+    "EV Charger Installation"
+   ],
+   [
+    "light-fixture-installation",
+    "Light Fixture Installation"
+   ]
+  ]
+ },
+ {
+  "id": "concrete-masonry",
+  "title": "Concrete and Masonry",
+  "chips": [
+   [
+    "concrete-driveways",
+    "Driveways"
+   ],
+   [
+    "concrete-walkways",
+    "Walkways"
+   ],
+   [
+    "concrete-steps",
+    "Steps"
+   ],
+   [
+    "concrete-steps-replacement",
+    "Concrete Steps Replacement"
+   ],
+   [
+    "concrete-patio-installation",
+    "Concrete Patio Installation"
+   ],
+   [
+    "parging",
+    "Parging"
+   ],
+   [
+    "repointing",
+    "Repointing"
+   ],
+   [
+    "chimney-repair",
+    "Chimney Repair"
+   ],
+   [
+    "foundation-crack-repair",
+    "Foundation Crack Repair"
+   ],
+   [
+    "brick-repair",
+    "Brick Repair"
+   ],
+   [
+    "concrete-contractor",
+    "Concrete Contractor"
+   ],
+   [
+    "masonry-contractor",
+    "Masonry Contractor"
+   ]
+  ]
+ },
+ {
+  "id": "waterproofing",
+  "title": "Waterproofing",
+  "chips": [
+   [
+    "interior-waterproofing",
+    "Interior Waterproofing"
+   ],
+   [
+    "exterior-waterproofing",
+    "Exterior Waterproofing"
+   ],
+   [
+    "weeping-tile",
+    "Weeping Tile"
+   ],
+   [
+    "french-drain",
+    "French Drain"
+   ],
+   [
+    "sump-pump-installation",
+    "Sump Pump"
+   ],
+   [
+    "backwater-valve-installation",
+    "Backwater Valve"
+   ],
+   [
+    "window-well-installation",
+    "Window Wells"
+   ],
+   [
+    "basement-waterproofing",
+    "Basement Waterproofing"
+   ],
+   [
+    "waterproofing-contractor",
+    "Waterproofing Contractor"
+   ],
+   [
+    "wet-basement-repair",
+    "Wet Basement Repair"
+   ]
+  ]
+ },
+ {
+  "id": "doors",
+  "title": "Doors",
+  "chips": [
+   [
+    "garage-door-repair",
+    "Garage Door Repair"
+   ],
+   [
+    "garage-door-installation",
+    "Garage Door Installation"
+   ],
+   [
+    "door-installation",
+    "Door Installation"
+   ],
+   [
+    "door-repair",
+    "Door Repair"
+   ],
+   [
+    "door-replacement",
+    "Door Replacement"
+   ],
+   [
+    "custom-doors",
+    "Custom Doors"
+   ],
+   [
+    "front-door-installation",
+    "Front Door Installation"
+   ],
+   [
+    "interior-door-installation",
+    "Interior Door Installation"
+   ],
+   [
+    "exterior-door-installation",
+    "Exterior Door Installation"
+   ],
+   [
+    "pocket-doors",
+    "Pocket Doors"
+   ],
+   [
+    "bifold-doors",
+    "Bifold Doors"
+   ],
+   [
+    "bifold-door-installation",
+    "Bifold Door Installation"
+   ],
+   [
+    "sliding-door-installation",
+    "Sliding Door Installation"
+   ],
+   [
+    "storm-doors",
+    "Storm Doors"
+   ],
+   [
+    "storm-door-installation",
+    "Storm Door Installation"
+   ],
+   [
+    "closet-doors",
+    "Closet Doors"
+   ],
+   [
+    "barn-doors",
+    "Barn Doors"
+   ],
+   [
+    "french-doors",
+    "French Doors"
+   ],
+   [
+    "door-frame-repair",
+    "Frame Repair"
+   ],
+   [
+    "door-hardware",
+    "Hardware Installation and Repair"
+   ]
+  ]
+ },
+ {
+  "id": "windows",
+  "title": "Windows",
+  "chips": [
+   [
+    "windows",
+    "Window Replacement"
+   ],
+   [
+    "window-replacement",
+    "Window Replacement (Toronto)"
+   ],
+   [
+    "window-installation",
+    "Window Installation"
+   ],
+   [
+    "window-repair",
+    "Window Repair"
+   ],
+   [
+    "window-glass-replacement",
+    "Window Glass Replacement"
+   ],
+   [
+    "basement-window-replacement",
+    "Basement Window Replacement"
+   ],
+   [
+    "egress-windows",
+    "Egress Windows"
+   ],
+   [
+    "window-well-installation",
+    "Window Well Installation"
+   ]
+  ]
+ },
+ {
+  "id": "roofing-siding",
+  "title": "Roofing and Siding",
+  "chips": [
+   [
+    "roofing-siding",
+    "Roofing and Siding"
+   ],
+   [
+    "asphalt-shingle-roofing",
+    "Asphalt Shingle Roofing"
+   ],
+   [
+    "cedar-shake-roofing",
+    "Cedar Shake Roofing"
+   ],
+   [
+    "shingle-replacement",
+    "Shingle Replacement"
+   ],
+   [
+    "vinyl-siding-installation",
+    "Vinyl Siding Installation"
+   ],
+   [
+    "siding-installation",
+    "Siding Installation"
+   ],
+   [
+    "siding-repair",
+    "Siding Repair"
+   ],
+   [
+    "siding-replacement",
+    "Siding Replacement"
+   ],
+   [
+    "soffit-and-fascia-installation",
+    "Soffit and Fascia Installation"
+   ],
+   [
+    "engineered-wood-siding",
+    "Engineered Wood Siding"
+   ],
+   [
+    "exterior-cladding",
+    "Exterior Cladding"
+   ],
+   [
+    "eavestrough-installation",
+    "Eavestrough Installation"
+   ]
+  ]
+ },
+ {
+  "id": "fences",
+  "title": "Fences",
+  "chips": [
+   [
+    "fence-installation",
+    "Fence Installation"
+   ],
+   [
+    "vinyl-fence-installation",
+    "Vinyl Fence Installation"
+   ],
+   [
+    "aluminum-fence-installation",
+    "Aluminum Fence Installation"
+   ],
+   [
+    "composite-fence-installation",
+    "Composite Fence Installation"
+   ]
+  ]
+ },
+ {
+  "id": "kitchen",
+  "title": "Kitchen",
+  "chips": [
+   [
+    "kitchen-remodeling",
+    "Kitchen Remodeling"
+   ],
+   [
+    "kitchen-renovation",
+    "Kitchen Renovation"
+   ],
+   [
+    "countertop-installation",
+    "Countertop Installation"
+   ],
+   [
+    "granite-countertop-installation",
+    "Granite Countertop Installation"
+   ],
+   [
+    "backsplash-installation",
+    "Backsplash Installation"
+   ],
+   [
+    "custom-kitchen-cabinets",
+    "Custom Kitchen Cabinets"
+   ],
+   [
+    "kitchen-cabinet-installation",
+    "Kitchen Cabinet Installation"
+   ],
+   [
+    "kitchen-cabinet-refacing",
+    "Kitchen Cabinet Refacing"
+   ],
+   [
+    "kitchen-cabinet-painting",
+    "Kitchen Cabinet Painting"
+   ],
+   [
+    "condo-kitchen-renovation",
+    "Condo Kitchen Renovation"
+   ]
+  ]
+ },
+ {
+  "id": "cabinetry-storage",
+  "title": "Cabinetry and Storage",
+  "chips": [
+   [
+    "custom-cabinetry",
+    "Custom Cabinetry"
+   ],
+   [
+    "cabinet-refinishing",
+    "Cabinet Refinishing"
+   ],
+   [
+    "cabinet-painting",
+    "Cabinet Painting"
+   ],
+   [
+    "garage-cabinets",
+    "Garage Cabinets"
+   ]
+  ]
+ },
+ {
+  "id": "bathroom",
+  "title": "Bathroom",
+  "chips": [
+   [
+    "bathroom-renovation",
+    "Bathroom Renovation"
+   ],
+   [
+    "bathroom-remodeling",
+    "Bathroom Remodeling"
+   ]
+  ]
+ },
+ {
+  "id": "flooring",
+  "title": "Flooring",
+  "chips": [
+   [
+    "flooring",
+    "Flooring"
+   ],
+   [
+    "flooring-installation",
+    "Flooring Installation"
+   ],
+   [
+    "flooring-contractor",
+    "Flooring Contractor"
+   ],
+   [
+    "hardwood-floor-installation",
+    "Hardwood Floor Installation"
+   ]
+  ]
+ },
+ {
+  "id": "decks",
+  "title": "Decks",
+  "chips": [
+   [
+    "deck-builder",
+    "Deck Builder"
+   ],
+   [
+    "deck-building",
+    "Deck Building"
+   ],
+   [
+    "deck-repair",
+    "Deck Repair"
+   ],
+   [
+    "deck-replacement",
+    "Deck Replacement"
+   ]
+  ]
+ },
+ {
+  "id": "whole-home",
+  "title": "Whole-Home",
+  "chips": [
+   [
+    "home-additions",
+    "Home Additions"
+   ],
+   [
+    "home-addition",
+    "Home Addition"
+   ],
+   [
+    "house-extension",
+    "House Extension"
+   ],
+   [
+    "design-planning",
+    "Design and Planning"
+   ],
+   [
+    "accessibility-aging-in-place",
+    "Accessibility and Aging-in-Place"
+   ],
+   [
+    "energy-efficiency-green",
+    "Energy Efficiency and Green Renovations"
+   ],
+   [
+    "home-renovation",
+    "Home Renovation"
+   ],
+   [
+    "home-remodeling",
+    "Home Remodeling"
+   ],
+   [
+    "whole-home-renovation",
+    "Whole Home Renovation"
+   ],
+   [
+    "interior-renovation",
+    "Interior Renovation"
+   ],
+   [
+    "exterior-renovation",
+    "Exterior Renovation"
+   ],
+   [
+    "open-concept-renovation",
+    "Open Concept Renovation"
+   ],
+   [
+    "condo-renovation",
+    "Condo Renovation"
+   ],
+   [
+    "garage-conversion",
+    "Garage Conversion"
+   ],
+   [
+    "general-contractor",
+    "General Contractor"
+   ],
+   [
+    "renovation-contractor",
+    "Renovation Contractor"
+   ]
+  ]
+ },
+ {
+  "id": "trim-millwork",
+  "title": "Trim and Millwork",
+  "chips": [
+   [
+    "framing-carpentry",
+    "Framing and Carpentry"
+   ],
+   [
+    "custom-millwork",
+    "Custom Millwork"
+   ]
+  ]
+ },
+ {
+  "id": "plumbing",
+  "title": "Plumbing",
+  "chips": [
+   [
+    "water-line-replacement",
+    "Water Line Replacement"
+   ]
+  ]
+ },
+ {
+  "id": "specialty-rooms",
+  "title": "Specialty Rooms",
+  "chips": [
+   [
+    "garage-renovation",
+    "Garage Renovation"
+   ],
+   [
+    "laundry-room-renovation",
+    "Laundry Room Renovation"
+   ]
+  ]
+ },
+ {
+  "id": "demolition-prep",
+  "title": "Demolition and Prep",
+  "chips": [
+   [
+    "bathroom-demolition",
+    "Bathroom Demolition"
+   ]
+  ]
+ }
+]
