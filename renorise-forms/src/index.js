@@ -20,6 +20,10 @@ import { isRateLimited, recordRequest, pruneOldEvents } from './ratelimit.js';
 import { sendViaResend, customerAckEmail, internalNotificationEmail } from './email.js';
 
 const MAX_BODY_BYTES = 20_000; // generous for this form; blocks absurd payloads
+// A job left in 'sending' longer than this means the invocation that
+// claimed it died mid-send; it becomes eligible again (Resend's
+// Idempotency-Key makes the re-send safe).
+const STALE_SENDING_MS = 10 * 60 * 1000;
 
 export default {
   async fetch(request, env, ctx) {
@@ -170,6 +174,10 @@ async function createEmailJobIfMissing(db, leadId, type) {
     .run();
 }
 
+function staleCutoffIso() {
+  return new Date(Date.now() - STALE_SENDING_MS).toISOString();
+}
+
 /** Attempts to send both of a specific lead's email jobs right now. */
 async function sendPendingEmailsForLead(env, db, leadId) {
   const jobs = await db
@@ -186,10 +194,12 @@ async function retryPendingEmailJobs(env, db) {
   const jobs = await db
     .prepare(
       `SELECT * FROM email_jobs
-       WHERE status IN ('pending', 'failed') AND attempts < max_attempts
+       WHERE attempts < max_attempts
+         AND (status IN ('pending', 'failed') OR (status = 'sending' AND updated_at < ?))
        ORDER BY created_at ASC
        LIMIT 20`
     )
+    .bind(staleCutoffIso())
     .all();
   for (const job of jobs.results || []) {
     await attemptSendJob(env, db, job);
@@ -205,16 +215,17 @@ async function attemptSendJob(env, db, job) {
   const claim = await db
     .prepare(
       `UPDATE email_jobs SET status = 'sending', attempts = attempts + 1, updated_at = ?
-       WHERE id = ? AND status IN ('pending', 'failed')`
+       WHERE id = ? AND attempts < max_attempts
+         AND (status IN ('pending', 'failed') OR (status = 'sending' AND updated_at < ?))`
     )
-    .bind(nowIso(), job.id)
+    .bind(nowIso(), job.id, staleCutoffIso())
     .run();
   if (!claim.meta || claim.meta.changes === 0) return; // already claimed elsewhere
 
   const lead = await db.prepare('SELECT * FROM leads WHERE id = ?').bind(job.lead_id).first();
   if (!lead) {
     await db
-      .prepare("UPDATE email_jobs SET status = 'failed', last_error = ?, updated_at = ? WHERE id = ?")
+      .prepare("UPDATE email_jobs SET status = 'failed', last_error = ?, attempts = max_attempts, updated_at = ? WHERE id = ?")
       .bind('Lead record not found', nowIso(), job.id)
       .run();
     return;
@@ -224,7 +235,7 @@ async function attemptSendJob(env, db, job) {
   const statusColumn = job.email_type === 'customer' ? 'customer_email_status' : 'internal_email_status';
 
   try {
-    const messageId = await sendViaResend(env, template);
+    const messageId = await sendViaResend(env, template, job.idempotency_key);
     await db
       .prepare("UPDATE email_jobs SET status = 'sent', resend_message_id = ?, updated_at = ? WHERE id = ?")
       .bind(messageId, nowIso(), job.id)
@@ -234,11 +245,11 @@ async function attemptSendJob(env, db, job) {
       .bind(lead.id)
       .run();
   } catch (err) {
-    const exhausted = job.attempts + 1 >= job.max_attempts;
+    const exhausted = err.permanent === true || job.attempts + 1 >= job.max_attempts;
     const nextStatus = exhausted ? 'failed' : 'pending';
     await db
-      .prepare('UPDATE email_jobs SET status = ?, last_error = ?, updated_at = ? WHERE id = ?')
-      .bind(nextStatus, String(err.message).slice(0, 500), nowIso(), job.id)
+      .prepare('UPDATE email_jobs SET status = ?, last_error = ?, attempts = MAX(attempts, ?), updated_at = ? WHERE id = ?')
+      .bind(nextStatus, String(err.message).slice(0, 500), exhausted ? job.max_attempts : 0, nowIso(), job.id)
       .run();
     // Mirror onto the lead only once retries are exhausted — while a
     // retry is still scheduled, the lead's status stays "pending" rather

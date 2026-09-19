@@ -5,10 +5,9 @@ form submissions to D1, then sends a customer acknowledgement and an
 internal notification via Resend. Replaces Formspree for the
 homepage, Contact page, and `/assessment/` page forms.
 
-Status: code, config, and the migration have been validated locally and
-with read-only checks against the real Cloudflare account (see Section 5).
-Nothing has been applied to the remote database or deployed yet — those
-steps below are run by you, from this folder.
+Status: migration applied to the remote database; Worker code passes the
+isolated local test suite (Section 3a). See Section 5 for the checklist of
+what has and hasn't been verified against the real services.
 
 ---
 
@@ -209,6 +208,27 @@ sweep or a fresh `sendPendingEmailsForLead` call clears the backlog.
 
 ---
 
+## 3a. Automated isolated test suite
+
+```bash
+cd renorise-forms
+node test/run-tests.mjs
+```
+
+Runs the real Worker under `wrangler dev` against a **throwaway local D1**
+(`.wrangler/test-state`), Cloudflare's Turnstile *test* secrets, and a
+local **mock Resend** server — no real email, no real keys, no production
+data. It writes a temporary `.dev.vars` and deletes it afterward. Covers:
+storage of every field, customer + internal emails, duplicate protection,
+validation, CORS/OPTIONS/routing, rate limiting, D1 failure (→ 500, never a
+success), Resend failure with retry/backoff bounds and stable
+Idempotency-Keys, permanent-4xx handling, stale-`sending` recovery,
+Turnstile reject / fail-closed, and log hygiene.
+
+Requires Node 22+ (uses `node:sqlite`).
+
+---
+
 ## 4. Deploy
 
 Once local testing passes:
@@ -252,8 +272,10 @@ Verified (read-only checks against the real Cloudflare account, plus local tests
 - [x] Migration `0001_init.sql` applies cleanly to a local scratch database; duplicate-key insert verified ignored
 - [x] Turnstile **site key** wired into `js/assessment-form.js`
 
+- [x] Migration `0001_init.sql` applied to the **remote** `renorise-leads` database (by you)
+- [x] Isolated local suite (`node test/run-tests.mjs`) — see Section 3a
+
 Still to do (needs your go-ahead / a real run):
-- [ ] Apply the migration to the **remote** database
 - [ ] Deploy the Worker, then run the Section 3 tests against the real URL with your own email
 - [ ] Confirm both test emails actually arrive (accepted by Resend != delivered)
 - [ ] Add any preview origins to `ALLOWED_ORIGINS` and the Turnstile hostname list if you want to test from a non-production URL

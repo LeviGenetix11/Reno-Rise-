@@ -2,6 +2,10 @@ name = "renorise-forms"
 main = "src/index.js"
 compatibility_date = "2026-09-19"
 
+# Only the stable workers.dev URL is used. Per-version preview URLs would be
+# an extra public endpoint onto the same D1/secrets, so keep them off.
+preview_urls = false
+
 # --- D1 database ------------------------------------------------------
 # Targets your EXISTING database (renorise-leads) — no new database is
 # created. The ID is an identifier, not a secret.
@@ -19,7 +23,9 @@ crons = ["*/15 * * * *"]
 # RESEND_API_KEY and TURNSTILE_SECRET_KEY are NOT here — they're set via
 # `wrangler secret put`, never committed to the repo or wrangler.toml.
 [vars]
-ALLOWED_ORIGINS = "https://renosrise.com,https://www.renosrise.com"
+# The last entry is the Vercel branch-preview alias for cloudflare-forms-backend,
+# added for pre-merge testing. Review/remove it once the branch is merged.
+ALLOWED_ORIGINS = "https://renosrise.com,https://www.renosrise.com,https://reno-rise-git-cloudflare-forms-backend-reno-rise.vercel.app"
 INTERNAL_NOTIFY_EMAIL = "hello@renosrise.com"
 CUSTOMER_FROM_EMAIL = "RenoRise <hello@notify.renosrise.com>"
 REPLY_TO_EMAIL = "hello@renosrise.com"

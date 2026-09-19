@@ -5,7 +5,7 @@
 
 import { escapeHtml } from './utils.js';
 
-const RESEND_URL = 'https://api.resend.com/emails';
+const DEFAULT_RESEND_URL = 'https://api.resend.com/emails';
 
 /**
  * Sends one email via Resend. Throws on any non-2xx response so the
@@ -13,12 +13,18 @@ const RESEND_URL = 'https://api.resend.com/emails';
  * Returns Resend's message id on success — this confirms the API
  * *accepted* the email, not that it was delivered to an inbox.
  */
-export async function sendViaResend(env, { from, to, replyTo, subject, html }) {
-  const res = await fetch(RESEND_URL, {
+export async function sendViaResend(env, { from, to, replyTo, subject, html }, idempotencyKey) {
+  // RESEND_API_URL is unset in production (defaults to Resend). It exists
+  // only so the isolated local test harness can point at a mock server.
+  const res = await fetch(env.RESEND_API_URL || DEFAULT_RESEND_URL, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
+      // Stable per lead+email type, so Resend itself de-duplicates if a
+      // send is retried after an ambiguous failure (e.g. a timeout after
+      // Resend already accepted the request).
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
     body: JSON.stringify({
       from,
@@ -32,7 +38,11 @@ export async function sendViaResend(env, { from, to, replyTo, subject, html }) {
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     const message = (data && (data.message || data.name)) || `HTTP ${res.status}`;
-    throw new Error(`Resend rejected the email: ${message}`);
+    const err = new Error(`Resend rejected the email: ${message}`);
+    // 4xx (other than timeout/rate-limit) will not succeed on retry —
+    // e.g. an invalid recipient — so don't burn retries on them.
+    err.permanent = res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429;
+    throw err;
   }
   return data?.id || null;
 }
