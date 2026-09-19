@@ -13,7 +13,7 @@ const DEFAULT_RESEND_URL = 'https://api.resend.com/emails';
  * Returns Resend's message id on success — this confirms the API
  * *accepted* the email, not that it was delivered to an inbox.
  */
-export async function sendViaResend(env, { from, to, replyTo, subject, html }, idempotencyKey) {
+export async function sendViaResend(env, { from, to, replyTo, subject, html, text, headers }, idempotencyKey) {
   // RESEND_API_URL is unset in production (defaults to Resend). It exists
   // only so the isolated local test harness can point at a mock server.
   const res = await fetch(env.RESEND_API_URL || DEFAULT_RESEND_URL, {
@@ -32,6 +32,10 @@ export async function sendViaResend(env, { from, to, replyTo, subject, html }, i
       reply_to: replyTo,
       subject,
       html,
+      // Only the follow-up emails set these; the confirmation and internal
+      // notification bodies are unchanged.
+      ...(text ? { text } : {}),
+      ...(headers ? { headers } : {}),
     }),
   });
 

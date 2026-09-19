@@ -19,6 +19,9 @@ import * as v from './views.js';
 import { toCsv } from './csv.js';
 import { STAGE_LABEL, SOURCE_LABEL } from './constants.js';
 import { formatDateTime, formatDate, torontoToday } from './time.js';
+import * as sdb from './seq-db.js';
+import * as sv from './seq-views.js';
+import { loadSettings } from '../../renorise-shared/followup-db.js';
 
 const MAX_FORM_BYTES = 60_000;
 
@@ -90,7 +93,9 @@ async function handleGet(request, ctx) {
     const detail = await db.leadDetail(ctx.db, m[1]);
     if (!detail) return notFound(ctx);
     const [contractors, csrf] = await Promise.all([db.listContractors(ctx.db, false), ctx.csrf()]);
-    return page(ctx, { title: detail.lead.name, active: 'leads', body: v.leadPage({ detail, contractors, csrf, today: torontoToday() }) });
+    const seq = await sdb.enrollmentForLead(ctx.db, detail.lead.id);
+    const sequenceHtml = sv.sequenceCard({ lead: detail.lead, seq, csrf, today: torontoToday() });
+    return page(ctx, { title: detail.lead.name, active: 'leads', body: v.leadPage({ detail, contractors, csrf, today: torontoToday(), sequenceHtml }) });
   }
 
   if (path === '/follow-ups') {
@@ -111,6 +116,32 @@ async function handleGet(request, ctx) {
     const contractor = await db.getContractor(ctx.db, m[1]);
     if (!contractor) return notFound(ctx);
     return page(ctx, { title: contractor.name, active: 'contractors', body: v.contractorFormPage({ contractor, csrf: await ctx.csrf() }) });
+  }
+
+  // ---- follow-up email sequence
+  if (path === '/sequence') {
+    const [ov, sends, csrf] = await Promise.all([sdb.sequenceOverview(ctx.db), sdb.recentSends(ctx.db), ctx.csrf()]);
+    return page(ctx, { title: 'Follow-up emails', active: 'sequence', body: sv.sequencePage({ ov, sends, csrf }) });
+  }
+  if (path === '/sequence/queue') {
+    const [items, csrf] = await Promise.all([sdb.approvalQueue(ctx.db), ctx.csrf()]);
+    return page(ctx, { title: 'Awaiting approval', active: 'sequence', body: sv.queuePage({ items, csrf }) });
+  }
+  if (path === '/sequence/preview') {
+    const [settings, csrf] = await Promise.all([loadSettings(ctx.db), ctx.csrf()]);
+    return page(ctx, { title: 'Email previews', active: 'sequence', body: sv.previewPage({ settings, name: (url.searchParams.get('name') || '').slice(0, 60), csrf }) });
+  }
+  if (path === '/sequence/settings') {
+    const [settings, csrf] = await Promise.all([loadSettings(ctx.db), ctx.csrf()]);
+    return page(ctx, { title: 'Follow-up settings', active: 'sequence', body: sv.settingsPage({ settings, csrf }) });
+  }
+  if ((m = /^\/leads\/([A-Za-z0-9-]+)\/sequence$/.exec(path))) {
+    const lead = await sdb.getLeadForSequence(ctx.db, m[1]);
+    if (!lead) return notFound(ctx);
+    const kind = url.searchParams.get('kind') === 'call' ? 'call' : 'website';
+    const form = { sourceKind: kind, callDate: (url.searchParams.get('call_date') || '').slice(0, 10) };
+    const plan = await sdb.planFor(ctx.db, lead, form);
+    return page(ctx, { title: 'Set up follow-ups', active: 'leads', body: sv.enrollPage({ lead, plan, form, csrf: await ctx.csrf(), today: torontoToday() }) });
   }
 
   if (path === '/emails') {
@@ -169,6 +200,44 @@ async function handlePost(request, ctx) {
   const path = ctx.url.pathname.replace(/\/+$/, '');
   const actor = ctx.email;
   let m;
+
+  // ---- follow-up email sequence
+  if ((m = /^\/leads\/([A-Za-z0-9-]+)\/sequence\/enroll$/.exec(path))) {
+    const kind = form.get('kind') === 'call' ? 'call' : 'website';
+    const callDate = /^\d{4}-\d{2}-\d{2}$/.test(String(form.get('call_date') || '')) ? String(form.get('call_date')) : '';
+    const res = await sdb.createEnrollment(
+      ctx.db,
+      m[1],
+      { sourceKind: kind, callDate, confirmed: form.get('confirmed') === 'yes', method: String(form.get('method') || ''), givenOn: String(form.get('given_on') || ''), evidence: String(form.get('evidence') || '') },
+      actor
+    );
+    if (res.ok) return back(ctx, `/leads/${m[1]}`, 'enrolled');
+    return back(ctx, `/leads/${m[1]}/sequence?kind=${kind}${callDate ? `&call_date=${callDate}` : ''}`, res.code);
+  }
+  if ((m = /^\/sequence\/steps\/([A-Za-z0-9-]+)\/(approve|skip)$/.exec(path))) {
+    const res = m[2] === 'approve' ? await sdb.approveStep(ctx.db, m[1], { inboxChecked: form.get('inbox_checked') === 'yes' }, actor) : await sdb.skipStep(ctx.db, m[1], actor);
+    return back(ctx, await sequenceBack(ctx, 'step', m[1], form.get('back')), res.code === 'stopped' ? 'stopped_on_approve' : res.code);
+  }
+  if ((m = /^\/sequence\/enrollments\/([A-Za-z0-9-]+)\/(pause|resume|stop)$/.exec(path))) {
+    const res = m[2] === 'stop' ? await sdb.stopByStaff(ctx.db, m[1], String(form.get('reason') || ''), actor) : await sdb.setPaused(ctx.db, m[1], m[2] === 'pause', actor);
+    return back(ctx, await sequenceBack(ctx, 'enrollment', m[1], form.get('back')), res.code);
+  }
+  if ((m = /^\/sequence\/sends\/([A-Za-z0-9-]+)\/retry$/.exec(path))) {
+    const res = await sdb.retryFailedSend(ctx.db, m[1], actor);
+    return back(ctx, await sequenceBack(ctx, 'send', m[1], form.get('back')), res.code);
+  }
+  if (path === '/sequence/test-send') {
+    const res = await sdb.queueTestSend(ctx.db, { to: form.get('to'), template: form.get('template'), variant: form.get('variant'), name: form.get('name') }, actor);
+    return back(ctx, '/sequence', res.code);
+  }
+  if (path === '/sequence/settings') {
+    const res = await sdb.saveSettings(ctx.db, form, actor);
+    return back(ctx, '/sequence/settings', res.code);
+  }
+  if (path === '/sequence/switch') {
+    const res = await sdb.setGlobalSwitch(ctx.db, form.get('on') === '1', form.get('confirm'), actor);
+    return back(ctx, '/sequence/settings', res.code);
+  }
 
   if ((m = /^\/leads\/([A-Za-z0-9-]+)\/(stage|notes|contractor|assessment|archive|unarchive|follow-ups)$/.exec(path))) {
     const [, leadId, action] = m;
@@ -232,4 +301,19 @@ function csrfFailure(ctx, reason, request) {
 function back(ctx, location, code) {
   const sep = location.includes('?') ? '&' : '?';
   return redirect(`${location}${sep}notice=${encodeURIComponent(code)}`, ctx.nonce);
+}
+
+/** Where to send the user after a follow-up sequence action (whitelisted; never a user-supplied URL). */
+async function sequenceBack(ctx, kind, id, backParam) {
+  if (backParam === 'lead') {
+    const sql =
+      kind === 'step'
+        ? 'SELECT e.lead_id AS lead_id FROM enrollment_steps s JOIN enrollments e ON e.id = s.enrollment_id WHERE s.id = ?'
+        : kind === 'enrollment'
+          ? 'SELECT lead_id FROM enrollments WHERE id = ?'
+          : 'SELECT lead_id FROM followup_sends WHERE id = ?';
+    const row = await ctx.db.prepare(sql).bind(id).first();
+    if (row && row.lead_id) return `/leads/${row.lead_id}`;
+  }
+  return backParam === 'queue' ? '/sequence/queue' : '/sequence';
 }

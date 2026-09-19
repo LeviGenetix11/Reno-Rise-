@@ -106,7 +106,7 @@ export function leadsPage({ result, filters, contractors }) {
 
 // ------------------------------------------------------------------ lead detail
 
-export function leadPage({ detail, contractors, csrf, today }) {
+export function leadPage({ detail, contractors, csrf, today, sequenceHtml }) {
   const { lead, notes, activity, followUps, jobs } = detail;
   const open = followUps.filter((f) => !f.completed_at);
   const done = followUps.filter((f) => f.completed_at);
@@ -191,6 +191,8 @@ export function leadPage({ detail, contractors, csrf, today }) {
       <form method="post" action="${post(`/follow-ups/${f.id}/complete`)}">${csrfField(csrf)}<input type="hidden" name="back" value="lead"><button class="secondary" type="submit">Mark complete</button></form></li>`)}</ul>` : html`<p class="empty">No open follow-ups.</p>`}
     ${done.length ? html`<h3>Completed</h3><ul class="plain">${done.map((f) => html`<li>${formatDate(f.due_on)}${f.note ? html` — ${f.note}` : ''}<br><span class="hint">Completed ${formatDateTime(f.completed_at)}</span></li>`)}</ul>` : ''}
   </section>
+
+  ${sequenceHtml || ''}
 
   <section class="card" aria-labelledby="em-h">
     <h2 id="em-h">Emails for this lead</h2>

@@ -2,6 +2,8 @@
 // HTML-escaped unless it was produced by html`` itself (or explicitly marked
 // with raw()). Customer-submitted text can therefore never become markup.
 
+import { SEQ_NOTICES } from './seq-notices.js';
+
 class Raw {
   constructor(s) {
     this.s = s;
@@ -64,6 +66,8 @@ export const NOTICES = {
   csrf: ['error', 'Your session check failed. Reload the page and try again.'],
   bad_request: ['error', 'That request could not be processed.'],
 };
+
+Object.assign(NOTICES, SEQ_NOTICES);
 
 const CSS = `
 :root{--bg:#f4f5f7;--card:#fff;--ink:#14171d;--muted:#5b6472;--line:#d9dde3;--brand:#14171d;--accent:#b84a00;--accent-ink:#fff;--ok:#1a6b3a;--ok-bg:#e6f4ea;--err:#a11d1d;--err-bg:#fdeaea;--info:#1d4f91;--info-bg:#e8f0fb;--warn:#8a5a00;--warn-bg:#fff4dc;--focus:#1a56db}
@@ -144,6 +148,7 @@ ul.plain li:last-child{border-bottom:0}
 .tabs a[aria-current="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
 .empty{color:var(--muted);padding:8px 0}
 .overdue{color:var(--err);font-weight:600}
+.mono{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 ui-monospace,Consolas,monospace;background:#f6f7f9;border:1px solid var(--line);border-radius:8px;padding:10px}
 `;
 
 export function layout({ title, active, email, nonce, notice, body }) {
@@ -152,6 +157,7 @@ export function layout({ title, active, email, nonce, notice, body }) {
     ['/leads', 'Leads', 'leads'],
     ['/follow-ups', 'Follow-ups', 'follow-ups'],
     ['/contractors', 'Contractors', 'contractors'],
+    ['/sequence', 'Follow-up emails', 'sequence'],
     ['/emails', 'Email activity', 'emails'],
   ];
   const n = notice && NOTICES[notice] ? NOTICES[notice] : null;

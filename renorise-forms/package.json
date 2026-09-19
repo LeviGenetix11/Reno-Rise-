@@ -8,7 +8,8 @@
     "deploy": "wrangler deploy",
     "migrate:local": "wrangler d1 migrations apply renorise-leads --local",
     "migrate:remote": "wrangler d1 migrations apply renorise-leads --remote",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "test:followups": "node test/followup-tests.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.135.0"
