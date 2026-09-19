@@ -81,7 +81,11 @@ export function securityHeaders(nonce) {
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     'Content-Security-Policy': [
       "default-src 'none'",
-      `style-src 'nonce-${nonce}'`,
+      // Plus Jakarta Sans (same typeface as the public site) comes from Google Fonts; the logo is an
+      // embedded data: image. Scripts stay fully blocked and nothing else is allowed.
+      `style-src 'nonce-${nonce}' https://fonts.googleapis.com`,
+      "font-src https://fonts.gstatic.com",
+      "img-src data:",
       "form-action 'self'",
       "frame-ancestors 'none'",
       "base-uri 'none'",
