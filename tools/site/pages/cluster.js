@@ -15,6 +15,7 @@ const PERMIT_NOTE = 'Toronto Building lists underpinning, structural or material
 const pages = [
   {
     slug: 'basement-finishing',
+    photos: [['finished-basement-living-room', 'Finished basement living room with a large television and sectional sofa', 'Photo: Curtis Adams on Pexels'], ['finished-basement-sofa-room', 'Finished basement sitting room with a leather sofa and bright windows', 'Photo: Michael Gault Photos on Pexels'], ['basement-family-room-fireplace', 'Basement family room with wood paneling and a fireplace', 'Photo: Peter Vang on Pexels']],
     title: 'Basement Finishing in Toronto | What to Know Before You Start | Reno Rise',
     description: 'Basement finishing for dry, tall-enough Toronto basements: walls, flooring, lighting and when a permit is needed. Request a basement assessment.',
     h1: 'Basement Finishing in Toronto',
@@ -68,6 +69,7 @@ const pages = [
   },
   {
     slug: 'basement-soundproofing',
+    photos: [['finished-basement-dining-living-area', 'Finished basement dining and living area with small high windows', 'Photo: Elias Storm on Pexels'], ['room-under-renovation', 'Room under renovation with a ladder and drywall', 'Photo: Valentin Ivantsov on Pexels'], ['basement-room-with-windows', 'Basement room with windows and natural light', 'Photo: Peter Vang on Pexels']],
     title: 'Basement Soundproofing in Toronto | Suites, Theatres & Gyms | Reno Rise',
     description: 'Plan basement soundproofing for rental suites, home theatres and gyms: assemblies, ceilings and sealing. Request a basement assessment.',
     h1: 'Basement Soundproofing in Toronto',
@@ -158,6 +160,7 @@ const pages = [
   },
   {
     slug: 'walkout-construction',
+    photos: [['basement-staircase-brick-wall', 'Staircase down to a basement beside an exposed brick wall', 'Photo: Curtis Adams on Pexels'], ['basement-room-with-windows', 'Basement room with windows and natural light', 'Photo: Peter Vang on Pexels']],
     title: 'Basement Walkouts & Separate Entrances in Toronto | Reno Rise',
     description: 'Planning a basement walkout or separate entrance? What is involved, permits and drainage considerations. Request a basement assessment.',
     h1: 'Walkouts & Separate Entrances for Toronto Basements',
@@ -197,6 +200,8 @@ const pages = [
 for (const p of pages) {
   const body = `
     <p>${p.intro.join('</p>\n    <p>')}</p>
+
+    ${p.photos ? U.stockGallery(depth, p.photos, { heading: 'Photos for Reference' }) : ''}
 
     <h2>What the Work Typically Involves</h2>
     ${U.checkList(p.involves)}

@@ -27,8 +27,15 @@ function scopeNote(root, hasFigures) {
   return `<div class="notice" role="note" data-scope-note>${L.ICON.info}<div><p><strong>General information.</strong> Reno Rise focuses on <a href="${root}services/basement-renovation/">basement renovations</a> and <a href="${root}services/legal-basement-apartment-toronto/">legal secondary suites</a>. This page describes work that independent professionals carry out; Reno Rise does not perform it.${figures}</p></div></div>`;
 }
 
-function transformSecondaryService(h, depth) {
+// Pages where an owner-supplied customer comment is topical. Elsewhere the old (generic) testimonial stays removed.
+const TOPICAL_QUOTES = { 'services/kitchen-remodeling/': 'priya' };
+
+function transformSecondaryService(h, depth, urlPath) {
   h = removeElement(h, /<div class="testimonial-grid"[^>]*>/);
+  if (TOPICAL_QUOTES[urlPath] && !h.includes('data-customer-comments-inline')) {
+    const fig = L.quoteFigure(TOPICAL_QUOTES[urlPath]);
+    h = h.replace(/(<h2 id="faq">)/, (m) => `<div class="quote-grid single" data-customer-comments-inline style="margin:8px 0 32px;">${fig}</div>\n    ${m}`);
+  }
   const start = h.indexOf('<main');
   const end = h.indexOf('<!-- ========== CTA BAND');
   if (start < 0 || end < 0) return h;

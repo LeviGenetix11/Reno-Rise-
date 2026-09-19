@@ -324,7 +324,7 @@ function transform(file, html, stats) {
     h = t.h; stats.removedTestimonials += t.n;
   }
 
-  if (isService && !GENERATED_SLUGS.has(slugOf(urlPath))) h = transformSecondaryService(h, depth);
+  if (isService && !GENERATED_SLUGS.has(slugOf(urlPath))) h = transformSecondaryService(h, depth, urlPath);
 
   const rules = applyRules(h, CLAIM_RULES);
   h = rules.h; stats.claimHits += rules.n;

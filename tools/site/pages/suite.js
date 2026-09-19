@@ -199,6 +199,12 @@ ${TOC.map(([id, label], i) => `        <li><a href="#${id}"><span class="toc-num
       <div data-assessment-form-mount data-source="assessment" data-project-type="Legal secondary suite / basement apartment" data-thank-you-href="${h('assessment/thank-you.html')}"></div>
     </section>
 
+    ${U.stockGallery(depth, [
+      ['finished-basement-dining-living-area', 'Finished basement dining and living area with small high windows', 'Photo: Elias Storm on Pexels'],
+      ['basement-room-with-windows', 'Basement room with windows and natural light', 'Photo: Peter Vang on Pexels'],
+      ['basement-staircase-brick-wall', 'Staircase down to a basement beside an exposed brick wall', 'Photo: Curtis Adams on Pexels'],
+    ], { heading: 'Photos for Reference' })}
+
     <h2 id="faq">Frequently asked questions</h2>
 ${U.faqItems(FAQ)}
 

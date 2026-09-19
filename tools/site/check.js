@@ -88,7 +88,10 @@ for (const { rel, html, urlPath } of pages.values()) {
     prev = lvl;
   }
   // forbidden content (outside <script> and outside the tools)
-  const visible = html.replace(/<script[\s\S]*?<\/script>/g, (s) => (/ld\+json/.test(s) ? s : ''));
+  // Owner-supplied customer comments are quoted verbatim, so they are exempt from the claim rules.
+  const visible = html
+    .replace(/<script[\s\S]*?<\/script>/g, (s) => (/ld\+json/.test(s) ? s : ''))
+    .replace(/<figure class="customer-quote">[\s\S]*?<\/figure>/g, '');
   for (const [re, why] of FORBIDDEN) if (re.test(visible)) warn(rel, `forbidden content: ${why} (${re})`);
 
   // links / assets
