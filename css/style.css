@@ -1173,6 +1173,11 @@ section { position: relative; }
   color: var(--muted);
   margin: -6px 0 0;
 }
+.turnstile-mount {
+  display: flex;
+  justify-content: center;
+  min-height: 65px;
+}
 .form-success {
   display: none;
   text-align: center;

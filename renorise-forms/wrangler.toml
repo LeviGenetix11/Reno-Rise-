@@ -1,0 +1,27 @@
+name = "renorise-forms"
+main = "src/index.js"
+compatibility_date = "2026-09-19"
+
+# --- D1 database ------------------------------------------------------
+# Targets your EXISTING database (renorise-leads). "database_id" below is
+# a placeholder — replace it with the real ID before deploying (see the
+# repo README for how to find it, since wrangler isn't available in the
+# environment this was written from to look it up automatically).
+[[d1_databases]]
+binding = "DB"
+database_name = "renorise-leads"
+database_id = "REPLACE_WITH_REAL_D1_DATABASE_ID"
+
+# --- Scheduled retry sweep for pending/failed emails -------------------
+# Runs every 15 minutes; see src/index.js `scheduled()`.
+[triggers]
+crons = ["*/15 * * * *"]
+
+# --- Non-secret configuration -------------------------------------------
+# RESEND_API_KEY and TURNSTILE_SECRET_KEY are NOT here — they're set via
+# `wrangler secret put`, never committed to the repo or wrangler.toml.
+[vars]
+ALLOWED_ORIGINS = "https://renosrise.com,https://www.renosrise.com"
+INTERNAL_NOTIFY_EMAIL = "hello@renosrise.com"
+CUSTOMER_FROM_EMAIL = "RenoRise <hello@notify.renosrise.com>"
+REPLY_TO_EMAIL = "hello@renosrise.com"

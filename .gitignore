@@ -1,1 +1,7 @@
 SEO_brief/
+
+# Cloudflare Worker (renorise-forms) local/dev artifacts — never commit
+# secrets or local state.
+renorise-forms/node_modules/
+renorise-forms/.wrangler/
+renorise-forms/.dev.vars
