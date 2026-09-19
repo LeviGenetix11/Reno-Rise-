@@ -5,8 +5,10 @@ reads and manages the **existing** leads in the `renorise-leads` D1 database.
 Twilio call tracking (Phase 2) and the social content planner (Phase 3) are
 not built yet.
 
-Status: **built and tested locally; not yet deployed or reviewed.** See
-"What is done / what is waiting" at the bottom.
+Status: **deployed in a CLOSED state (every request returns 503) at
+`https://renorise-dashboard.levi-gene-ous.workers.dev`; waiting for the
+remote migration, the administrator email, and Cloudflare Access setup.** Not
+merged to `main`.
 
 ---
 
@@ -151,7 +153,8 @@ preview behind Access.
 
 ## 5. Enable access and deploy
 
-Do these **in order**. The dashboard is closed (503) until step 4.
+Do these **in order**. The dashboard stays closed (503) until the Access
+values are filled in and redeployed (step 6).
 
 1. **Confirm the administrator sign-in email** (the address that will receive
    the one-time PIN). Put it in `ADMIN_EMAILS` in `wrangler.toml`.
