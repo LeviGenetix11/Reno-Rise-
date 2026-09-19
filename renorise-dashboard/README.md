@@ -11,6 +11,8 @@ Status: **live and merged to `main` (2026-09-19).** Deployed at
 Migration 0002 is applied to production. Follow-ups, stage changes, and
 assessment dates have been exercised through the real sign-in.
 
+> **Follow-up emails:** the dashboard also has a "Follow-up emails" area (enroll with recorded permission, approval queue, previews, settings, on/off switch). See `../renorise-shared/README.md`. Not deployed yet; its switch is OFF.
+
 ---
 
 ## 1. Architecture and resource names

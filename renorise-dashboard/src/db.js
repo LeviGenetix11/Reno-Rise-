@@ -5,6 +5,11 @@
 
 import { STAGE_KEYS, STAGE_LABEL, PAGE_SIZE, EXPORT_LIMIT } from './constants.js';
 import { torontoToday, isValidDateString, torontoInputToUtcIso, formatDateTime, formatDate } from './time.js';
+import { stopEnrollmentsForLead } from '../../renorise-shared/followup-db.js';
+
+// Lead changes that must end any follow-up sequence (so a stop never depends on
+// the sender noticing later; the sender ALSO re-checks before every send).
+const STAGE_STOP_REASON = { won: 'won', lost: 'lost', assessment_booked: 'booked' };
 
 const newId = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
@@ -169,6 +174,7 @@ export async function setStage(db, leadId, stage, actor) {
     db.prepare('UPDATE leads SET status = ?, updated_at = ? WHERE id = ?').bind(stage, nowIso(), leadId),
     activityStmt(db, leadId, 'stage_changed', `Stage changed from ${from} to ${STAGE_LABEL[stage]}`, actor),
   ]);
+  if (STAGE_STOP_REASON[stage]) await stopEnrollmentsForLead(db, leadId, STAGE_STOP_REASON[stage], actor);
   return { ok: true, code: 'stage_saved' };
 }
 
@@ -274,6 +280,7 @@ export async function setAssessment(db, leadId, localValue, actor) {
     db.prepare('UPDATE leads SET assessment_at = ?, updated_at = ? WHERE id = ?').bind(iso, nowIso(), leadId),
     activityStmt(db, leadId, 'assessment_set', `Assessment recorded for ${formatDateTime(iso)} (Toronto time)`, actor),
   ]);
+  await stopEnrollmentsForLead(db, leadId, 'booked', actor);
   return { ok: true, code: 'assessment_saved' };
 }
 
@@ -285,6 +292,7 @@ export async function setArchived(db, leadId, archive, actor) {
     db.prepare('UPDATE leads SET archived_at = ?, updated_at = ? WHERE id = ?').bind(archive ? nowIso() : null, nowIso(), leadId),
     activityStmt(db, leadId, archive ? 'archived' : 'unarchived', archive ? 'Lead archived' : 'Lead restored from archive', actor),
   ]);
+  if (archive) await stopEnrollmentsForLead(db, leadId, 'archived', actor);
   return { ok: true, code: archive ? 'archived' : 'unarchived' };
 }
 

@@ -9,6 +9,8 @@ Status: **live in production; migration complete (2026-09-19).** The site's form
 (Formspree was replaced after the checks below passed). Migration applied,
 Worker deployed, production CORS origins = renosrise.com + www only.
 
+> **Follow-up emails:** this Worker also runs the (opt-in, approval-gated) follow-up sequence and the public unsubscribe and Resend-webhook endpoints. See `../renorise-shared/README.md`. It is not deployed yet and its switch is OFF.
+
 ---
 
 ## 0. One-time setup

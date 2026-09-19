@@ -18,6 +18,9 @@ import { validateLead } from './validate.js';
 import { verifyTurnstile } from './turnstile.js';
 import { isRateLimited, recordRequest, pruneOldEvents } from './ratelimit.js';
 import { sendViaResend, customerAckEmail, internalNotificationEmail } from './email.js';
+import { runFollowups } from './followups/processor.js';
+import { handleUnsubscribe } from './followups/unsubscribe.js';
+import { handleResendWebhook } from './followups/webhook.js';
 
 const MAX_BODY_BYTES = 20_000; // generous for this form; blocks absurd payloads
 // A job left in 'sending' longer than this means the invocation that
@@ -29,6 +32,13 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const allowedOrigin = resolveOrigin(request, env);
+
+    // Follow-up sequence endpoints (public, but each is protected by its own
+    // secret: an unguessable token, or a verified Resend signature). They do not
+    // touch the /api/leads form path below.
+    const unsub = /^\/u\/([A-Za-z0-9_-]{1,80})$/.exec(url.pathname);
+    if (unsub) return handleUnsubscribe(request, env, unsub[1]);
+    if (url.pathname === '/webhooks/resend') return handleResendWebhook(request, env);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(allowedOrigin) });
@@ -109,6 +119,12 @@ export default {
     ctx.waitUntil((async () => {
       await pruneOldEvents(db);
       await retryPendingEmailJobs(env, db);
+      // Follow-ups run AFTER confirmations/notifications, and can never break them.
+      try {
+        await runFollowups(env, db);
+      } catch (err) {
+        console.log('Follow-up processor error:', err.message);
+      }
     })());
   },
 };
