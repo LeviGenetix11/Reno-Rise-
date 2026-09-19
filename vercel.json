@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/renorise-forms/:path*", "destination": "/", "permanent": false },
+    { "source": "/renorise-dashboard/:path*", "destination": "/", "permanent": false }
+  ]
+}

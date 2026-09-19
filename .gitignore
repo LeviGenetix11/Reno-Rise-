@@ -5,3 +5,9 @@ SEO_brief/
 renorise-forms/node_modules/
 renorise-forms/.wrangler/
 renorise-forms/.dev.vars
+
+# Cloudflare dashboard Worker local/dev artifacts
+renorise-dashboard/node_modules/
+renorise-dashboard/.wrangler/
+renorise-dashboard/.dev.vars
+npm-dash.log

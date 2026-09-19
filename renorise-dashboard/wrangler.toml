@@ -1,0 +1,31 @@
+name = "renorise-dashboard"
+main = "src/index.js"
+compatibility_date = "2026-09-19"
+
+# The dashboard is served on its workers.dev address and MUST sit behind
+# Cloudflare Access (see README, "Enable access"). Per-version preview URLs are
+# off so there is exactly one URL to protect. The Worker also verifies the
+# Access token itself on every request and refuses everything until the three
+# settings below are filled in.
+workers_dev = true
+preview_urls = false
+
+# --- D1 -----------------------------------------------------------------
+# The SAME existing database the public form Worker writes to. No second
+# lead store. Schema changes live in ../renorise-forms/migrations so there is
+# one ordered migration history for the one database.
+[[d1_databases]]
+binding = "DB"
+database_name = "renorise-leads"
+database_id = "debd2c89-e46b-4585-9693-0f83f35cb0de"
+migrations_dir = "../renorise-forms/migrations"
+
+# --- Access settings (non-secret; filled in after Access is enabled) -----
+# ACCESS_TEAM_DOMAIN : your Zero Trust team domain, e.g. "yourteam.cloudflareaccess.com"
+# ACCESS_AUD         : the Application Audience (AUD) tag of the Access application
+# ADMIN_EMAILS       : comma-separated sign-in emails allowed to use the dashboard
+# While any of these is empty the dashboard answers 503 to every request.
+[vars]
+ACCESS_TEAM_DOMAIN = ""
+ACCESS_AUD = ""
+ADMIN_EMAILS = ""
