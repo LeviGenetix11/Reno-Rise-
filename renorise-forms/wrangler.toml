@@ -3,14 +3,12 @@ main = "src/index.js"
 compatibility_date = "2026-09-19"
 
 # --- D1 database ------------------------------------------------------
-# Targets your EXISTING database (renorise-leads). "database_id" below is
-# a placeholder — replace it with the real ID before deploying (see the
-# repo README for how to find it, since wrangler isn't available in the
-# environment this was written from to look it up automatically).
+# Targets your EXISTING database (renorise-leads) — no new database is
+# created. The ID is an identifier, not a secret.
 [[d1_databases]]
 binding = "DB"
 database_name = "renorise-leads"
-database_id = "REPLACE_WITH_REAL_D1_DATABASE_ID"
+database_id = "debd2c89-e46b-4585-9693-0f83f35cb0de"
 
 # --- Scheduled retry sweep for pending/failed emails -------------------
 # Runs every 15 minutes; see src/index.js `scheduled()`.

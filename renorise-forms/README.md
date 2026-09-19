@@ -5,11 +5,10 @@ form submissions to D1, then sends a customer acknowledgement and an
 internal notification via Resend. Replaces Formspree for the
 homepage, Contact page, and `/assessment/` page forms.
 
-This was written in an environment with **no Node.js/npm/Wrangler
-installed**, so none of the commands below have been run yet. Every
-command in this README needs to be run by you, from your own machine,
-with your own Cloudflare login. The "Testing" section at the end marks
-exactly what that means was and wasn't verified.
+Status: code, config, and the migration have been validated locally and
+with read-only checks against the real Cloudflare account (see Section 5).
+Nothing has been applied to the remote database or deployed yet — those
+steps below are run by you, from this folder.
 
 ---
 
@@ -27,27 +26,12 @@ Cloudflare account — this needs to be the account that owns the
 `renorise-forms` Worker and `renorise-leads` D1 database already
 referenced in `wrangler.toml`.
 
-### Find the D1 database ID
+### D1 database ID
 
-`wrangler.toml` currently has a placeholder:
-
-```toml
-database_id = "REPLACE_WITH_REAL_D1_DATABASE_ID"
-```
-
-Find the real one with:
-
-```bash
-npx wrangler d1 list
-```
-
-This lists every D1 database in your account with its name and ID.
-Find the row where `name` is `renorise-leads`, copy its `uuid`, and
-paste it into `wrangler.toml` in place of the placeholder.
-
-(Alternative if you'd rather use the dashboard: Cloudflare dashboard →
-Workers & Pages → D1 → click **renorise-leads** → the Database ID is
-shown on that page.)
+`wrangler.toml` already contains the real ID for `renorise-leads`
+(`debd2c89-e46b-4585-9693-0f83f35cb0de`), confirmed against
+`npx wrangler d1 list`. If you ever need to look it up again, run that
+command or check Cloudflare dashboard -> Workers & Pages -> D1.
 
 ### Verify the existing Worker's D1 binding name
 
@@ -259,17 +243,21 @@ npx wrangler d1 execute renorise-leads --remote --command "SELECT id, name, emai
 
 ---
 
-## 5. What still needs your login/configuration (nothing here was verifiable from the writing environment)
+## 5. Status checklist
 
-- [ ] Real D1 `database_id` filled into `wrangler.toml`
-- [ ] Confirmed the existing Worker's D1 binding is actually named `DB`
-- [ ] `RESEND_API_KEY` confirmed present via `wrangler secret list`
-- [ ] Turnstile widget created; `TURNSTILE_SECRET_KEY` set via `wrangler secret put`
-- [ ] Turnstile **site key** added to the frontend (see repo root `js/assessment-form.js`)
-- [ ] Migration applied locally and remotely
-- [ ] All test cases in Section 3 run locally
-- [ ] Worker deployed and smoke-tested against the real URL with your own email
-- [ ] Confirmed both test emails actually arrived (not just accepted)
+Verified (read-only checks against the real Cloudflare account, plus local tests):
+- [x] Real D1 `database_id` in `wrangler.toml` — matches `wrangler d1 list` for `renorise-leads` (database currently has 0 tables)
+- [x] `RESEND_API_KEY` and `TURNSTILE_SECRET_KEY` both exist on the Worker (`wrangler secret list`, names only)
+- [x] `wrangler deploy --dry-run` bundles cleanly; binding `env.DB` -> `renorise-leads`
+- [x] Migration `0001_init.sql` applies cleanly to a local scratch database; duplicate-key insert verified ignored
+- [x] Turnstile **site key** wired into `js/assessment-form.js`
+
+Still to do (needs your go-ahead / a real run):
+- [ ] Apply the migration to the **remote** database
+- [ ] Deploy the Worker, then run the Section 3 tests against the real URL with your own email
+- [ ] Confirm both test emails actually arrive (accepted by Resend != delivered)
+- [ ] Add any preview origins to `ALLOWED_ORIGINS` and the Turnstile hostname list if you want to test from a non-production URL
+- [ ] Merge the `cloudflare-forms-backend` branch only after all of the above
 
 ## 6. Rollback
 

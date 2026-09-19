@@ -12,17 +12,16 @@
 // (form id xqpaanag) after the Worker passed testing — see
 // renorise-forms/README.md for the full deployment/testing record.
 //
-// TO ACTIVATE (only remaining step): replace TURNSTILE_SITE_KEY below
-// with the real public site key from your Cloudflare Turnstile
-// dashboard (Turnstile → your widget → Site Key). It's a public value,
-// safe to commit — the matching secret key lives only on the Worker.
+// TURNSTILE_SITE_KEY below is the public site key for the renosrise.com
+// Turnstile widget — a public value, safe to commit. The matching secret
+// key lives only on the Worker (TURNSTILE_SECRET_KEY).
 // ---------------------------------------------------------------------
 
 (function () {
   'use strict';
 
   var LEADS_API_URL = 'https://renorise-forms.levi-gene-ous.workers.dev/api/leads';
-  var TURNSTILE_SITE_KEY = 'REPLACE_WITH_REAL_TURNSTILE_SITE_KEY';
+  var TURNSTILE_SITE_KEY = '0x4AAAAAAE8mYweT8x0kPwcV';
   var PHONE_PATTERN = '[+]?1?[-.\\s]?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}';
   var SESSION_FLAG = 'renoriseAssessmentSubmitted';
 
