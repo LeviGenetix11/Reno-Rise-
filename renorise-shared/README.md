@@ -1,6 +1,6 @@
 # Follow-up email sequence — three follow-ups over 7 days
 
-**Status: built and tested locally on branch `followup-sequence-v2`. Not deployed. The migration is not applied. The global sending switch is OFF. No customer is enrolled.**
+**Status (2026-09-19): migration 0003 applied to production; forms Worker and dashboard deployed from branch `followup-sequence-v2` (not yet merged to `main`); five real test emails sent to hello@renosrise.com and levi.gene.ous@gmail.com; the global sending switch is OFF; no customer is enrolled. Still to do: add the Resend webhook and set `RESEND_WEBHOOK_SECRET` (follow-ups will not send without it), review the tests, then decide on turning the switch ON.**
 
 This adds an opt-in, manually approved follow-up sequence on top of the working
 lead system. It does **not** change the immediate customer confirmation or the
