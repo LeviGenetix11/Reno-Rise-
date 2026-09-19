@@ -111,6 +111,17 @@ ${card({ icon: 'foundation', title: 'Underpinning: When It Is Needed', text: 'Ce
   </div>
 </section>
 
+<!-- ========== INSPIRATION (STOCK) ========== -->
+<section class="section-tight">
+  <div class="container">
+    ${U.stockGallery(depth, [
+      ['finished-basement-dining-living-area', 'Finished basement dining and living area with small high windows', 'Photo: Elias Storm on Pexels'],
+      ['finished-basement-living-room', 'Finished basement living room with a large television and sectional sofa', 'Photo: Curtis Adams on Pexels'],
+      ['basement-family-room-fireplace', 'Basement family room with wood paneling and a fireplace', 'Photo: Peter Vang on Pexels'],
+    ])}
+  </div>
+</section>
+
 <!-- ========== FORM ========== -->
 <section class="section section-cream" id="assessment-form">
   <div class="container" style="max-width:860px;">

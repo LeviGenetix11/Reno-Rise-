@@ -119,7 +119,9 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
           <li>${L.ICON.mail} <a href="mailto:${L.EMAIL}" style="color:#fff;">${L.EMAIL}</a></li>
         </ul>
         <div style="border-top:1px solid rgba(255,255,255,0.12); margin-top:20px; padding-top:20px;">
-          <p style="color:rgba(255,255,255,0.85); font-size:14px; margin:0 0 8px;">Prefer to write? Email or leave a message and Reno Rise will review it. Please do not send banking or payment details.</p>
+          <p style="color:rgba(255,255,255,0.6); font-size:13px; margin:0 0 6px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Office &amp; Inquiry Hours</p>
+          <p style="color:rgba(255,255,255,0.85); font-size:14px; margin:0 0 10px;">Every day: 8:00 AM – 8:00 PM</p>
+          <p style="color:rgba(255,255,255,0.6); font-size:12.5px; margin:0; line-height:1.5;">Submit an assessment request anytime. Inquiries received outside office hours will be reviewed the next business day.</p>
         </div>
       </div>
       ${U.notice('<p><strong>Other kinds of projects?</strong> Reno Rise focuses on basements. If you are planning other work, you can still tell us about it and we will say whether we can point you to a suitable independent professional. Not every project can be matched.</p>')}
@@ -226,7 +228,7 @@ legalPage({
 
       <h2>Who we share it with</h2>
       <ul>
-        <li><strong>Independent professionals.</strong> With your consent, we may share your project details with a professional we think may be able to help. That professional is independent of Reno Rise and handles your information under their own practices. Reno Rise may receive compensation from professionals for introductions.</li>
+        <li><strong>Independent professionals.</strong> With your consent, we may share your project details with a professional we think may be able to help. That professional is independent of Reno Rise and handles your information under their own practices.</li>
         <li><strong>Service providers.</strong> Companies that host our website and store form data, send email, filter spam and handle phone calls on our behalf (currently including Vercel, Cloudflare, Resend and a telephone service provider).</li>
         <li><strong>Legal and safety.</strong> Where required by law or to protect rights and safety.</li>
       </ul>

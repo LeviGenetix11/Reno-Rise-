@@ -259,6 +259,11 @@ function applyRules(h, rules) {
   return { h, n };
 }
 
+function ensureIcons(h, depth) {
+  if (!/rel="apple-touch-icon"/.test(h)) h = h.replace(/(<link rel="icon"[^>]*>)/, (m) => m + String.fromCharCode(10) + '<link rel="apple-touch-icon" href="' + L.up(depth) + 'images/apple-touch-icon.png">');
+  return h;
+}
+
 function ensureAccessibility(h) {
   if (!h.includes('class="skip-link"')) h = h.replace(/<body([^>]*)>\s*/, (m, a) => `<body${a}>\n<a href="#main-content" class="skip-link">Skip to content</a>\n\n`);
   h = h.replace(/<main>/, '<main id="main-content">');
@@ -331,6 +336,7 @@ function transform(file, html, stats) {
   if (TITLE_OVERRIDES[urlPath]) h = h.split(TITLE_OVERRIDES[urlPath][0]).join(TITLE_OVERRIDES[urlPath][1]);
   h = replaceJsonLd(h, urlPath, rel);
   h = ensureSocialMeta(h, urlPath);
+  h = ensureIcons(h, depth);
   h = ensureAccessibility(h);
   h = h.replace(/\n{3,}/g, '\n\n');
   // 404.html is served at any missing URL, so every reference must be root-absolute.

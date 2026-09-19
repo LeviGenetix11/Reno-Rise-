@@ -63,7 +63,20 @@ const suiteCard = plainCard({
   href: h('services/legal-basement-apartment-toronto/'),
 });
 
-const postCards = POSTS.map((p) => plainCard({ ...p, href: p.file }));
+const stockCard = (p) => `      <article class="post-card" data-category="${p.cats}">
+        <div class="thumb">
+          <img src="../images/stock/${p.img}-700w.webp" width="700" height="467" alt="${p.alt}" loading="lazy">
+          <span class="tag">${p.tag}</span>
+        </div>
+        <div class="body">
+          <div class="meta"><span>${clock} Sep 19, 2026</span></div>
+          <h3>${p.title}</h3>
+          <p>${p.excerpt}</p>
+          <a class="readmore" href="${p.file}">Read guide ${arrow}</a>
+        </div>
+      </article>`;
+
+const postCards = POSTS.map(stockCard);
 
 const pc = (tag, title, text, href) => `        <a class="pc-card" href="${href}">
           <span class="pc-tag">${tag}</span>

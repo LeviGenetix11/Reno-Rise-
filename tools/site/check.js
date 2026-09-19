@@ -116,6 +116,9 @@ for (const { rel, html, urlPath } of pages.values()) {
 for (const [t, rels] of seenTitles) if (rels.length > 1) warn(rels.join(', '), `duplicate <title> "${t}"`);
 for (const [d, rels] of seenDescs) if (rels.length > 1) warn(rels.join(', '), `duplicate description`);
 
+// ---- on-page SEO checklist (SEO_brief/on-page-seo.md) ----
+require('./seo-checks').seoChecks(pages, warn);
+
 // ---- service URLs must not disappear ----
 try {
   const tracked = execFileSync('git', ['ls-tree', '-r', '--name-only', 'main'], { cwd: ROOT, encoding: 'utf8' }).split('\n');

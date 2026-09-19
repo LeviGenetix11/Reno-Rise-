@@ -86,6 +86,7 @@ ${robots ? `<meta name="robots" content="${robots}">\n` : ''}<link rel="canonica
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
 <link rel="stylesheet" href="${up(depth)}css/style.css">
 <link rel="icon" type="image/png" href="${up(depth)}images/favicon.png">
+<link rel="apple-touch-icon" href="${up(depth)}images/apple-touch-icon.png">
 
 ${ldGraph.length ? ldScript(ldGraph) + '\n' : ''}
 <meta property="og:type" content="website">

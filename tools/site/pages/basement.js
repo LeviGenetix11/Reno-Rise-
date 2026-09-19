@@ -44,6 +44,12 @@ const body = `
       </div>
     </div>
 
+    ${U.stockGallery(depth, [
+      ['finished-basement-living-room', 'Finished basement living room with a large television and sectional sofa', 'Photo: Curtis Adams on Pexels'],
+      ['finished-basement-sofa-room', 'Finished basement sitting room with a leather sofa and bright windows', 'Photo: Michael Gault Photos on Pexels'],
+      ['basement-family-room-fireplace', 'Basement family room with wood paneling and a fireplace', 'Photo: Peter Vang on Pexels'],
+    ])}
+
     <h2>What Drives the Cost</h2>
     <p>Reno Rise does not publish basement price ranges, because a figure without a site visit and a defined scope can mislead. The factors that move a budget most are:</p>
     ${U.checkList([

@@ -54,3 +54,22 @@ const formBand = (depth, { type, title = 'Request a Basement Assessment', text }
 
 module.exports.guideAside = guideAside;
 module.exports.formBand = formBand;
+
+/** Clearly labelled stock-photo gallery. Never presented as Reno Rise project work. */
+function stockGallery(depth, items, { heading = 'Basement Inspiration', note } = {}) {
+  const figs = items
+    .map(([file, alt, credit]) => `      <figure class="stock-figure">
+        <img src="${L.up(depth)}images/stock/${file}-700w.webp" width="700" height="467" loading="lazy" alt="${alt}">
+        <figcaption>${credit}</figcaption>
+      </figure>`)
+    .join('\n');
+  return `<div class="stock-block">
+    <span class="stock-tag">Inspiration &middot; Stock photography</span>
+    <h2>${heading}</h2>
+    <p>${note || 'Ideas for how a finished basement can look and feel. These are stock photos from Pexels, shown for inspiration only. They are not Reno Rise projects, and Reno Rise does not perform renovation work.'}</p>
+    <div class="stock-gallery">
+${figs}
+    </div>
+  </div>`;
+}
+module.exports.stockGallery = stockGallery;
