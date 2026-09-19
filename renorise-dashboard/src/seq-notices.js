@@ -39,6 +39,6 @@ export const SEQ_NOTICES = {
   bad_setting: ['error', 'One of the numbers is out of range.'],
   bad_window: ['error', 'The sending window must end after it starts.'],
   bad_base_url: ['error', 'The unsubscribe address must be a secure https:// address.'],
-  business_details_missing: ['error', 'Enter the legal business name and the mailing address first. They are required in every email.'],
+  business_details_missing: ['error', 'Enter the business name and a complete mailing address first (a street number and name, a PO box, a rural route, or general delivery). A postal code and city alone is not enough. They are required in every email.'],
   switch_confirm: ['error', 'Type ENABLE FOLLOW-UPS exactly to turn sending on.'],
 };

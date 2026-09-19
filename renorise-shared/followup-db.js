@@ -27,8 +27,25 @@ export async function saveSetting(db, key, value, actor) {
     .run();
 }
 
+/**
+ * A mailing address the CRTC accepts is a street (civic) address, a PO box, a
+ * rural route, or general delivery. This is a sanity check, not a postal
+ * validator: it refuses text such as "Reno Rise M5V 3A3 Toronto Ontario" (a
+ * postal code alone does not say where mail is delivered).
+ */
+export function addressLooksComplete(address) {
+  const a = String(address || '').trim();
+  if (a.length < 10) return false;
+  const street = /^\d+[A-Za-z]?[\s,-]+\S+/; // "100 Example Street", "12A Main St"
+  const streetWithUnit = /\b\d+[A-Za-z]?\s+[A-Za-z][\w'.-]*\s+(St|Street|Ave|Avenue|Rd|Road|Cres|Crescent|Dr|Drive|Blvd|Boulevard|Ct|Court|Lane|Ln|Way|Pl|Place|Terr|Terrace|Pkwy|Parkway|Sq|Square|Trail)\b/i;
+  const poBox = /\bP\.?\s?O\.?\s*Box\s*#?\s*\d+|\bBox\s+#?\d+|\bCP\s+\d+/i;
+  const ruralRoute = /\bR\.?R\.?\s*#?\s*\d+/i;
+  const generalDelivery = /\bGeneral Delivery\b|\bPoste Restante\b/i;
+  return street.test(a) || streetWithUnit.test(a) || poBox.test(a) || ruralRoute.test(a) || generalDelivery.test(a);
+}
+
 export const businessDetailsOk = (s) =>
-  String(s.business_legal_name || '').trim().length >= 2 && String(s.business_mailing_address || '').trim().length >= 10;
+  String(s.business_legal_name || '').trim().length >= 2 && addressLooksComplete(s.business_mailing_address);
 
 // ------------------------------------------------------------------ suppression
 

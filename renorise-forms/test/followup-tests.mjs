@@ -14,7 +14,7 @@ import { runFollowups } from '../src/followups/processor.js';
 import worker from '../src/index.js';
 import { planEnrollment, reproject, VERSIONS, CURRENT_VERSION, maxEmailsPerLead, DEFAULT_SETTINGS } from '../../renorise-shared/sequence.js';
 import { renderFollowup, firstNameOf, greetingFor, bodySentences, TEMPLATE_KEYS } from '../../renorise-shared/templates.js';
-import { saveSetting } from '../../renorise-shared/followup-db.js';
+import { saveSetting, businessDetailsOk } from '../../renorise-shared/followup-db.js';
 import { createEnrollment, approveStep, skipStep, setPaused, stopByStaff, queueTestSend, retryFailedSend, planFor, setGlobalSwitch, saveSettings } from '../../renorise-dashboard/src/seq-db.js';
 import { setStage, setArchived, setAssessment } from '../../renorise-dashboard/src/db.js';
 import { verifySvix } from '../src/followups/webhook.js';
@@ -276,6 +276,16 @@ await test('global sending switch OFF: approved follow-ups are held, and turning
   eq((await setGlobalSwitch(db, true, 'yes', 'a')).code, 'switch_confirm', 'needs the typed phrase'); eq((await setGlobalSwitch(db, true, 'ENABLE FOLLOW-UPS', 'a')).code, 'switch_on');
   eq((await run(env, db, '2026-09-20T13:20:00.000Z')).sent, 1, 'sends once on');
   eq((await setGlobalSwitch(db, false, '', 'a')).code, 'switch_off');
+});
+await test('a mailing address must be a street, PO box, rural route, or general delivery: a postal code and city alone is refused (sending cannot be enabled)', async () => {
+  const good = ['100 Example Street, Toronto, ON M5V 0A0', 'PO Box 123, Station A, Toronto, ON M5W 1A1', 'P.O. Box 55, Toronto, Ontario', 'General Delivery, Toronto, ON', 'RR 2, Stouffville, ON', 'Suite 200, 34 Main St, Toronto, ON'];
+  const bad = ['Reno Rise M5V 3A3 Toronto Ontario', 'Toronto, Ontario M5V 3A3', 'M5V 3A3', 'Toronto', '', '   '];
+  for (const a of good) ok(businessDetailsOk({ business_legal_name: 'Reno Rise', business_mailing_address: a }), `should accept: ${a}`);
+  for (const a of bad) ok(!businessDetailsOk({ business_legal_name: 'Reno Rise', business_mailing_address: a }), `should refuse: ${a}`);
+  const s = await setup({ enable: false }); await saveSetting(s.db, 'business_mailing_address', 'Reno Rise M5V 3A3 Toronto Ontario', 'test');
+  eq((await setGlobalSwitch(s.db, true, 'ENABLE FOLLOW-UPS', 'a')).code, 'business_details_missing', 'cannot turn sending on');
+  await saveSetting(s.db, 'global_send_enabled', '1', 'test'); const eid = await enroll(s.db); await approve(s.db, eid, 1, '2026-09-20T13:15:00.000Z');
+  eq((await run(s.env, s.db, '2026-09-20T13:15:00.000Z')).deferred, { business_details_missing: 1 }, 'the sender also refuses'); eq(mail.length, 0, 'nothing sent');
 });
 await test('migration default: the global switch is OFF in a brand-new database', async () => {
   eq(freshDb().one("SELECT value FROM sequence_settings WHERE key='global_send_enabled'").value, '0');
