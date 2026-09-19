@@ -207,6 +207,32 @@ Branch history: `dashboard-phase-1` was merged into `main` with merge commit
 `e43e8aa`. To undo the site-side changes: `git revert -m 1 e43e8aa`. The
 dashboard Worker itself is rolled back separately (see above).
 
+## Design (redesign, branch `dashboard-redesign`)
+
+The dashboard UI mirrors the public website: deep slate `#14171d`, warm cream, brand orange (`#f0782a` for icons and
+accents; a darker orange for buttons so white text passes WCAG AA), Plus Jakarta Sans, rounded cards, pill buttons, and
+the real logo file. It is styled in `src/styles.js`, laid out in `src/html.js`, and icons are inline SVG in `src/icons.js`.
+
+- **Navigation:** a dark sidebar with an icon per section (a scrollable icon bar at the top on phones and tablets), the
+  current page highlighted, and a "Skip to content" link.
+- **Summary panel** on every page: total leads, contacted leads, pending follow-ups (with an overdue count).
+- **Leads:** stage tabs with live counts and colour-coded dots, filters with active ones highlighted, removable
+  "Active filters" chips, and bold **Apply** and **Export CSV** buttons. Tables have zebra rows and hover highlight;
+  on phones and tablets each row becomes a compact card.
+- **Security policy change:** the Content-Security-Policy now also allows the Google Fonts stylesheet and font files
+  (`fonts.googleapis.com`, `fonts.gstatic.com`) and `data:` images (the embedded logo). Scripts remain fully
+  blocked and the pages contain no `<script>` tags. If the font cannot load, a system font is used.
+
+Check it (Windows PowerShell, from `renorise-dashboard\`; needs Edge or Chrome, and internet for the web font):
+
+```powershell
+npm run test:design
+```
+
+It seeds a throwaway database, then checks 11 pages at phone, tablet and desktop widths for accessibility (axe-core WCAG 2
+A/AA, including colour contrast), no sideways scrolling, keyboard navigation and focus rings, and the real security
+policy. Screenshots are written to `design-preview\` (git-ignored).
+
 ---
 
 ## 6. Tests actually completed
