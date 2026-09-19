@@ -5,10 +5,12 @@ reads and manages the **existing** leads in the `renorise-leads` D1 database.
 Twilio call tracking (Phase 2) and the social content planner (Phase 3) are
 not built yet.
 
-Status: **deployed in a CLOSED state (every request returns 503) at
-`https://renorise-dashboard.levi-gene-ous.workers.dev`; waiting for the
-remote migration, the administrator email, and Cloudflare Access setup.** Not
-merged to `main`.
+Status: **deployed at `https://renorise-dashboard.levi-gene-ous.workers.dev`
+behind Cloudflare Access (team `renorise-admin.cloudflareaccess.com`, admin
+`levi.gene.ous@gmail.com`).** Anonymous requests, forged tokens, and forged
+cookies are all redirected to the Access sign-in page. **Waiting for the remote
+migration (section 3)**; until it is applied, signed-in pages show an error
+page. Not merged to `main`.
 
 ---
 
