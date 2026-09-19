@@ -5,12 +5,11 @@ reads and manages the **existing** leads in the `renorise-leads` D1 database.
 Twilio call tracking (Phase 2) and the social content planner (Phase 3) are
 not built yet.
 
-Status: **deployed at `https://renorise-dashboard.levi-gene-ous.workers.dev`
-behind Cloudflare Access (team `renorise-admin.cloudflareaccess.com`, admin
-`levi.gene.ous@gmail.com`).** Anonymous requests, forged tokens, and forged
-cookies are all redirected to the Access sign-in page. **Waiting for the remote
-migration (section 3)**; until it is applied, signed-in pages show an error
-page. Not merged to `main`.
+Status: **live and merged to `main` (2026-09-19).** Deployed at
+`https://renorise-dashboard.levi-gene-ous.workers.dev` behind Cloudflare Access
+(team `renorise-admin.cloudflareaccess.com`, admin `levi.gene.ous@gmail.com`).
+Migration 0002 is applied to production. Follow-ups, stage changes, and
+assessment dates have been exercised through the real sign-in.
 
 ---
 
@@ -202,6 +201,10 @@ volume. Nothing paid is enabled.
 - **Git:** work is on branch `dashboard-phase-1`; `main` is untouched until you
   approve. If merged and something is wrong: `git revert <merge commit>`.
 
+Branch history: `dashboard-phase-1` was merged into `main` with merge commit
+`e43e8aa`. To undo the site-side changes: `git revert -m 1 e43e8aa`. The
+dashboard Worker itself is rolled back separately (see above).
+
 ---
 
 ## 6. Tests actually completed
@@ -211,7 +214,8 @@ against the real Cloudflare Access sign-in, because Access is not enabled.
 
 | Suite | Result |
 |---|---|
-| Dashboard (`npm test`, 56 checks) | **56/56 passed** |
+| Dashboard (`npm test`, 64 checks) | **64/64 passed** |
+| Real browser, actual forms (`npm run test:browser`, 9 checks) | **9/9 passed** |
 | Existing public Worker suite on the extended schema (49 checks) | **49/49 passed** |
 | Browser layout + accessibility (9 pages x 3 widths: 390, 768, 1280 px; Edge + axe-core WCAG 2.x A/AA + best practice) | **clean after 1 fix** (a wrong ARIA role on the overview tiles); no horizontal scrolling |
 
@@ -227,10 +231,10 @@ Toronto times); email retry (eligibility, double-click safety, one send by the
 existing cron with the original idempotency key); a live public form
 submission appearing in the dashboard; and no secrets/contact details in logs.
 
-Not yet verified (needs your Cloudflare account): the Access sign-in flow
-itself, the Access policy contents, and a real end-to-end run against the
-production database after the migration is applied. Also not verified by any
-test: mobile use on a physical phone.
+Verified in production by the owner: sign-in through Access, adding and
+completing a follow-up (exactly one row), stage change, assessment date.
+Not yet exercised in production: notes, contractors, archive/restore, CSV
+export, email retry.
 
 Test-environment note: the local emulator can report `SQLITE_BUSY` when two
 local Workers and a test reader share one file. Production D1 does not behave
