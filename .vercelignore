@@ -1,0 +1,10 @@
+# Internal tooling and working files: never served on renosrise.com.
+tools/
+renorise-forms/
+renorise-dashboard/
+renorise-shared/
+renorise-voice/
+SEO_brief/
+*.csv
+reno_service_data.py
+used-keywords.md
