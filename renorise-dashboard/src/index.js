@@ -65,7 +65,11 @@ export default {
 };
 
 const page = async (ctx, { title, active, body, status = 200 }) =>
-  respond(layout({ title, active, email: ctx.email, nonce: ctx.nonce, notice: ctx.url.searchParams.get('notice'), body }), status, ctx.nonce);
+  respond(
+    layout({ title, active, email: ctx.email, nonce: ctx.nonce, notice: ctx.url.searchParams.get('notice'), body, summary: await db.summaryCounts(ctx.db) }),
+    status,
+    ctx.nonce
+  );
 
 const notFound = (ctx) => respond(errorPage('Not found', 'That page does not exist.', ctx.nonce), 404, ctx.nonce);
 
@@ -83,8 +87,8 @@ async function handleGet(request, ctx) {
 
   if (path === '/leads') {
     const filters = db.parseLeadFilters(url);
-    const [result, contractors] = await Promise.all([db.listLeads(ctx.db, filters), db.listContractors(ctx.db, false)]);
-    return page(ctx, { title: 'Leads', active: 'leads', body: v.leadsPage({ result, filters, contractors }) });
+    const [result, contractors, stages] = await Promise.all([db.listLeads(ctx.db, filters), db.listContractors(ctx.db, false), db.stageCounts(ctx.db, filters)]);
+    return page(ctx, { title: 'Leads', active: 'leads', body: v.leadsPage({ result, filters, contractors, stages }) });
   }
 
   if (path === '/leads/export.csv') return exportCsv(ctx);

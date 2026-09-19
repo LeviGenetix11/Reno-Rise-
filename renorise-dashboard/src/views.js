@@ -1,17 +1,30 @@
 // Page renderers. Each returns an html`` value; all dynamic text is escaped by
 // default (see html.js), so customer-submitted content is always inert.
 
-import { html, raw } from './html.js';
+import { html, raw, icon } from './html.js';
 import { STAGES, SOURCES, stageLabel, SOURCE_LABEL, EMAIL_TYPE_LABEL, emailJobLabel, emailStatusLabel } from './constants.js';
 import { formatDate, formatDateTime, utcIsoToTorontoInput } from './time.js';
 
 const csrfField = (t) => html`<input type="hidden" name="csrf" value="${t}">`;
 
-const stageBadge = (s) => html`<span class="badge st-${STAGES.some(([k]) => k === s) ? s : 'other'}">${stageLabel(s)}</span>`;
+const stageBadge = (s) => html`<span class="badge st-${STAGES.some(([k]) => k === s) ? s : 'other'}"><i class="dot"></i>${stageLabel(s)}</span>`;
 
 function emailBadge(status) {
   const cls = status === 'sent' ? 'b-ok' : status === 'failed' ? 'b-err' : 'b-warn';
   return html`<span class="badge ${cls}">${emailStatusLabel(status)}</span>`;
+}
+
+// Table helpers: keep the leads table narrow enough to fit without sideways scrolling.
+const splitDateTime = (iso) => {
+  const t = formatDateTime(iso);
+  const i = t.lastIndexOf(', ');
+  return i < 0 ? [t, ''] : [t.slice(0, i), t.slice(i + 2)];
+};
+const SHORT_EMAIL = { sent: 'Accepted', pending: 'Queued', failed: 'Failed' };
+const emailPair = (l) => html`<div class="mail-pair"><span class="mini-l">Customer</span>${emailBadgeShort(l.customer_email_status)}</div><div class="mail-pair"><span class="mini-l">Internal</span>${emailBadgeShort(l.internal_email_status)}</div>`;
+function emailBadgeShort(status) {
+  const cls = status === 'sent' ? 'b-ok' : status === 'failed' ? 'b-err' : 'b-warn';
+  return html`<span class="badge ${cls}" title="${emailStatusLabel(status)}${status === 'sent' ? ' (inbox delivery not verified)' : ''}">${SHORT_EMAIL[status] || status}</span>`;
 }
 
 const telHref = (phone) => `tel:${String(phone).replace(/[^\d+]/g, '')}`;
@@ -39,15 +52,15 @@ function pager(path, params, page, total, pageSize) {
 // ------------------------------------------------------------------ overview
 
 export function overviewPage({ counts, recent, assessments }) {
-  const tile = (href, n, label, alert) => html`<a class="stat ${alert && n > 0 ? 'alert' : ''}" href="${href}"><div class="n">${n}</div><div class="l">${label}</div></a>`;
+  const tile = (href, n, label, alert, ic, tone) => html`<a class="stat ${alert && n > 0 ? 'alert' : ''}" href="${href}"><span class="stat-ico tone-${tone}">${icon(ic)}</span><div class="n">${n}</div><div class="l">${label}</div></a>`;
   return html`
 <h1>Overview</h1>
 <div class="grid stats">
-  ${tile('/leads?status=new', counts.new_leads, 'New leads', false)}
-  ${tile('/follow-ups', counts.overdue, 'Overdue follow-ups', true)}
-  ${tile('/follow-ups', counts.due_today, 'Follow-ups due today', false)}
-  ${tile('/leads?status=assessment_booked', counts.booked, 'Assessments booked', false)}
-  ${tile('/emails?status=failed', counts.email_failed, 'Email failures', true)}
+  ${tile('/leads?status=new', counts.new_leads, 'New leads', false, 'users', 'blue')}
+  ${tile('/follow-ups', counts.overdue, 'Overdue follow-ups', true, 'alert', 'red')}
+  ${tile('/follow-ups', counts.due_today, 'Follow-ups due today', false, 'clock', 'gold')}
+  ${tile('/leads?status=assessment_booked', counts.booked, 'Assessments booked', false, 'calendar', 'teal')}
+  ${tile('/emails?status=failed', counts.email_failed, 'Email failures', true, 'mail', 'red')}
 </div>
 <p class="hint">Leads received in the last 7 days: ${counts.leads_7d}. Upcoming recorded assessments: ${counts.upcoming_assessments}. Emails currently retrying: ${counts.email_retrying}.</p>
 <div class="grid cols">
@@ -65,39 +78,57 @@ export function overviewPage({ counts, recent, assessments }) {
 
 // ------------------------------------------------------------------ leads list
 
-export function leadsPage({ result, filters, contractors }) {
+export function leadsPage({ result, filters, contractors, stages }) {
   const { rows, total, pageSize } = result;
   const { page, ...rest } = filters;
+  const tabs = [['', 'All', stages.all], ...STAGES.map(([k, label]) => [k, label, stages.by[k] || 0])];
+  const contractorLabel = filters.contractor === 'none' ? 'Unassigned' : (contractors.find((c) => c.id === filters.contractor) || {}).name || 'Selected contractor';
+
+  // Every active filter is shown as a removable chip, so it is always obvious what narrows the list.
+  const chips = [];
+  if (filters.q) chips.push(['Search', `“${filters.q}”`, { ...rest, q: '' }]);
+  if (filters.status) chips.push(['Stage', stageLabel(filters.status), { ...rest, status: '' }]);
+  if (filters.source) chips.push(['Source', SOURCE_LABEL[filters.source] || filters.source, { ...rest, source: '' }]);
+  if (filters.contractor) chips.push(['Contractor', contractorLabel, { ...rest, contractor: '' }]);
+  if (filters.archived !== 'no') chips.push(['Archive', filters.archived === 'only' ? 'Archived only' : 'Active + archived', { ...rest, archived: 'no' }]);
+  const on = (cond) => (cond ? 'is-active' : '');
+
   return html`
 <h1>Leads</h1>
-<form class="card" method="get" action="/leads" role="search" aria-label="Search and filter leads">
+<nav class="stage-tabs" aria-label="Filter by stage">
+  ${tabs.map(([key, label, n]) => html`<a class="tab" href="/leads${qs({ ...rest, status: key })}" ${filters.status === key ? raw('aria-current="true"') : ''}><i class="dot dot-${key || 'all'}"></i>${label} <span class="count">${n}</span></a>`)}
+</nav>
+<form class="card filters" method="get" action="/leads" role="search" aria-label="Search and filter leads">
+  <input type="hidden" name="status" value="${filters.status}">
   <div class="row">
-    <div class="field"><label for="q">Search</label><input id="q" name="q" type="search" value="${filters.q}" placeholder="Name, email, phone, city, project" maxlength="100"></div>
-    <div class="field"><label for="status">Stage</label>
-      <select id="status" name="status"><option value="">All stages</option>${STAGES.map(([k, v]) => html`<option value="${k}" ${filters.status === k ? raw('selected') : ''}>${v}</option>`)}</select></div>
+    <div class="field"><label for="q">Search</label><div class="search">${icon('search')}<input id="q" name="q" type="search" class="${on(filters.q)}" value="${filters.q}" placeholder="Name, email, phone, city, project" maxlength="100"></div></div>
     <div class="field"><label for="source">Source page</label>
-      <select id="source" name="source"><option value="">All sources</option>${SOURCES.map(([k, v]) => html`<option value="${k}" ${filters.source === k ? raw('selected') : ''}>${v}</option>`)}</select></div>
+      <select id="source" name="source" class="${on(filters.source)}"><option value="">All sources</option>${SOURCES.map(([k, v]) => html`<option value="${k}" ${filters.source === k ? raw('selected') : ''}>${v}</option>`)}</select></div>
     <div class="field"><label for="contractor">Contractor</label>
-      <select id="contractor" name="contractor"><option value="">Any</option><option value="none" ${filters.contractor === 'none' ? raw('selected') : ''}>Unassigned</option>${contractors.map((c) => html`<option value="${c.id}" ${filters.contractor === c.id ? raw('selected') : ''}>${c.name}</option>`)}</select></div>
+      <select id="contractor" name="contractor" class="${on(filters.contractor)}"><option value="">Any</option><option value="none" ${filters.contractor === 'none' ? raw('selected') : ''}>Unassigned</option>${contractors.map((c) => html`<option value="${c.id}" ${filters.contractor === c.id ? raw('selected') : ''}>${c.name}</option>`)}</select></div>
     <div class="field"><label for="archived">Archive</label>
-      <select id="archived" name="archived"><option value="no" ${filters.archived === 'no' ? raw('selected') : ''}>Active only</option><option value="all" ${filters.archived === 'all' ? raw('selected') : ''}>Active + archived</option><option value="only" ${filters.archived === 'only' ? raw('selected') : ''}>Archived only</option></select></div>
-    <div><button type="submit">Apply</button></div>
+      <select id="archived" name="archived" class="${on(filters.archived !== 'no')}"><option value="no" ${filters.archived === 'no' ? raw('selected') : ''}>Active only</option><option value="all" ${filters.archived === 'all' ? raw('selected') : ''}>Active + archived</option><option value="only" ${filters.archived === 'only' ? raw('selected') : ''}>Archived only</option></select></div>
   </div>
-  <p class="hint"><a href="/leads">Clear filters</a> · <a href="/leads/export.csv${qs(rest)}">Export these ${total} lead${total === 1 ? '' : 's'} as CSV</a></p>
+  <div class="actions">
+    <button type="submit">${icon('filter')}Apply</button>
+    <a class="btn btn-dark" href="/leads/export.csv${qs(rest)}">${icon('download')}Export CSV (${total} lead${total === 1 ? '' : 's'})</a>
+    ${chips.length ? html`<a class="link-clear" href="/leads">Clear all filters</a>` : ''}
+  </div>
 </form>
+${chips.length
+  ? html`<div class="chips" role="group" aria-label="Active filters"><span class="chips-label">Active filters:</span>${chips.map(([label, value, params]) => html`<a class="chip" href="/leads${qs(params)}" aria-label="Remove filter ${label}: ${value}">${label}: ${value}${icon('x')}</a>`)}</div>`
+  : ''}
 <div class="card">
   ${rows.length
-    ? html`<div class="tablewrap"><table class="stack"><caption class="hint">Leads, newest first</caption>
-    <thead><tr><th scope="col">Received (Toronto)</th><th scope="col">Name</th><th scope="col">Contact</th><th scope="col">Project</th><th scope="col">Stage</th><th scope="col">Contractor</th><th scope="col">Next follow-up</th><th scope="col">Emails</th></tr></thead>
+    ? html`<div class="tablewrap"><table class="stack"><caption class="sr-only">Leads, newest first</caption>
+    <thead><tr><th scope="col">Received (Toronto)</th><th scope="col">Name</th><th scope="col">Contact</th><th scope="col">Project</th><th scope="col">Stage and next step</th><th scope="col">Emails</th></tr></thead>
     <tbody>${rows.map((l) => html`<tr>
-      <td data-label="Received">${formatDateTime(l.created_at)}</td>
-      <td data-label="Name"><a href="/leads/${l.id}">${l.name}</a>${l.archived_at ? html` <span class="badge">Archived</span>` : ''}</td>
+      <td data-label="Received"><span class="nowrap">${splitDateTime(l.created_at)[0]}</span><br><span class="hint">${splitDateTime(l.created_at)[1]}</span></td>
+      <td data-label="Name"><a href="/leads/${l.id}">${l.name}</a>${l.archived_at ? html` <span class="badge">Archived</span>` : ''}${l.contractor_name ? html`<br><span class="hint">Contractor: ${l.contractor_name}</span>` : ''}</td>
       <td data-label="Contact">${l.email}<br>${l.phone}</td>
       <td data-label="Project">${l.renovation_type}<br><span class="hint">${l.city}</span></td>
-      <td data-label="Stage">${stageBadge(l.status)}</td>
-      <td data-label="Contractor">${l.contractor_name || '—'}</td>
-      <td data-label="Follow-up">${l.next_follow_up ? formatDate(l.next_follow_up) : '—'}</td>
-      <td data-label="Emails">${emailBadge(l.customer_email_status)} ${emailBadge(l.internal_email_status)}</td>
+      <td data-label="Stage">${stageBadge(l.status)}${l.next_follow_up ? html`<br><span class="hint nowrap">Follow-up: ${formatDate(l.next_follow_up).replace(/^[A-Za-z]+, /, '')}</span>` : ''}</td>
+      <td data-label="Emails">${emailPair(l)}</td>
     </tr>`)}</tbody></table></div>`
     : html`<p class="empty">No leads match these filters.</p>`}
   ${pager('/leads', rest, filters.page, total, pageSize)}
@@ -241,7 +272,7 @@ ${section('fu-done', 'Recently completed', data.completed, 'done')}`;
 
 export function contractorsPage({ rows, csrf }) {
   return html`<h1>Contractors</h1>
-<p><a class="btn" href="/contractors/new">Add contractor</a></p>
+<p><a class="btn" href="/contractors/new">${icon('plus')}Add contractor</a></p>
 <p class="hint">A simple internal directory. Assigning a contractor to a lead does not email or share anything with them.</p>
 <div class="card">
 ${rows.length ? html`<div class="tablewrap"><table class="stack"><thead><tr><th scope="col">Name</th><th scope="col">Company</th><th scope="col">Services</th><th scope="col">Area</th><th scope="col">Contact</th><th scope="col">Active leads</th></tr></thead>

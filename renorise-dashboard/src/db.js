@@ -98,6 +98,32 @@ export async function exportLeads(db, filters) {
   return rows.results || [];
 }
 
+// ---------------------------------------------------------------- summary (top panel on every page)
+
+export async function summaryCounts(db) {
+  const today = torontoToday();
+  return db
+    .prepare(
+      `SELECT
+        (SELECT COUNT(*) FROM leads WHERE archived_at IS NULL) AS total,
+        (SELECT COUNT(*) FROM leads WHERE archived_at IS NULL AND status = 'contacted') AS contacted,
+        (SELECT COUNT(*) FROM follow_ups f JOIN leads l ON l.id = f.lead_id
+           WHERE f.completed_at IS NULL AND l.archived_at IS NULL) AS pending_followups,
+        (SELECT COUNT(*) FROM follow_ups f JOIN leads l ON l.id = f.lead_id
+           WHERE f.completed_at IS NULL AND f.due_on < ? AND l.archived_at IS NULL) AS overdue`
+    )
+    .bind(today)
+    .first();
+}
+
+/** Lead counts per stage, for the stage tabs. Honours every filter EXCEPT the stage itself. */
+export async function stageCounts(db, filters) {
+  const { sql, binds } = buildLeadWhere({ ...filters, status: '' });
+  const rows = await db.prepare(`SELECT l.status AS status, COUNT(*) AS n FROM leads l ${sql} GROUP BY l.status`).bind(...binds).all();
+  const by = Object.fromEntries((rows.results || []).map((r) => [r.status, r.n]));
+  return { by, all: Object.values(by).reduce((a, b) => a + b, 0) };
+}
+
 // ---------------------------------------------------------------- overview
 
 export async function overview(db) {

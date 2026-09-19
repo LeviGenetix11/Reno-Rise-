@@ -8,9 +8,11 @@
     "deploy": "wrangler deploy",
     "test": "node test/run-tests.mjs",
     "test:browser": "node test/browser-check.mjs",
-    "test:sequence": "node test/sequence-pages-tests.mjs"
+    "test:sequence": "node test/sequence-pages-tests.mjs",
+    "test:design": "node test/design-check.mjs"
   },
   "devDependencies": {
+    "axe-core": "^4.13.0",
     "playwright-core": "^1.63.0",
     "wrangler": "^4.135.0"
   },
