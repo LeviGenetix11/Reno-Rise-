@@ -23,9 +23,7 @@ crons = ["*/15 * * * *"]
 # RESEND_API_KEY and TURNSTILE_SECRET_KEY are NOT here — they're set via
 # `wrangler secret put`, never committed to the repo or wrangler.toml.
 [vars]
-# The last entry is the Vercel branch-preview alias for cloudflare-forms-backend,
-# added for pre-merge testing. Review/remove it once the branch is merged.
-ALLOWED_ORIGINS = "https://renosrise.com,https://www.renosrise.com,https://reno-rise-git-cloudflare-forms-backend-reno-rise.vercel.app"
+ALLOWED_ORIGINS = "https://renosrise.com,https://www.renosrise.com"
 INTERNAL_NOTIFY_EMAIL = "hello@renosrise.com"
 CUSTOMER_FROM_EMAIL = "RenoRise <hello@notify.renosrise.com>"
 REPLY_TO_EMAIL = "hello@renosrise.com"

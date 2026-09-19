@@ -5,9 +5,9 @@ form submissions to D1, then sends a customer acknowledgement and an
 internal notification via Resend. Replaces Formspree for the
 homepage, Contact page, and `/assessment/` page forms.
 
-Status: migration applied to the remote database; Worker code passes the
-isolated local test suite (Section 3a). See Section 5 for the checklist of
-what has and hasn't been verified against the real services.
+Status: **switched to production; final live test pending.** The site's forms submit to this Worker
+(Formspree was replaced after the checks below passed). Migration applied,
+Worker deployed, production CORS origins = renosrise.com + www only.
 
 ---
 
@@ -275,11 +275,11 @@ Verified (read-only checks against the real Cloudflare account, plus local tests
 - [x] Migration `0001_init.sql` applied to the **remote** `renorise-leads` database (by you)
 - [x] Isolated local suite (`node test/run-tests.mjs`) — see Section 3a
 
-Still to do (needs your go-ahead / a real run):
-- [ ] Deploy the Worker, then run the Section 3 tests against the real URL with your own email
-- [ ] Confirm both test emails actually arrive (accepted by Resend != delivered)
-- [ ] Add any preview origins to `ALLOWED_ORIGINS` and the Turnstile hostname list if you want to test from a non-production URL
-- [ ] Merge the `cloudflare-forms-backend` branch only after all of the above
+Production switch:
+- [x] Worker deployed; smoke-tested (405/404, CORS allow/deny, bad JSON, validation, bogus Turnstile token -> 403 with nothing saved)
+- [x] Real Resend delivery confirmed (customer + internal emails received)
+- [x] Real preview submission: exactly one lead, two email jobs, both sent on the first attempt within ~0.6 s (immediate send; cron is retry-only)
+- [x] Preview origin removed from ALLOWED_ORIGINS before the production switch
 
 ## 6. Rollback
 

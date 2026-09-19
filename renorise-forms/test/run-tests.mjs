@@ -86,7 +86,7 @@ function sql(command) {
     localDb = new DatabaseSync(`${dir}/${file}`);
     localDb.exec('PRAGMA busy_timeout = 10000');
   }
-  if (/^s*select/i.test(command)) return localDb.prepare(command).all().map((r) => ({ ...r }));
+  if (/^\s*select/i.test(command)) return localDb.prepare(command).all().map((r) => ({ ...r }));
   localDb.exec(command);
   return [];
 }
@@ -175,7 +175,7 @@ async function startDev(turnstileSecret, { scheduled }) {
     ].join('\n') + '\n'
   );
   // ALLOWED_ORIGINS comes from wrangler.toml [vars] — i.e. this run also
-  // proves the real config admits the preview origin.
+  // proves the real production config: renosrise.com + www allowed, anything else rejected.
   const args = ['dev', '--port', String(PORT), '--persist-to', STATE, '--ip', '127.0.0.1'];
   if (scheduled) args.push('--test-scheduled');
   dev = spawn(process.execPath, [WRANGLER, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
@@ -336,8 +336,8 @@ await test('HTML in fields is escaped in both emails', async () => {
 // ---- 4. CORS / routing -----------------------------------------------------
 console.log('\n[CORS + routing]');
 const opts = (origin) => http('OPTIONS', '/api/leads', { headers: { Origin: origin, 'Access-Control-Request-Method': 'POST' } });
-await test('OPTIONS from renosrise.com, www, and preview origin -> 204 + matching ACAO', async () => {
-  for (const o of [ORIGIN, 'https://www.renosrise.com', PREVIEW_ORIGIN]) {
+await test('OPTIONS from renosrise.com and www -> 204 + matching ACAO', async () => {
+  for (const o of [ORIGIN, 'https://www.renosrise.com']) {
     const r = await opts(o);
     eq(r.status, 204, o);
     eq(r.headers.get('access-control-allow-origin'), o, `ACAO for ${o}`);
@@ -353,13 +353,16 @@ await test('POST from an unlisted origin -> 403, nothing saved', async () => {
   eq(r.status, 403, 'status'); eq(r.json.error, 'origin_not_allowed', 'error');
   eq(leadCount(), before, 'lead count unchanged');
 });
+await test('POST from the old Vercel preview origin -> 403 (no longer allowed in production)', async () => {
+  eq((await post(leadBody(), { origin: PREVIEW_ORIGIN })).status, 403, 'status');
+});
 await test('POST from a look-alike origin (renosrise.com.evil.example) -> 403', async () => {
   eq((await post(leadBody(), { origin: 'https://renosrise.com.evil.example' })).status, 403, 'status');
 });
-await test('success response carries ACAO for the (preview) origin', async () => {
-  const r = await post(leadBody(), { origin: PREVIEW_ORIGIN });
+await test('success response carries ACAO for the www origin', async () => {
+  const r = await post(leadBody(), { origin: 'https://www.renosrise.com' });
   eq(r.status, 201, 'status');
-  eq(r.headers.get('access-control-allow-origin'), PREVIEW_ORIGIN, 'ACAO');
+  eq(r.headers.get('access-control-allow-origin'), 'https://www.renosrise.com', 'ACAO');
 });
 await test('GET /api/leads -> 405 (no public read endpoint)', async () => {
   eq((await http('GET', '/api/leads')).status, 405, 'status');
