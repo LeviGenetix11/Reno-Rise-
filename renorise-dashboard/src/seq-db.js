@@ -27,8 +27,10 @@ import {
   reprojectEnrollment,
   completeIfDone,
   usage,
+  openEnrollmentForPerson,
 } from '../../renorise-shared/followup-db.js';
 import { torontoDateOf, torontoToday, isValidDateString, torontoDateHourToUtcIso } from './time.js';
+import { STAGE_STOPS_SEQUENCE } from './crm-constants.js';
 
 const newId = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
@@ -158,6 +160,22 @@ export async function createEnrollment(db, leadId, input, actor, now = new Date(
   if (stop) return { ok: false, code: `not_eligible_${stop}` };
   const open = await db.prepare("SELECT id FROM enrollments WHERE lead_id = ? AND status IN ('active','paused')").bind(leadId).first();
   if (open) return { ok: false, code: 'already_enrolled' };
+
+  // CRM rules. The follow-up emails are generic check-ins, so a person gets ONE
+  // sequence at a time (across all their projects and any submission using the same
+  // email address), and a project that is on hold, not a fit, already moved on, or a
+  // test record is not enrolled. Nothing here ever restarts a stopped sequence.
+  const person = await openEnrollmentForPerson(db, { contactId: lead.contact_id, email: lead.email, exceptLeadId: leadId });
+  if (person) return { ok: false, code: 'person_has_open_sequence' };
+  const opp = lead.opportunity_id
+    ? await db.prepare('SELECT stage, qualification, is_test FROM opportunities WHERE id = ?').bind(lead.opportunity_id).first()
+    : null;
+  if (opp) {
+    if (opp.is_test && !TEST_RECIPIENTS.includes(lead.email.trim().toLowerCase())) return { ok: false, code: 'test_record_not_enrollable' };
+    if (opp.qualification === 'not_a_fit') return { ok: false, code: 'not_eligible_not_a_fit' };
+    if (opp.stage === 'on_hold') return { ok: false, code: 'not_eligible_on_hold' };
+    if (STAGE_STOPS_SEQUENCE[opp.stage]) return { ok: false, code: `not_eligible_${STAGE_STOPS_SEQUENCE[opp.stage]}` };
+  }
 
   const plan = await planFor(db, lead, input, now);
   if (!plan.ok) return plan;

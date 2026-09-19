@@ -3,7 +3,9 @@
 // with raw()). Customer-submitted text can therefore never become markup.
 
 import { SEQ_NOTICES } from './seq-notices.js';
+import { CRM_NOTICES } from './crm-notices.js';
 import { CSS } from './styles.js';
+import { CSS_CRM } from './styles-crm.js';
 import { LOGO_DATA_URI } from './assets.js';
 import { iconSvg } from './icons.js';
 
@@ -70,11 +72,13 @@ export const NOTICES = {
   bad_request: ['error', 'That request could not be processed.'],
 };
 
-Object.assign(NOTICES, SEQ_NOTICES);
+Object.assign(NOTICES, SEQ_NOTICES, CRM_NOTICES);
 
 const NAV = [
   ['/', 'Overview', 'overview', 'grid'],
+  ['/today', 'Today', 'today', 'clock'],
   ['/leads', 'Leads', 'leads', 'users'],
+  ['/contacts', 'Contacts', 'contacts', 'user'],
   ['/follow-ups', 'Follow-ups', 'follow-ups', 'calendar'],
   ['/contractors', 'Contractors', 'contractors', 'tool'],
   ['/sequence', 'Follow-up emails', 'sequence', 'send'],
@@ -83,13 +87,13 @@ const NAV = [
 
 export const icon = (name, cls) => raw(iconSvg(name, cls));
 
-/** Compact panel at the top of every page: total leads, contacted leads, pending follow-ups. */
+/** Compact panel at the top of every page: total leads, leads in progress, pending follow-ups. */
 function summaryPanel(s) {
   if (!s) return '';
   return html`<section class="summary" aria-label="Summary">
   <a class="sum" href="/leads"><span class="sum-ico tone-orange">${icon('users')}</span><span><span class="sum-n">${s.total}</span><span class="sum-l">Total leads</span></span></a>
-  <a class="sum" href="/leads?status=contacted"><span class="sum-ico tone-gold">${icon('phone')}</span><span><span class="sum-n">${s.contacted}</span><span class="sum-l">Contacted</span></span></a>
-  <a class="sum" href="/follow-ups"><span class="sum-ico tone-teal">${icon('clock')}</span><span><span class="sum-n">${s.pending_followups}</span><span class="sum-l">Pending follow-ups${s.overdue ? html`<span class="sum-sub">${s.overdue} overdue</span>` : ''}</span></span></a>
+  <a class="sum" href="/leads?view=pipeline"><span class="sum-ico tone-gold">${icon('board')}</span><span><span class="sum-n">${s.in_progress}</span><span class="sum-l">In progress</span></span></a>
+  <a class="sum" href="/follow-ups"><span class="sum-ico tone-teal">${icon('clock')}</span><span><span class="sum-n">${s.pending_tasks}</span><span class="sum-l">Pending follow-ups${s.overdue ? html`<span class="sum-sub">${s.overdue} overdue</span>` : ''}</span></span></a>
 </section>`;
 }
 
@@ -105,7 +109,7 @@ export function layout({ title, active, email, nonce, notice, body, summary }) {
 <title>${title} — RenoRise Dashboard</title>
 <link rel="icon" href="${LOGO_DATA_URI}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
-<style nonce="${nonce}">${raw(CSS)}</style>
+<style nonce="${nonce}">${raw(CSS + CSS_CRM)}</style>
 </head>
 <body>
 <a class="skip" href="#content">Skip to content</a>

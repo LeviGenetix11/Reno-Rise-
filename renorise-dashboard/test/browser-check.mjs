@@ -88,81 +88,100 @@ page.on('request', (r) => { if (r.method() === 'POST') posts.push({ url: r.url()
 const notice = async () => (await page.locator('.notice').first().textContent({ timeout: 5000 })).trim();
 const title = () => page.title();
 
-console.log('\n[real browser: follow-ups]');
-await test('add a follow-up through the real form (this is what returned "Request blocked")', async () => {
+console.log('\n[real browser: tasks (the extended Follow-ups)]');
+await test('add a task through the real form (this is what returned "Request blocked")', async () => {
   await page.goto(`${BASE}/leads/L1`);
-  await page.fill('#due_on', '2030-05-20');
-  await page.fill('#fu_note', 'Call back about the quote');
-  await page.click('button:has-text("Add follow-up")');
+  await page.fill('#pt-title', 'Call back about the quote');
+  await page.fill('#pt-due', '2030-05-20');
+  await page.click('button:has-text("Add task")');
   await page.waitForURL(/notice=/);
   const p = { headers: await posts.at(-1).req.allHeaders() };
   console.log(`        browser sent: Origin=${p.headers.origin}  Sec-Fetch-Site=${p.headers['sec-fetch-site']}  Referer=${p.headers.referer}`);
-  eq(await notice(), 'Follow-up added.', `page said "${await title()}" — the browser's POST was rejected`);
-  eq(rows("SELECT COUNT(*) n FROM follow_ups WHERE lead_id='L1'")[0].n, 1, 'stored follow-ups');
+  eq(await notice(), 'Task added.', `page said "${await title()}" — the browser's POST was rejected`);
+  eq(rows("SELECT COUNT(*) n FROM tasks WHERE title='Call back about the quote'")[0].n, 1, 'stored tasks');
 });
 await test('the browser sends a same-origin Origin header on the post', async () => {
   const h = await posts.at(-1).req.allHeaders(); eq(h.origin, BASE, 'Origin header');
   eq(h['sec-fetch-site'], 'same-origin', 'Sec-Fetch-Site');
 });
-await test('complete the follow-up through the real form; it shows as completed', async () => {
-  await page.click('button:has-text("Mark complete")');
+await test('complete the task through the real form, with a note; it shows as finished', async () => {
+  await page.fill('input[name=note][placeholder^="Completion note"]', 'Left a message');
+  await page.locator('button:has-text("Mark done")').first().click();
   await page.waitForURL(/notice=/);
-  eq(await notice(), 'Follow-up marked complete.', `page said "${await title()}"`);
-  const r = rows("SELECT completed_at FROM follow_ups WHERE lead_id='L1'");
-  eq(r.length, 1, 'still exactly one follow-up'); ok(r[0].completed_at, 'completed_at set');
+  eq(await notice(), 'Task marked complete.', `page said "${await title()}"`);
+  const r = rows("SELECT status, completion_note FROM tasks WHERE title='Call back about the quote'");
+  eq(r.length, 1, 'still exactly one task'); eq(r[0].status, 'done'); eq(r[0].completion_note, 'Left a message');
 });
-await test('a genuine double-click on "Add follow-up" stores exactly one follow-up', async () => {
+await test('a genuine double-click on "Add task" stores exactly one task', async () => {
   await page.goto(`${BASE}/leads/L1`);
-  await page.fill('#due_on', '2030-06-01');
-  await page.fill('#fu_note', 'double click');
-  await page.dblclick('button:has-text("Add follow-up")');
+  await page.fill('#pt-title', 'double click');
+  await page.fill('#pt-due', '2030-06-01');
+  await page.dblclick('button:has-text("Add task")');
   await page.waitForURL(/notice=/);
   await sleep(800);
-  eq(rows("SELECT COUNT(*) n FROM follow_ups WHERE lead_id='L1' AND due_on='2030-06-01'")[0].n, 1, 'rows for that date');
+  eq(rows("SELECT COUNT(*) n FROM tasks WHERE due_on='2030-06-01' AND title='double click'")[0].n, 1, 'rows for that task');
 });
 await test('refreshing the page after adding does not re-post the form (post/redirect/get)', async () => {
-  const before = rows('SELECT COUNT(*) n FROM follow_ups')[0].n;
+  const before = rows('SELECT COUNT(*) n FROM tasks')[0].n;
   await page.reload(); await sleep(500);
-  eq(rows('SELECT COUNT(*) n FROM follow_ups')[0].n, before, 'follow-ups after refresh');
+  eq(rows('SELECT COUNT(*) n FROM tasks')[0].n, before, 'tasks after refresh');
 });
-await test('the follow-ups page lists open items and completes from there', async () => {
+await test('the Follow-ups page lists open tasks and completes from there', async () => {
   await page.goto(`${BASE}/follow-ups`);
   await page.click('button:has-text("Mark complete")');
   await page.waitForURL(/notice=/);
-  eq(await notice(), 'Follow-up marked complete.', 'notice');
+  eq(await notice(), 'Task marked complete.', 'notice');
 });
 
-console.log('\n[real browser: other write forms use the same protection]');
-await test('note, stage, assessment date, contractor and archive forms all work in the browser', async () => {
+console.log('\n[real browser: the other CRM forms use the same protection]');
+await test('note, call, stage (with a reason), appointment and archive forms all work in the browser', async () => {
   await page.goto(`${BASE}/leads/L1`);
   await page.fill('#note', 'Real browser note'); await page.click('button:has-text("Save note")'); await page.waitForURL(/notice=/);
   eq(await notice(), 'Note added.', 'note');
-  await page.selectOption('#stage', 'contacted'); await page.click('button:has-text("Update")'); await page.waitForURL(/notice=/);
-  eq(await notice(), 'Stage updated.', 'stage');
-  await page.fill('#assessment_at', '2030-07-04T10:30'); await page.locator('form[action$="/assessment"] button').click(); await page.waitForURL(/notice=/);
-  eq(await notice(), 'Assessment date updated.', 'assessment');
-  await page.goto(`${BASE}/leads/L1`); await page.click('button:has-text("Archive lead")'); await page.waitForURL(/notice=/);
-  eq(await notice(), 'Lead archived. It is hidden from the default list and can be restored.', 'archive');
+  await page.selectOption('#c-out', 'no_answer'); await page.fill('#c-sum', 'Rang out'); await page.click('button:has-text("Record call")'); await page.waitForURL(/notice=/);
+  eq(await notice(), 'Call recorded.', 'call');
+  eq(rows("SELECT stage FROM opportunities WHERE id='op-L1'")[0].stage, 'contact_attempted', 'the ticked box moved the stage forward');
+  await page.selectOption('#stage-select', 'lost'); await page.selectOption('#lost-reason', 'price'); await page.click('button:has-text("Update stage")'); await page.waitForURL(/notice=/);
+  eq(await notice(), 'Stage updated.', 'stage'); eq(rows("SELECT stage, stage_reason FROM opportunities WHERE id='op-L1'")[0].stage_reason, 'price', 'reason stored');
+  await page.selectOption('#stage-select', 'in_conversation'); await page.click('button:has-text("Update stage")'); await page.waitForURL(/notice=/);
+  eq(await notice(), 'Stage updated.', 'reopened');
+  await page.fill('#ap-when', '2030-07-04T10:30'); await page.click('button:has-text("Record appointment")'); await page.waitForURL(/notice=/);
+  ok(/Appointment recorded/.test(await notice()), 'appointment');
+  await page.goto(`${BASE}/leads/L1`); await page.click('button:has-text("Archive this project")'); await page.waitForURL(/notice=/);
+  ok(/^Archived\./.test(await notice()), 'archive');
+});
+await test('the pipeline board can be operated with the keyboard alone: focus the card\'s Move control, choose a stage, press Enter on Move', async () => {
+  await page.goto(`${BASE}/leads?view=pipeline&archived=all`);
+  await page.focus('#mv-op-L1');
+  await page.selectOption('#mv-op-L1', 'qualified'); // the same value change a keyboard user makes with the arrow keys
+  await page.keyboard.press('Tab'); // to the Move button
+  await page.keyboard.press('Enter');
+  await page.waitForURL(/notice=/);
+  eq(rows("SELECT stage FROM opportunities WHERE id='op-L1'")[0].stage, 'qualified', 'moved by keyboard');
+  await page.goto(`${BASE}/leads?view=pipeline&archived=all`);
+  await page.selectOption('#mv-op-L1', 'lost'); await page.locator('#mv-op-L1').locator('xpath=following-sibling::button').click(); await page.waitForURL(/notice=/);
+  ok(/#stage$/.test(page.url()) || /reason/i.test(await notice()), 'a move that needs a reason lands on the stage form');
+  eq(rows("SELECT stage FROM opportunities WHERE id='op-L1'")[0].stage, 'qualified', 'unchanged until a reason is given');
 });
 
 console.log('\n[real browser: protection is still ON]');
 await test('a form on ANOTHER site cannot post to the dashboard, even from a signed-in browser (403, nothing saved)', async () => {
-  const before = rows('SELECT COUNT(*) n FROM follow_ups')[0].n;
+  const before = rows('SELECT COUNT(*) n FROM tasks')[0].n;
   const evil = await ctx.newPage();
   const resp = await Promise.all([evil.waitForResponse((r) => r.url().includes('/follow-ups') && r.request().method() === 'POST'), evil.goto(`http://127.0.0.1:${ATTACKER_PORT}/`)]).then((x) => x[0]);
   eq(resp.status(), 403, 'status');
   ok(/Request blocked/.test(await resp.text()), 'blocked page');
-  eq(rows('SELECT COUNT(*) n FROM follow_ups')[0].n, before, 'follow-ups unchanged');
+  eq(rows('SELECT COUNT(*) n FROM tasks')[0].n, before, 'tasks unchanged');
   await evil.close();
 });
 await test('a same-origin post with a missing CSRF token is still refused', async () => {
-  const before = rows('SELECT COUNT(*) n FROM follow_ups')[0].n;
+  const before = rows('SELECT COUNT(*) n FROM tasks')[0].n;
   await page.goto(`${BASE}/leads/L1`);
   await page.evaluate(() => { document.querySelectorAll('input[name=csrf]').forEach((i) => i.remove()); });
-  await page.fill('#due_on', '2030-08-08');
-  const [resp] = await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST'), page.click('button:has-text("Add follow-up")')]);
+  await page.fill('#pt-due', '2030-08-08');
+  const [resp] = await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST'), page.click('button:has-text("Add task")')]);
   eq(resp.status(), 403, 'status');
-  eq(rows('SELECT COUNT(*) n FROM follow_ups')[0].n, before, 'follow-ups unchanged');
+  eq(rows('SELECT COUNT(*) n FROM tasks')[0].n, before, 'tasks unchanged');
 });
 
 await browser.close();

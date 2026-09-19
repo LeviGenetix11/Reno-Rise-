@@ -211,3 +211,57 @@ export async function budgetFor(db, settings, kind, now = new Date()) {
   else if (kind === 'followup' && u.day_followups + 1 > followCap) reason = 'followup_cap';
   return { ok: reason === null, reason, ...u, day_cap: dayCap, month_cap: monthCap };
 }
+
+// ------------------------------------------------------------------ project-scoped (CRM)
+// A project (opportunity) can hold several submissions (leads rows), and one
+// contact can hold several projects. These helpers act on ONE project only, so
+// closing or booking project A can never stop the follow-ups of project B for the
+// same customer. Used by the dashboard only; the sender never calls them.
+
+/** Stops every open follow-up enrollment attached to this project's submissions. */
+export async function stopEnrollmentsForOpportunity(db, opportunityId, reason, actor = 'system') {
+  const open = await db
+    .prepare("SELECT e.id FROM enrollments e JOIN leads l ON l.id = e.lead_id WHERE l.opportunity_id = ? AND e.status IN ('active', 'paused')")
+    .bind(opportunityId)
+    .all();
+  let n = 0;
+  for (const e of open.results || []) if (await stopEnrollment(db, e.id, reason, actor)) n++;
+  return n;
+}
+
+/** Pauses (never restarts) this project's active enrollments. Resuming is always a separate, explicit staff action. */
+export async function pauseEnrollmentsForOpportunity(db, opportunityId, actor = 'system') {
+  const open = await db
+    .prepare("SELECT e.id, e.lead_id FROM enrollments e JOIN leads l ON l.id = e.lead_id WHERE l.opportunity_id = ? AND e.status = 'active'")
+    .bind(opportunityId)
+    .all();
+  let n = 0;
+  for (const e of open.results || []) {
+    const now = nowIso();
+    const res = await db.prepare("UPDATE enrollments SET status = 'paused', updated_at = ? WHERE id = ? AND status = 'active'").bind(now, e.id).run();
+    if (res.meta && res.meta.changes) {
+      await db.batch([activityStmt(db, e.lead_id, 'followup_paused', 'Follow-up sequence paused (project put on hold)', actor)]);
+      n++;
+    }
+  }
+  return n;
+}
+
+/**
+ * The open (active or paused) enrollment, if any, that already covers this person:
+ * on any of the contact's projects, or on any submission using the same email
+ * address. The follow-up emails are generic, so a person gets ONE sequence at a
+ * time rather than overlapping or conflicting ones.
+ * Returns { id, lead_id } or null.
+ */
+export async function openEnrollmentForPerson(db, { contactId, email, exceptLeadId }) {
+  return db
+    .prepare(
+      `SELECT e.id, e.lead_id FROM enrollments e JOIN leads l ON l.id = e.lead_id
+       WHERE e.status IN ('active', 'paused') AND e.lead_id != ?
+         AND ( (? != '' AND l.contact_id = ?) OR (? != '' AND lower(l.email) = ?) )
+       LIMIT 1`
+    )
+    .bind(exceptLeadId, contactId || '', contactId || '', lc(email), lc(email))
+    .first();
+}

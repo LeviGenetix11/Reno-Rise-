@@ -19,6 +19,7 @@ import { writeFileSync, readFileSync, mkdirSync, rmSync, existsSync, readdirSync
 import { DatabaseSync } from 'node:sqlite';
 import { generateKeyPairSync, createSign } from 'node:crypto';
 import { chromium } from 'playwright-core';
+import { seedPreviewData } from './preview-seed.mjs';
 
 const WRANGLER = 'node_modules/wrangler/bin/wrangler.js';
 const STATE = '.wrangler/design-state';
@@ -34,23 +35,7 @@ if (existsSync(STATE)) rmSync(STATE, { recursive: true, force: true });
 execFileSync(process.execPath, [WRANGLER, 'd1', 'migrations', 'apply', 'renorise-leads', '--local', '--persist-to', STATE], { stdio: 'ignore' });
 const dir = `${STATE}/v3/d1/miniflare-D1DatabaseObject`;
 const db = new DatabaseSync(`${dir}/${readdirSync(dir).find((f) => f.endsWith('.sqlite') && f !== 'metadata.sqlite')}`);
-const names = ['Priya Sharma', 'Marcus Johnson', 'Elena Rossi', 'David Chen', 'Aisha Khan', 'Tom Baker', 'Sofia Martins', 'James O’Neil', 'Nadia Petrova', 'Luca Bianchi', 'Grace Kim', 'Omar Haddad', '<b>Markup</b> Tester', 'Averyveryveryverylongsinglewordnamewithnobreakstotestwrapping'];
-const types = ['Kitchen remodel', 'Basement finishing', 'Bathroom renovation', 'Flooring', 'Home addition', 'Deck build'];
-const stages = ['new', 'new', 'contacted', 'contacted', 'assessment_booked', 'quote_sent', 'won', 'lost', 'new', 'contacted', 'new', 'quote_sent', 'new', 'new'];
-const cities = ['Toronto', 'Mississauga', 'Vaughan', 'Markham', 'Brampton'];
-const isoDaysAgo = (n) => new Date(Date.now() - n * 86400000).toISOString();
-const dateOffset = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
-db.exec('PRAGMA foreign_keys = ON');
-db.prepare("INSERT INTO contractors (id, name, company, service_types, service_area, email, phone, created_at, updated_at) VALUES ('C1','Sam Builder','Sam Builds Inc','kitchens, basements','Peel','sam@example.test','(905) 555-0199','2026-09-01','2026-09-01')").run();
-names.forEach((n, i) => {
-  const id = `L${String(i + 1).padStart(2, '0')}`;
-  db.prepare("INSERT INTO leads (id, idempotency_key, created_at, name, email, phone, city, renovation_type, project_timing, source, status, customer_email_status, internal_email_status, contractor_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
-    .run(id, `k${i}`, isoDaysAgo(i + 1), n, `client${i + 1}@example.test`, `(416) 555-01${String(10 + i)}`, cities[i % 5], types[i % 6], 'Within 1-3 months', ['homepage', 'contact', 'assessment'][i % 3], stages[i], i === 3 ? 'failed' : 'sent', 'sent', i === 2 || i === 4 ? 'C1' : null);
-});
-db.prepare("INSERT INTO email_jobs (id, lead_id, email_type, idempotency_key, status, attempts, max_attempts, last_error, created_at, updated_at) VALUES ('J1','L04','customer','L04:customer','failed',5,5,'Resend rejected the email: simulated','2026-09-15T00:00:00Z','2026-09-15T00:00:00Z')").run();
-for (const [lid, due, note] of [['L01', dateOffset(-3), 'Call back about the kitchen quote'], ['L03', dateOffset(-1), 'Send photos of the basement'], ['L02', dateOffset(0), 'Confirm measurement visit'], ['L05', dateOffset(2), 'Check permit question'], ['L06', dateOffset(6), 'Follow up on the quote']]) {
-  db.prepare('INSERT INTO follow_ups (id, lead_id, due_on, note, created_at) VALUES (?,?,?,?,?)').run(`F-${lid}`, lid, due, note, '2026-09-10T12:00:00Z');
-}
+await seedPreviewData(db);
 db.close();
 
 // ---- signed test token + mock Access key endpoint ----
@@ -76,7 +61,7 @@ for (let i = 0; i < 90; i++) { try { if ((await fetch(`${BASE}/`)).status === 40
 // The login header goes ONLY to the dashboard, never to third-party hosts (a real browser wouldn't either).
 const authRoute = (ctx) => ctx.route((u) => u.hostname === '127.0.0.1', (r) => r.continue({ headers: { ...r.request().headers(), 'cf-access-jwt-assertion': jwt } }));
 const browser = await chromium.launch({ executablePath: BROWSER, headless: true });
-const pages = [['home', '/'], ['leads', '/leads'], ['leads-filtered', '/leads?status=contacted&q=a&source=contact'], ['lead-detail', '/leads/L03'], ['follow-ups', '/follow-ups'], ['contractors', '/contractors'], ['emails', '/emails'], ['sequence', '/sequence'], ['queue', '/sequence/queue'], ['settings', '/sequence/settings'], ['preview', '/sequence/preview?name=Jamie%20Lee']];
+const pages = [['home', '/'], ['today', '/today'], ['leads', '/leads'], ['pipeline', '/leads?view=pipeline'], ['leads-filtered', '/leads?status=in_conversation&q=a&source=contact'], ['leads-needs-stage', '/leads?status=needs_review'], ['project', '/leads/op-L01'], ['project-quote', '/leads/op-L08'], ['project-needs-stage', '/leads/op-L03'], ['contacts', '/contacts'], ['contact', '/contacts/ct-L01'], ['new-inquiry', '/leads/new'], ['follow-ups', '/follow-ups'], ['contractors', '/contractors'], ['contractor', '/contractors/C1'], ['emails', '/emails'], ['sequence', '/sequence'], ['queue', '/sequence/queue'], ['settings', '/sequence/settings'], ['preview', '/sequence/preview?name=Jamie%20Lee']];
 const viewports = [['mobile', 390, 844], ['tablet', 768, 1024], ['desktop', 1280, 800]];
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? ' — ' + detail : ''}`); };
@@ -116,7 +101,7 @@ console.log('\n[keyboard navigation (desktop)]');
   check('every focused element shows a visible focus ring', seen.every((s) => s.ring), JSON.stringify(seen.filter((s) => !s.ring)));
   check('every focused element is on screen (nothing hidden off-canvas)', seen.every((s) => s.onScreen));
   await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
-  for (let i = 0; i < 4; i++) await page.keyboard.press('Tab'); // skip, brand, Overview, Leads
+  for (let i = 0; i < 5; i++) await page.keyboard.press('Tab'); // skip, brand, Overview, Today, Leads
   await page.keyboard.press('Enter');
   await page.waitForURL(/\/leads$/, { timeout: 5000 }).then(() => check('Tab + Enter on "Leads" in the menu navigates there', true), () => check('Tab + Enter on "Leads" in the menu navigates there', false));
   await ctx.close();

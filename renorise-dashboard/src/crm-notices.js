@@ -1,0 +1,60 @@
+// Fixed messages for the CRM screens, selected by a short code (request input is
+// never echoed into a page). These also replace a few older messages whose wording
+// only made sense before follow-ups and assessments became tasks and appointments.
+
+export const CRM_NOTICES = {
+  // --- replaced wording
+  bad_date: ['error', 'Enter a valid date.'],
+  bad_datetime: ['error', 'Enter a valid date and time. That local time may not exist because of a clock change.'],
+  bad_stage: ['error', 'Choose one of the listed stages.'],
+  archived: ['ok', 'Archived. It is hidden from the default lists, nothing was deleted, and follow-up emails for it were stopped.'],
+  unarchived: ['ok', 'Restored from the archive. Follow-up emails were not restarted.'],
+
+  // --- saved
+  contact_saved: ['ok', 'Contact details saved. The original submissions were not changed.'],
+  project_saved: ['ok', 'Project details saved.'],
+  project_created: ['ok', 'Saved. Nothing was emailed to anyone.'],
+  qualification_saved: ['ok', 'Qualification updated.'],
+  delivery_saved: ['ok', 'Work status updated.'],
+  task_saved: ['ok', 'Task added.'],
+  task_done: ['ok', 'Task marked complete.'],
+  task_cancelled: ['ok', 'Task cancelled.'],
+  task_rescheduled: ['ok', 'Task moved to the new date.'],
+  call_logged: ['ok', 'Call recorded.'],
+  appointment_saved: ['ok', 'Appointment recorded. Automatic follow-up emails for this project were stopped.'],
+  appointment_rescheduled: ['ok', 'Appointment rescheduled.'],
+  appointment_cancelled: ['ok', 'Appointment cancelled. Follow-up emails were not restarted.'],
+  appointment_completed: ['ok', 'Appointment marked completed.'],
+  appointment_no_show: ['ok', 'Appointment marked as a no-show.'],
+  permission_saved: ['ok', 'Permission record added.'],
+  contact_archived: ['ok', 'Contact archived. Nothing was deleted.'],
+  contact_unarchived: ['ok', 'Contact restored.'],
+  test_marked: ['ok', 'Marked as a test record. It is left out of business counts and Today; nothing was deleted.'],
+  test_unmarked: ['ok', 'Test-record mark removed.'],
+
+  // --- refused
+  contact_name: ['error', 'A name is required.'],
+  contact_email: ['error', 'That email address does not look valid.'],
+  contact_phone: ['error', 'That phone number does not look valid (it needs at least 7 digits).'],
+  contact_needs_email_or_phone: ['error', 'Add an email address or a phone number, so the person can be identified. You do not need both.'],
+  bad_postal: ['error', 'A postal code looks like M5V 3A3. Leave it blank if you do not know it; nothing is filled in for you.'],
+  dates_order: ['error', 'The target completion date is before the desired start date.'],
+  bad_budget: ['error', 'Enter whole-dollar amounts, with the maximum at least the minimum.'],
+  budget_needed: ['error', 'Enter a minimum or a maximum budget, or choose "Not yet discussed".'],
+  bad_currency: ['error', 'Choose Canadian or US dollars.'],
+  reason_required: ['error', 'Choose a reason first. Lost, On hold and Not a fit each need one so the history is useful later.'],
+  note_required: ['error', 'When the reason is "Other", add a short note explaining it.'],
+  hold_review_required: ['error', 'Choose the date to review this project again.'],
+  hold_review_past: ['error', 'The review date must be today or later.'],
+  delivery_needs_won: ['error', 'Work status only applies once the project is Won. Winning a project does not mean the work is done.'],
+  contact_has_open_projects: ['error', 'This contact still has projects that are not archived. Archive those first.'],
+  bad_channel: ['error', 'Choose how this inquiry arrived.'],
+  received_future: ['error', 'The time the inquiry was received cannot be in the future.'],
+  call_future: ['error', 'A call cannot be logged for a time in the future.'],
+  call_summary_long: ['error', 'A call summary can be up to 2,000 characters.'],
+  completion_note_long: ['error', 'A completion note can be up to 500 characters.'],
+  appointment_notes_long: ['error', 'Appointment notes can be up to 500 characters.'],
+  appointment_not_scheduled: ['error', 'Only a scheduled appointment can be changed.'],
+  task_not_open: ['error', 'That task is already finished.'],
+  bad_assignee: ['error', 'Choose a signed-in staff member from the list.'],
+};
