@@ -26,6 +26,6 @@ migrations_dir = "../renorise-forms/migrations"
 # ADMIN_EMAILS       : comma-separated sign-in emails allowed to use the dashboard
 # While any of these is empty the dashboard answers 503 to every request.
 [vars]
-ACCESS_TEAM_DOMAIN = ""
+ACCESS_TEAM_DOMAIN = "renorise-admin.cloudflareaccess.com"
 ACCESS_AUD = ""
-ADMIN_EMAILS = ""
+ADMIN_EMAILS = "levi.gene.ous@gmail.com"
