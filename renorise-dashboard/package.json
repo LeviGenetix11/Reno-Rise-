@@ -9,7 +9,9 @@
     "test": "node test/run-tests.mjs",
     "test:browser": "node test/browser-check.mjs",
     "test:sequence": "node test/sequence-pages-tests.mjs",
-    "test:design": "node test/design-check.mjs"
+    "test:design": "node test/design-check.mjs",
+    "test:crm": "node test/crm-core-tests.mjs && node test/crm-pages-tests.mjs",
+    "preview": "node test/preview.mjs"
   },
   "devDependencies": {
     "axe-core": "^4.13.0",

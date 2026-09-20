@@ -10,17 +10,30 @@
 //
 // Writes are POST-only, protected by an Origin check plus a per-session CSRF
 // token, and answered with a 303 redirect (post/redirect/get).
+//
+// The CRM (contacts, projects, stages, tasks, calls, appointments, timeline, Today)
+// is in crm-db.js / crm-work.js / crm-query.js / crm-views.js. Nothing in this
+// Worker sends email: it only records decisions; the public Worker's scheduled job
+// does all sending.
 
 import { authenticate } from './auth.js';
 import { csrfToken, originProblem, tokenOk, makeNonce, securityHeaders } from './security.js';
-import { layout, errorPage, toString } from './html.js';
+import { layout, errorPage, toString, html } from './html.js';
 import * as db from './db.js';
 import * as v from './views.js';
 import { toCsv } from './csv.js';
-import { STAGE_LABEL, SOURCE_LABEL } from './constants.js';
 import { formatDateTime, formatDate, torontoToday } from './time.js';
 import * as sdb from './seq-db.js';
 import * as sv from './seq-views.js';
+import * as crm from './crm-db.js';
+import * as work from './crm-work.js';
+import * as q from './crm-query.js';
+import * as cv from './crm-views.js';
+import * as cdb from './calls-db.js';
+import * as clv from './calls-views.js';
+import { streamVoicemail, voicemailConfigured, checkPlayback } from './voicemail.js';
+import { getCallById } from '../../renorise-shared/calls-db.js';
+import { STAGE_LABEL, SOURCE_LABEL, QUALIFICATION_LABEL, PRIORITY_LABEL, MARKETING_SOURCE_LABEL } from './crm-constants.js';
 import { loadSettings } from '../../renorise-shared/followup-db.js';
 
 const MAX_FORM_BYTES = 60_000;
@@ -33,6 +46,9 @@ const respond = (body, status, nonce, extra = {}) =>
 
 const redirect = (location, nonce) =>
   new Response(null, { status: 303, headers: { Location: location, ...securityHeaders(nonce) } });
+
+/** Signed-in staff emails (the Access allow-list). With one staff member there is nobody to assign tasks between. */
+const staffEmails = (env) => String(env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
 
 export default {
   async fetch(request, env) {
@@ -51,9 +67,19 @@ export default {
       return respond(errorPage(title, msg, nonce), auth.status, nonce);
     }
 
-    const ctx = { env, db: env.DB, email: auth.email, nonce, url, csrf: () => csrfToken(env.CSRF_SECRET, auth.email) };
+    const ctx = { env, db: env.DB, email: auth.email, nonce, url, csrf: () => csrfToken(env.CSRF_SECRET, auth.email), staff: staffEmails(env) };
 
     try {
+      // Every original submission gets a contact and a project the first time it is seen (idempotent, cheap when
+      // there is nothing to do). If the database update has not been applied yet, say so instead of failing oddly.
+      try {
+        await crm.ensureCrmRecords(env.DB);
+      } catch (err) {
+        if (/no such (table|column)/i.test(String(err.message))) {
+          return respond(errorPage('Database update needed', 'This dashboard version needs the database updates (migrations 0004 and 0005). Apply them, then reload. Nothing has been lost.', nonce), 503, nonce);
+        }
+        throw err;
+      }
       if (request.method === 'GET' || request.method === 'HEAD') return await handleGet(request, ctx);
       if (request.method === 'POST') return await handlePost(request, ctx);
       return respond(errorPage('Method not allowed', 'That method is not supported.', nonce), 405, nonce, { Allow: 'GET, HEAD, POST' });
@@ -66,7 +92,7 @@ export default {
 
 const page = async (ctx, { title, active, body, status = 200 }) =>
   respond(
-    layout({ title, active, email: ctx.email, nonce: ctx.nonce, notice: ctx.url.searchParams.get('notice'), body, summary: await db.summaryCounts(ctx.db) }),
+    layout({ title, active, email: ctx.email, nonce: ctx.nonce, notice: ctx.url.searchParams.get('notice'), body, summary: await q.summaryCounts(ctx.db) }),
     status,
     ctx.nonce
   );
@@ -81,30 +107,116 @@ async function handleGet(request, ctx) {
   let m;
 
   if (path === '/') {
-    const data = await db.overview(ctx.db);
-    return page(ctx, { title: 'Overview', active: 'overview', body: v.overviewPage(data) });
+    const data = await q.overview(ctx.db);
+    return page(ctx, { title: 'Overview', active: 'overview', body: cv.overviewPage(data) });
+  }
+
+  if (path === '/today') {
+    const [data, csrf] = await Promise.all([q.todayData(ctx.db), ctx.csrf()]);
+    return page(ctx, { title: 'Today', active: 'today', body: cv.todayPage({ data, csrf, staleForm: data.settings }) });
   }
 
   if (path === '/leads') {
-    const filters = db.parseLeadFilters(url);
-    const [result, contractors, stages] = await Promise.all([db.listLeads(ctx.db, filters), db.listContractors(ctx.db, false), db.stageCounts(ctx.db, filters)]);
-    return page(ctx, { title: 'Leads', active: 'leads', body: v.leadsPage({ result, filters, contractors, stages }) });
+    const filters = q.parseLeadFilters(url);
+    const [contractors, stages, testHidden, csrf] = await Promise.all([db.listContractors(ctx.db, false), q.stageCounts(ctx.db, filters), q.hiddenTestCount(ctx.db), ctx.csrf()]);
+    const today = torontoToday();
+    if (filters.view === 'pipeline') {
+      const board = await q.pipelineOpportunities(ctx.db, filters);
+      return page(ctx, { title: 'Leads', active: 'leads', body: cv.leadsPage({ result: null, board, filters, contractors, stages, testHidden, csrf, today }) });
+    }
+    const result = await q.listOpportunities(ctx.db, filters);
+    return page(ctx, { title: 'Leads', active: 'leads', body: cv.leadsPage({ result, board: null, filters, contractors, stages, testHidden, csrf, today }) });
   }
 
   if (path === '/leads/export.csv') return exportCsv(ctx);
 
+  if (path === '/leads/new') {
+    return page(ctx, { title: 'Add an inquiry', active: 'leads', body: cv.newProjectPage({ contact: null, csrf: await ctx.csrf() }) });
+  }
+
   if ((m = /^\/leads\/([A-Za-z0-9-]+)$/.exec(path))) {
-    const detail = await db.leadDetail(ctx.db, m[1]);
-    if (!detail) return notFound(ctx);
-    const [contractors, csrf] = await Promise.all([db.listContractors(ctx.db, false), ctx.csrf()]);
-    const seq = await sdb.enrollmentForLead(ctx.db, detail.lead.id);
-    const sequenceHtml = sv.sequenceCard({ lead: detail.lead, seq, csrf, today: torontoToday() });
-    return page(ctx, { title: detail.lead.name, active: 'leads', body: v.leadPage({ detail, contractors, csrf, today: torontoToday(), sequenceHtml }) });
+    const opp = await crm.getOpportunity(ctx.db, m[1]);
+    if (!opp) return notFound(ctx);
+    const [contact, submissions, timeline, tasks, appointments, contractors, csrf, jobs, duplicates, seqLead] = await Promise.all([
+      crm.getContact(ctx.db, opp.contact_id),
+      crm.submissionsFor(ctx.db, opp.id),
+      q.buildTimeline(ctx.db, { opportunityId: opp.id }),
+      work.tasksFor(ctx.db, { opportunityId: opp.id }),
+      work.appointmentsFor(ctx.db, opp.id),
+      db.listContractors(ctx.db, false),
+      ctx.csrf(),
+      q.emailJobsFor(ctx.db, opp.id),
+      crm.possibleDuplicates(ctx.db, opp.contact_id),
+      q.sequenceLeadFor(ctx.db, opp.id),
+    ]);
+    const today = torontoToday();
+    let sequenceHtml = '';
+    if (seqLead && seqLead.email) {
+      sequenceHtml = sv.sequenceCard({ lead: seqLead, seq: await sdb.enrollmentForLead(ctx.db, seqLead.id), csrf, today });
+    } else {
+      sequenceHtml = html`<section class="card" aria-labelledby="seq-h"><h2 id="seq-h">Follow-up emails</h2><p class="empty">This project has no email address on file, so it cannot be enrolled in follow-up emails.</p></section>`;
+    }
+    return page(ctx, {
+      title: opp.title,
+      active: 'leads',
+      body: cv.projectPage({ opp, contact, submissions, timeline, tasks, appointments, contractors, csrf, today, sequenceHtml, seqLead, jobs, duplicates, assignees: ctx.staff }),
+    });
+  }
+
+  if (path === '/contacts') {
+    const filters = q.parseContactFilters(url);
+    const [result, testHidden] = await Promise.all([q.listContacts(ctx.db, filters), q.hiddenTestCount(ctx.db)]);
+    return page(ctx, { title: 'Contacts', active: 'contacts', body: cv.contactsPage({ result, filters, testHidden }) });
+  }
+
+  if ((m = /^\/contacts\/([A-Za-z0-9-]+)\/projects\/new$/.exec(path))) {
+    const contact = await crm.getContact(ctx.db, m[1]);
+    if (!contact) return notFound(ctx);
+    return page(ctx, { title: 'Add another project', active: 'contacts', body: cv.newProjectPage({ contact, csrf: await ctx.csrf() }) });
+  }
+
+  if ((m = /^\/contacts\/([A-Za-z0-9-]+)$/.exec(path))) {
+    const contact = await crm.getContact(ctx.db, m[1]);
+    if (!contact) return notFound(ctx);
+    const [bundle, duplicates, timeline, tasks, csrf] = await Promise.all([
+      q.contactBundle(ctx.db, contact.id),
+      crm.possibleDuplicates(ctx.db, contact.id),
+      q.buildTimeline(ctx.db, { contactId: contact.id }),
+      work.tasksFor(ctx.db, { contactId: contact.id }),
+      ctx.csrf(),
+    ]);
+    return page(ctx, { title: contact.display_name, active: 'contacts', body: cv.contactPage({ contact, bundle, duplicates, timeline, tasks, csrf, today: torontoToday(), assignees: ctx.staff }) });
   }
 
   if (path === '/follow-ups') {
-    const [data, csrf] = await Promise.all([db.listFollowUps(ctx.db), ctx.csrf()]);
-    return page(ctx, { title: 'Follow-ups', active: 'follow-ups', body: v.followUpsPage({ data, csrf }) });
+    const filters = work.parseTaskFilters(url);
+    const [data, csrf] = await Promise.all([work.listTasks(ctx.db, filters), ctx.csrf()]);
+    return page(ctx, { title: 'Follow-ups', active: 'follow-ups', body: cv.tasksPage({ data, filters, csrf, assignees: ctx.staff }) });
+  }
+
+  if (path === '/calls') {
+    const filters = cdb.parseCallFilters(url);
+    const [result, counts] = await Promise.all([cdb.listCalls(ctx.db, filters), cdb.callCounts(ctx.db)]);
+    return page(ctx, { title: 'Calls', active: 'calls', body: clv.callsPage({ result, counts, filters }) });
+  }
+
+  if (path === '/calls/playback-check') {
+    // Read-only setup check: runs on the server with the saved credentials and shows pass / fail only.
+    return page(ctx, { title: 'Voicemail playback check', active: 'calls', body: clv.playbackCheckPage({ steps: await checkPlayback(ctx.env) }) });
+  }
+
+  if ((m = /^\/calls\/([A-Za-z0-9-]+)\/voicemail$/.exec(path))) {
+    // Private playback: fetched from Twilio server-side with our credentials and streamed; there is no public link.
+    const call = await getCallById(ctx.db, m[1]);
+    return streamVoicemail(request, ctx.env, call, securityHeaders(ctx.nonce));
+  }
+
+  if ((m = /^\/calls\/([A-Za-z0-9-]+)$/.exec(path))) {
+    const detail = await cdb.callDetail(ctx.db, m[1]);
+    if (!detail) return notFound(ctx);
+    const q = (url.searchParams.get('q') || '').trim().slice(0, 60);
+    const [csrf, results] = await Promise.all([ctx.csrf(), q && !detail.call.contact_id ? cdb.searchContactsToLink(ctx.db, q) : []]);
+    return page(ctx, { title: 'Call', active: 'calls', body: clv.callPage({ detail, csrf, playback: voicemailConfigured(ctx.env), results, q, today: torontoToday() }) });
   }
 
   if (path === '/contractors') {
@@ -119,7 +231,12 @@ async function handleGet(request, ctx) {
   if ((m = /^\/contractors\/([A-Za-z0-9-]+)$/.exec(path))) {
     const contractor = await db.getContractor(ctx.db, m[1]);
     if (!contractor) return notFound(ctx);
-    return page(ctx, { title: contractor.name, active: 'contractors', body: v.contractorFormPage({ contractor, csrf: await ctx.csrf() }) });
+    const [csrf, tasks] = await Promise.all([ctx.csrf(), work.tasksFor(ctx.db, { contractorId: contractor.id })]);
+    return page(ctx, {
+      title: contractor.name,
+      active: 'contractors',
+      body: html`${v.contractorFormPage({ contractor, csrf })}${cv.contractorTasks({ contractor, tasks, csrf, today: torontoToday(), assignees: ctx.staff })}`,
+    });
   }
 
   // ---- follow-up email sequence
@@ -158,18 +275,23 @@ async function handleGet(request, ctx) {
 }
 
 async function exportCsv(ctx) {
-  const filters = db.parseLeadFilters(ctx.url);
-  const rows = await db.exportLeads(ctx.db, filters);
+  const filters = q.parseLeadFilters(ctx.url);
+  const rows = await q.exportOpportunities(ctx.db, filters);
   const header = [
-    'Lead ID', 'Received (Toronto)', 'Name', 'Email', 'Phone', 'City / postal code', 'Renovation type', 'Preferred start',
-    'Target deadline', 'Project details', 'Source page', 'Stage', 'Contractor', 'Assessment (Toronto)', 'Next follow-up',
-    'Archived', 'Customer email (Resend)', 'Internal email (Resend)',
+    'Lead ID', 'Contact ID', 'Received (Toronto)', 'Name', 'Email', 'Phone', 'Project title', 'Renovation type', 'Property address', 'City', 'Postal code',
+    'Stage', 'Qualification', 'Priority', 'Budget', 'Preferred start', 'Target completion', 'Project description', 'Submission source', 'Marketing source',
+    'Customer-reported source', 'Contractor', 'Next appointment (Toronto)', 'Next task due', 'First contact recorded (Toronto)', 'Archived', 'Test record',
+    'Customer email (Resend)', 'Internal email (Resend)',
   ];
-  const body = rows.map((l) => [
-    l.id, formatDateTime(l.created_at), l.name, l.email, l.phone, l.city, l.renovation_type, l.project_timing,
-    l.target_deadline, l.project_details, SOURCE_LABEL[l.source] || l.source, STAGE_LABEL[l.status] || l.status,
-    l.contractor_name, l.assessment_at ? formatDateTime(l.assessment_at) : '', l.next_follow_up ? formatDate(l.next_follow_up) : '',
-    l.archived_at ? 'Yes' : 'No', l.customer_email_status, l.internal_email_status,
+  const budget = (o) =>
+    o.budget_status !== 'stated' ? 'Not yet discussed' : `${o.budget_min ?? ''}${o.budget_min != null && o.budget_max != null ? ' to ' : o.budget_max != null ? 'up to ' : ''}${o.budget_max ?? ''} ${o.budget_currency}`.trim();
+  const body = rows.map((o) => [
+    o.id, o.contact_id, formatDateTime(o.created_at), o.contact_name, o.contact_email, o.contact_phone, o.title, o.renovation_type, o.property_address, o.property_city, o.property_postal_code,
+    o.stage_needs_review ? 'Needs a stage (existing record)' : STAGE_LABEL[o.stage] || o.stage, QUALIFICATION_LABEL[o.qualification] || o.qualification, PRIORITY_LABEL[o.priority] || o.priority, budget(o),
+    [o.desired_start_date, o.desired_start_note].filter(Boolean).join(' · '), [o.target_completion_date, o.target_completion_note].filter(Boolean).join(' · '), o.description,
+    SOURCE_LABEL[o.first_source] || o.first_source, MARKETING_SOURCE_LABEL[o.marketing_source] || o.marketing_source, o.customer_reported_source, o.contractor_name,
+    o.next_appointment ? formatDateTime(o.next_appointment) : '', o.next_task_due ? formatDate(o.next_task_due) : '', o.first_contact_at ? formatDateTime(o.first_contact_at) : '',
+    o.archived_at ? 'Yes' : 'No', o.is_test ? 'Yes' : 'No', o.customer_email_status, o.internal_email_status,
   ]);
   const stamp = torontoToday();
   return new Response(toCsv(header, body), {
@@ -243,22 +365,141 @@ async function handlePost(request, ctx) {
     return back(ctx, '/sequence/settings', res.code);
   }
 
-  if ((m = /^\/leads\/([A-Za-z0-9-]+)\/(stage|notes|contractor|assessment|archive|unarchive|follow-ups)$/.exec(path))) {
-    const [, leadId, action] = m;
+  // ---- phone calls (recorded by the voice Worker; these are YOUR actions on them)
+  if ((m = /^\/calls\/([A-Za-z0-9-]+)\/(notes|link|unlink|project|new-lead|callback|task|mark)$/.exec(path))) {
+    const call = await getCallById(ctx.db, m[1]);
+    if (!call) return back(ctx, '/calls', 'not_found');
+    const here = `/calls/${call.id}`;
     let res;
-    if (action === 'stage') res = await db.setStage(ctx.db, leadId, String(form.get('stage') || ''), actor);
-    else if (action === 'notes') res = await db.addNote(ctx.db, leadId, form.get('body'), actor);
-    else if (action === 'contractor') res = await db.assignContractor(ctx.db, leadId, form.get('contractor_id'), actor);
-    else if (action === 'assessment') res = await db.setAssessment(ctx.db, leadId, form.get('assessment_at'), actor);
-    else if (action === 'archive') res = await db.setArchived(ctx.db, leadId, true, actor);
-    else if (action === 'unarchive') res = await db.setArchived(ctx.db, leadId, false, actor);
-    else res = await db.addFollowUp(ctx.db, leadId, String(form.get('due_on') || ''), form.get('note'), actor);
-    return back(ctx, `/leads/${leadId}`, res.code);
+    if (m[2] === 'notes') res = await cdb.saveCallNotes(ctx.db, call.id, form.get('notes'), actor);
+    else if (m[2] === 'link') res = await cdb.linkCall(ctx.db, call.id, String(form.get('contact_id') || ''), actor);
+    else if (m[2] === 'unlink') res = await cdb.unlinkCall(ctx.db, call.id, actor);
+    else if (m[2] === 'project') res = await cdb.attachCallToProject(ctx.db, call.id, String(form.get('opportunity_id') || ''), actor);
+    else if (m[2] === 'callback') res = await cdb.setCallback(ctx.db, call.id, String(form.get('action') || ''), actor);
+    else if (m[2] === 'task') res = await cdb.createCallbackTask(ctx.db, call.id, actor);
+    else if (m[2] === 'mark') res = await cdb.setDisposition(ctx.db, call.id, String(form.get('value') || ''), actor);
+    else {
+      const contact = crm.readContactForm(form);
+      if (!contact.ok) return back(ctx, here, contact.code);
+      const project = crm.readOpportunityForm(form);
+      if (!project.ok) return back(ctx, here, project.code);
+      res = await cdb.createLeadFromCall(ctx.db, call.id, contact.value, project.value, actor);
+      if (res.ok) return back(ctx, `/leads/${res.opportunityId}`, res.code);
+    }
+    return back(ctx, here, res.code);
   }
 
-  if ((m = /^\/leads\/([A-Za-z0-9-]+)\/follow-ups\/([A-Za-z0-9-]+)\/complete$/.exec(path))) {
-    const res = await db.completeFollowUp(ctx.db, m[1], m[2], actor);
-    return back(ctx, form.get('back') === 'followups' ? '/follow-ups' : `/leads/${m[1]}`, res.code);
+  // ---- CRM: reminder thresholds
+  if (path === '/settings/crm') {
+    const res = await crm.saveCrmSettings(ctx.db, form, actor);
+    return back(ctx, '/today', res.code);
+  }
+
+  // ---- CRM: new inquiry entered by hand (never sends anything)
+  if (path === '/leads') {
+    const contact = crm.readContactForm(form);
+    if (!contact.ok) return back(ctx, '/leads/new', contact.code);
+    const project = crm.readOpportunityForm(form);
+    if (!project.ok) return back(ctx, '/leads/new', project.code);
+    const res = await crm.createManualProject(ctx.db, { contactValue: contact.value, projectValue: project.value, channel: String(form.get('channel') || ''), receivedLocal: String(form.get('received_at') || '') }, actor);
+    return back(ctx, res.ok ? `/leads/${res.opportunityId}` : '/leads/new', res.code);
+  }
+
+  // ---- CRM: a project (lead) and everything on it
+  if ((m = /^\/leads\/([A-Za-z0-9-]+)\/(stage|qualification|details|notes|contractor|archive|unarchive|test|delivery|resume|calls|tasks|appointments|follow-ups)$/.exec(path))) {
+    const opp = await crm.getOpportunity(ctx.db, m[1]);
+    if (!opp) return back(ctx, '/leads', 'not_found');
+    const action = m[2];
+    const here = `/leads/${opp.id}`;
+    let res;
+    if (action === 'stage') {
+      const stage = String(form.get('stage') || '');
+      const reason = stage === 'lost' ? form.get('lost_reason') : stage === 'on_hold' ? form.get('hold_reason') : null;
+      res = await crm.setStage(ctx.db, opp.id, { stage, reason, reviewOn: form.get('review_on'), note: form.get('note') }, actor);
+      if (form.get('back') === 'board') {
+        // A quick move from the pipeline board: success returns to the board; a move that needs a reason opens the project's stage form.
+        if (res.ok) return back(ctx, '/leads?view=pipeline', res.code);
+        return backAt(ctx, here, res.code, 'stage');
+      }
+      return backAt(ctx, here, res.code, res.ok ? '' : 'stage');
+    }
+    if (action === 'qualification') res = await crm.setQualification(ctx.db, opp.id, { value: form.get('value'), reason: form.get('reason'), note: form.get('note') }, actor);
+    else if (action === 'details') {
+      const parsed = crm.readOpportunityForm(form);
+      res = parsed.ok ? await crm.updateOpportunity(ctx.db, opp.id, parsed.value, actor) : parsed;
+    } else if (action === 'notes') res = await crm.addNote(ctx.db, opp.id, form.get('body'), actor);
+    else if (action === 'contractor') res = await crm.assignContractor(ctx.db, opp.id, form.get('contractor_id'), actor);
+    else if (action === 'archive') res = await crm.setArchived(ctx.db, opp.id, true, actor);
+    else if (action === 'unarchive') res = await crm.setArchived(ctx.db, opp.id, false, actor);
+    else if (action === 'test') res = await crm.setTestFlag(ctx.db, opp.id, form.get('flag') === '1', actor);
+    else if (action === 'delivery') res = await crm.setDeliveryStatus(ctx.db, opp.id, String(form.get('delivery_status') || ''), actor);
+    else if (action === 'resume') res = await crm.resumeFromHold(ctx.db, opp.id, actor);
+    else if (action === 'calls') {
+      res = await work.logCall(
+        ctx.db,
+        { opportunityId: opp.id },
+        { outcome: form.get('outcome'), direction: form.get('direction'), occurredLocal: String(form.get('occurred_at') || ''), summary: form.get('summary'), nextTitle: form.get('next_title'), nextDue: form.get('next_due'), moveStage: form.get('move_stage') === 'yes' },
+        actor
+      );
+    } else if (action === 'appointments') {
+      res = await work.addAppointment(ctx.db, opp.id, { kind: form.get('kind'), startsLocal: String(form.get('starts_at') || ''), notes: form.get('notes'), moveStage: form.get('move_stage') === 'yes' }, actor);
+    } else {
+      // 'tasks', and the earlier /follow-ups path (same form, a date and an optional note)
+      const parsed = work.readTaskForm(form, ctx.staff);
+      res = parsed.ok ? await work.createTask(ctx.db, { opportunityId: opp.id }, parsed.value, actor) : parsed;
+    }
+    return back(ctx, here, res.code);
+  }
+
+  // ---- CRM: tasks
+  if ((m = /^\/tasks\/([A-Za-z0-9-]+)\/(complete|cancel|reschedule)$/.exec(path)) || (m = /^\/leads\/[A-Za-z0-9-]+\/follow-ups\/([A-Za-z0-9-]+)\/(complete)$/.exec(path))) {
+    const task = await work.getTask(ctx.db, m[1]);
+    if (!task) return back(ctx, '/follow-ups', 'not_found');
+    const res = m[2] === 'complete' ? await work.completeTask(ctx.db, task.id, form.get('note'), actor) : m[2] === 'cancel' ? await work.cancelTask(ctx.db, task.id, actor) : await work.rescheduleTask(ctx.db, task.id, String(form.get('due_on') || ''), actor);
+    const where = form.get('back');
+    const target = where === 'today' ? '/today' : where === 'followups' || (!task.opportunity_id && !task.contact_id) ? '/follow-ups' : where === 'contact' && task.contact_id ? `/contacts/${task.contact_id}` : task.opportunity_id ? `/leads/${task.opportunity_id}` : task.contact_id ? `/contacts/${task.contact_id}` : task.contractor_id ? `/contractors/${task.contractor_id}` : '/follow-ups';
+    return back(ctx, target, res.code);
+  }
+
+  // ---- CRM: appointments (redirects to the appointment's own project, never a supplied address)
+  if ((m = /^\/appointments\/([A-Za-z0-9-]+)\/(status|reschedule)$/.exec(path))) {
+    const appt = await work.getAppointment(ctx.db, m[1]);
+    if (!appt) return back(ctx, '/leads', 'not_found');
+    const res = m[2] === 'status' ? await work.setAppointmentStatus(ctx.db, appt.id, String(form.get('status') || ''), actor) : await work.rescheduleAppointment(ctx.db, appt.id, String(form.get('starts_at') || ''), actor);
+    return back(ctx, `/leads/${appt.opportunity_id}`, res.code);
+  }
+
+  // ---- CRM: contacts
+  if ((m = /^\/contacts\/([A-Za-z0-9-]+)\/projects$/.exec(path))) {
+    const contact = await crm.getContact(ctx.db, m[1]);
+    if (!contact) return back(ctx, '/contacts', 'not_found');
+    const project = crm.readOpportunityForm(form);
+    if (!project.ok) return back(ctx, `/contacts/${contact.id}/projects/new`, project.code);
+    const res = await crm.createManualProject(ctx.db, { contactId: contact.id, projectValue: project.value, channel: String(form.get('channel') || ''), receivedLocal: String(form.get('received_at') || '') }, actor);
+    return back(ctx, res.ok ? `/leads/${res.opportunityId}` : `/contacts/${contact.id}/projects/new`, res.code);
+  }
+  if ((m = /^\/contacts\/([A-Za-z0-9-]+)\/(archive|unarchive|permissions|calls|tasks)$/.exec(path))) {
+    const contact = await crm.getContact(ctx.db, m[1]);
+    if (!contact) return back(ctx, '/contacts', 'not_found');
+    const here = `/contacts/${contact.id}`;
+    let res;
+    if (m[2] === 'archive' || m[2] === 'unarchive') res = await crm.setContactArchived(ctx.db, contact.id, m[2] === 'archive', actor);
+    else if (m[2] === 'permissions') {
+      res = await crm.recordPermission(ctx.db, contact.id, { channel: form.get('channel'), status: form.get('status'), method: form.get('method'), givenOn: form.get('given_on'), evidence: form.get('evidence') }, actor);
+    } else if (m[2] === 'calls') {
+      res = await work.logCall(ctx.db, { contactId: contact.id }, { outcome: form.get('outcome'), direction: form.get('direction'), occurredLocal: String(form.get('occurred_at') || ''), summary: form.get('summary'), nextTitle: form.get('next_title'), nextDue: form.get('next_due'), moveStage: false }, actor);
+    } else {
+      const parsed = work.readTaskForm(form, ctx.staff);
+      res = parsed.ok ? await work.createTask(ctx.db, { contactId: contact.id }, parsed.value, actor) : parsed;
+    }
+    return back(ctx, here, res.code);
+  }
+  if ((m = /^\/contacts\/([A-Za-z0-9-]+)$/.exec(path))) {
+    const contact = await crm.getContact(ctx.db, m[1]);
+    if (!contact) return back(ctx, '/contacts', 'not_found');
+    const parsed = crm.readContactForm(form);
+    const res = parsed.ok ? await crm.updateContact(ctx.db, contact.id, parsed.value, actor) : parsed;
+    return back(ctx, `/contacts/${contact.id}`, res.code);
   }
 
   if ((m = /^\/emails\/([A-Za-z0-9-]+)\/retry$/.exec(path))) {
@@ -269,6 +510,15 @@ async function handlePost(request, ctx) {
       if (job) target = `/leads/${job.lead_id}`;
     }
     return back(ctx, target, res.code);
+  }
+
+  // ---- contractors
+  if ((m = /^\/contractors\/([A-Za-z0-9-]+)\/tasks$/.exec(path))) {
+    const contractor = await db.getContractor(ctx.db, m[1]);
+    if (!contractor) return back(ctx, '/contractors', 'not_found');
+    const parsed = work.readTaskForm(form, ctx.staff);
+    const res = parsed.ok ? await work.createTask(ctx.db, { contractorId: contractor.id }, parsed.value, actor) : parsed;
+    return back(ctx, `/contractors/${contractor.id}`, res.code);
   }
 
   if (path === '/contractors') {
@@ -307,6 +557,12 @@ function back(ctx, location, code) {
   return redirect(`${location}${sep}notice=${encodeURIComponent(code)}`, ctx.nonce);
 }
 
+/** Same, landing on a named section of the page (a fixed, code-supplied fragment, never user input). */
+function backAt(ctx, location, code, fragment) {
+  const sep = location.includes('?') ? '&' : '?';
+  return redirect(`${location}${sep}notice=${encodeURIComponent(code)}${fragment ? `#${fragment}` : ''}`, ctx.nonce);
+}
+
 /** Where to send the user after a follow-up sequence action (whitelisted; never a user-supplied URL). */
 async function sequenceBack(ctx, kind, id, backParam) {
   if (backParam === 'lead') {
@@ -321,3 +577,4 @@ async function sequenceBack(ctx, kind, id, backParam) {
   }
   return backParam === 'queue' ? '/sequence/queue' : '/sequence';
 }
+

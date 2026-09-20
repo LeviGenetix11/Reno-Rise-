@@ -18,6 +18,8 @@ export const STOP_LABELS = {
   lost: 'Lead marked Lost',
   archived: 'Lead archived',
   staff: 'Stopped by staff',
+  not_a_fit: 'Marked Not a fit',
+  progressed: 'Project moved on (referred to a contractor or quote stage)',
   suppressed_bounce: 'Email address bounced (suppressed)',
   suppressed_complaint: 'Spam complaint (suppressed)',
   suppressed_other: 'Email address suppressed',

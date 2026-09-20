@@ -27,3 +27,5 @@ ALLOWED_ORIGINS = "https://renosrise.com,https://www.renosrise.com"
 INTERNAL_NOTIFY_EMAIL = "hello@renosrise.com"
 CUSTOMER_FROM_EMAIL = "RenoRise <hello@notify.renosrise.com>"
 REPLY_TO_EMAIL = "hello@renosrise.com"
+# Where missed-call / voicemail alert emails link to (the private, sign-in-protected dashboard).
+DASHBOARD_BASE_URL = "https://renorise-dashboard.levi-gene-ous.workers.dev"
