@@ -30,6 +30,19 @@ function scopeNote(root, hasFigures) {
 // Pages where an owner-supplied customer comment is topical. Elsewhere the old (generic) testimonial stays removed.
 const TOPICAL_QUOTES = { 'services/kitchen-remodeling/': 'priya' };
 
+// The four general flooring pages stay under "Other home improvement services". Each gets one contextual pointer to the single
+// basement-flooring page, worded differently, so basement-specific intent lands on the right page and the two do not compete.
+function basementFlooringNote(root, urlPath) {
+  const svc = root + 'services/basement-flooring/';
+  const notes = {
+    'services/flooring/': `Flooring a basement? Floors over a concrete slab have their own moisture and subfloor considerations. See <a href="${svc}">basement flooring options for Toronto homes</a>.`,
+    'services/flooring-installation/': `Installing over a concrete basement slab is a different job from a main-floor install. <a href="${svc}">Subfloor and moisture planning for basements</a> is covered on its own page.`,
+    'services/flooring-contractor/': `Hiring for a basement floor? Some of the questions change. See <a href="${svc}">what to ask a flooring professional about a basement</a>.`,
+    'services/hardwood-floor-installation/': `Thinking about hardwood below grade? Solid and engineered wood are treated differently: read <a href="${root}blog/hardwood-flooring-in-basement.html">Can You Install Hardwood Flooring in a Basement?</a> and the <a href="${svc}">basement flooring page</a>.`,
+  };
+  return notes[urlPath] ? `<p data-basement-flooring-link>${notes[urlPath]}</p>` : '';
+}
+
 function transformSecondaryService(h, depth, urlPath) {
   h = removeElement(h, /<div class="testimonial-grid"[^>]*>/);
   if (TOPICAL_QUOTES[urlPath] && !h.includes('data-customer-comments-inline')) {
@@ -48,6 +61,8 @@ function transformSecondaryService(h, depth, urlPath) {
     const note = scopeNote(L.up(depth), hasFigures);
     region = region.replace(/(<(?:div|article) class="(?:container )?article-wrap">)/, (m) => m + '\n    ' + note);
   }
+  const bf = basementFlooringNote(L.up(depth), urlPath);
+  if (bf && !region.includes('data-basement-flooring-link')) region = region.replace('<div class="internal-links"', () => bf + '\n    <div class="internal-links"');
   return h.slice(0, start) + region + h.slice(end);
 }
 

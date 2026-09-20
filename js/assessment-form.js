@@ -39,6 +39,7 @@
     'Underpinning or ceiling-height work',
     'Waterproofing or moisture issue',
     'Separate entrance or egress window',
+    'Basement flooring',
     'Not sure'
   ];
   var CONDITIONS = ['Unfinished', 'Partially finished', 'Finished', 'Existing rental unit', 'Water or foundation concerns'];

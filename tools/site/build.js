@@ -13,6 +13,7 @@ const run = (file, args = []) => {
 run('pages/suite.js');
 run('pages/home.js');
 run('pages/cluster.js');
+run('pages/flooring.js');
 run('pages/landing.js');
 run('pages/services-index.js');
 run('pages/misc.js');
@@ -26,3 +27,4 @@ run('sync.js');
 run('sitemap.js');
 run('check.js');
 run('nav-check.js');
+run('flooring-check.js');

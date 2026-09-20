@@ -48,6 +48,7 @@ const DROPDOWN = [
   ['Egress Windows', 'services/egress-windows/'],
   ['Separate Entrances', 'services/walkout-construction/'],
   ['Soundproofing', 'services/basement-soundproofing/'],
+  ['Basement Flooring', 'services/basement-flooring/'],
   ['View All Services', 'services/'],
 ];
 const CTA = ['Get Matched', 'assessment/'];
@@ -110,7 +111,7 @@ for (const { rel, html, urlPath } of pages.values()) {
 
   // ---- mobile menu carries the same destinations
   const mob = links(mobileBlock);
-  const mobWant = ['Home', 'Services', ...DROPDOWN.slice(0, 8).map(([l]) => l), 'Guides', 'Service Areas', 'About', 'Contact', 'Get Matched'];
+  const mobWant = ['Home', 'Services', ...DROPDOWN.slice(0, 9).map(([l]) => l), 'Guides', 'Service Areas', 'About', 'Contact', 'Get Matched'];
   ok(JSON.stringify(mob.map((l) => l.text)) === JSON.stringify(mobWant), `${at} mobile menu is ${JSON.stringify(mob.map((l) => l.text))}`);
   ok(/id="site-menu"/.test(mobileBlock) && /aria-controls="site-menu"/.test(html) && /role="dialog"/.test(mobileBlock) && /aria-modal="true"/.test(mobileBlock), `${at} mobile menu lacks id/aria-controls/dialog semantics`);
 

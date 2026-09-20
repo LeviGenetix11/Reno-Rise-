@@ -179,7 +179,7 @@ const POSTS = [
       '<strong>Windows and entrances.</strong> Egress windows, window wells and separate entrances mean cutting the foundation and managing drainage.',
       `<strong>Suite requirements.</strong> Fire separation, exits, alarms and drawings add scope. See the ${SUITE}.`,
       `<strong>Design, engineering and permits.</strong> Drawings, permit fees and inspections. Toronto Building publishes ${X(SRC.permit, 'which work needs a permit')}.`,
-      '<strong>Finishes.</strong> Flooring, cabinetry, fixtures and appliances vary widely.',
+      `<strong>Finishes.</strong> Flooring, cabinetry, fixtures and appliances vary widely. Below-grade floors have their own moisture and height questions; see ${A('services/basement-flooring/', 'flooring for a below-grade slab')}.`,
     ])}
     <p>Renovation stress comes from uncertainty, not from the work. Once you can name what is driving your number, the stress drops. Funny how that works.</p>
 
@@ -241,7 +241,7 @@ const POSTS = [
     <p>A familiar scenario: a homeowner notices one corner of the basement feels oddly cold and jokes that it is a portal. It is not a portal. It is missing insulation, and the fix is simple. Mystery is usually physics. Fix the physics, fix the mystery. Ceiling height works the same way: measure it before you assume the worst, and before anyone sells you a dig.</p>
 
     <h2>How do you measure ceiling height?</h2>
-    <p>Measure from the finished floor level to the underside of the ceiling finish. Then subtract what will change: flooring, insulation and a fire-rated ceiling all cost you height. Beams and ducts can lower usable height in spots. Ask a designer which measurements apply to your project.</p>
+    <p>Measure from the finished floor level to the underside of the ceiling finish. Then subtract what will change: a ${A('blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'subfloor and finished flooring')}, insulation and a fire-rated ceiling all cost you height. Beams and ducts can lower usable height in spots. Ask a designer which measurements apply to your project.</p>
 
     <h2>What are the alternatives to underpinning?</h2>
     ${U.checkList([
@@ -367,7 +367,7 @@ const POSTS = [
     ${U.checkList([
       'Have a professional confirm the cause and the fix, and get the warranty in writing.',
       'Test the result through at least one heavy rainfall or thaw if you can.',
-      'Use finishes and insulation suited to below-grade walls.',
+      `Use finishes and insulation suited to below-grade walls, and choose a floor the slab can support (see ${A('services/basement-flooring/', 'basement flooring considerations')}).`,
       'Keep access to sump pumps, cleanouts and shut-offs.',
     ])}
     <p>When you are ready to plan the whole project, read ${RENO} and the ${SUITE}. Fixed properly, your basement goes from mystery novel to fresh start.</p>
@@ -382,6 +382,9 @@ const POSTS = [
     related: [['Basement Waterproofing', 'services/basement-waterproofing/'], ['Interior Waterproofing', 'services/interior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Basement Renovation', 'services/basement-renovation/']],
   },
 ];
+
+// Basement-flooring guides live in their own module (four articles, no more)
+POSTS.push(...require('./posts-flooring'));
 
 if (require.main === module) {
   for (const p of POSTS) {
@@ -401,8 +404,8 @@ if (require.main === module) {
       faq: p.faq,
       formType: p.formType,
       related: p.related,
-      updated: `By <a href="${h('about.html')}">Reno Rise</a>. Published ${DATE_LONG}. Last updated ${DATE_LONG}. General planning information, not legal or engineering advice.`,
-      article: { headline: p.title, date: DATE },
+      updated: `By <a href="${h('about.html')}">Reno Rise</a>. Published ${p.dateLong || DATE_LONG}. Last updated ${p.dateLong || DATE_LONG}. General planning information, not legal or engineering advice.`,
+      article: { headline: p.title, date: p.date || DATE },
       asideLinks: [
         ['Legal secondary suite guide', 'services/legal-basement-apartment-toronto/'],
         ['Basement renovation planning', 'services/basement-renovation/'],

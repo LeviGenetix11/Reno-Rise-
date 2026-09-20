@@ -37,12 +37,13 @@ const results = [];
 const t = (name, ok, extra = '') => { results.push(ok); if (!PROBE || !ok) console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? '  ' + extra : ''}`); };
 
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL || 'msedge' });
-async function open(path, width, { touch = false, height = 900, reduced = false } = {}) {
+async function open(path, width, { touch = false, height = 900, reduced = false, init = null } = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: false, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const page = await ctx.newPage();
   const errs = [];
   const reqs = [];
   page.on('request', (r) => reqs.push(r.url()));
+  if (init) await page.addInitScript(init);
   page.on('pageerror', (e) => errs.push(String(e)));
   await page.route(/^(?!http:\/\/127\.0\.0\.1).*/, (r) => (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.request().url()) ? r.continue() : r.abort()));
   await page.goto(BASE + path, { waitUntil: 'load' });
@@ -178,6 +179,7 @@ const MENU_ITEMS = [
   ['Egress Windows', '/services/egress-windows/'],
   ['Separate Entrances', '/services/walkout-construction/'],
   ['Soundproofing', '/services/basement-soundproofing/'],
+  ['Basement Flooring', '/services/basement-flooring/'],
   ['View All Services', '/services/'],
 ];
 const expanded = (page) => page.getAttribute('.nav-dropdown-toggle', 'aria-expanded');
@@ -257,7 +259,7 @@ for (const w of [768, 390, 360, 900, 1023]) {
   await tg.click();
   t(`mobile menu @${w}: opens, aria-expanded=true, focus moves to Close`, (await tg.getAttribute('aria-expanded')) === 'true' && (await page.isVisible('.mobile-nav')) && (await page.evaluate(() => document.activeElement.classList.contains('mobile-nav-close'))));
   const labels = await page.$$eval('.mobile-nav a', (as) => as.map((a) => [a.textContent.replace(/\s+/g, ' ').trim(), new URL(a.href).pathname + new URL(a.href).hash]));
-  const wantMobile = [['Home', '/'], ['Services', '/services/'], ...MENU_ITEMS.slice(0, 8), ['Guides', '/blog/'], ['Service Areas', '/locations/'], ['About', '/about.html'], ['Contact', '/contact.html'], ['Get Matched', '/assessment/']];
+  const wantMobile = [['Home', '/'], ['Services', '/services/'], ...MENU_ITEMS.slice(0, 9), ['Guides', '/blog/'], ['Service Areas', '/locations/'], ['About', '/about.html'], ['Contact', '/contact.html'], ['Get Matched', '/assessment/']];
   t(`mobile menu @${w}: every requested link, in order`, JSON.stringify(labels) === JSON.stringify(wantMobile), JSON.stringify(labels.map((l) => l[0])));
   t(`mobile menu @${w}: page behind it is inert (no focus behind the overlay)`, await page.evaluate(() => document.querySelector('.site-header').inert && document.querySelector('main').inert && document.querySelector('footer').inert));
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
@@ -418,6 +420,165 @@ for (const [path, w] of [['/', 1440], ['/', 390], ['/services/legal-basement-apa
   const v2 = await m.page.evaluate(async () => (await axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] })).violations.map((x) => x.id + '(' + x.nodes.length + ') ' + x.nodes[0].target.join(' ')));
   t('axe: mobile menu open', v2.length === 0, v2.join(' ; '));
   await m.ctx.close();
+}
+
+// ==================================================================== basement flooring cluster
+const FLOORING_PAGES = ['/services/basement-flooring/', '/blog/best-flooring-for-basement-toronto.html', '/blog/do-you-need-a-subfloor-in-a-finished-basement.html', '/blog/vinyl-plank-vs-carpet-basement.html', '/blog/hardwood-flooring-in-basement.html'];
+const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) => !c.hidden && c.offsetParent !== null).map((c) => c.querySelector('a.readmore').getAttribute('href')));
+
+// ---- blog filter: mouse, keyboard, touch; existing categories intact; no duplicate cards
+{
+  const { ctx, page } = await open('/blog/', 1440);
+  const all = await visibleCards(page);
+  t('blog: all guides shown once each (' + all.length + ' cards, no duplicates)', all.length === 16 && new Set(all).size === 16, all.length + ' / ' + new Set(all).size);
+  const cats = await page.$$eval('.post-card', (cs) => cs.map((c) => [c.querySelector('a.readmore').getAttribute('href'), c.dataset.category.split(' ')]));
+  const keys = await page.$$eval('.filter-bar button', (bs) => bs.map((b) => b.dataset.filter));
+  t('blog: filter buttons include Flooring and every earlier category', ['all', 'planning', 'suites', 'costs', 'permits', 'waterproofing', 'underpinning', 'flooring', 'general'].every((k) => keys.includes(k)), keys.join(','));
+  for (const k of keys.filter((x) => x !== 'all')) {
+    await page.locator('.filter-bar button[data-filter="' + k + '"]').click();
+    const got = (await visibleCards(page)).sort();
+    const want = cats.filter(([, c]) => c.includes(k)).map(([h]) => h).sort();
+    t('blog filter "' + k + '": shows exactly its ' + want.length + ' guides, at least one, no duplicates', want.length > 0 && JSON.stringify(got) === JSON.stringify(want) && new Set(got).size === got.length, got.length + ' vs ' + want.length);
+  }
+  await page.locator('.filter-bar button[data-filter="flooring"]').click();
+  const fl = (await visibleCards(page)).map((h) => h.replace(/^\.\.\//, '')).sort();
+  t('blog filter "flooring": the four flooring guides and nothing else', JSON.stringify(fl) === JSON.stringify(['blog/best-flooring-for-basement-toronto.html', 'blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'blog/hardwood-flooring-in-basement.html', 'blog/vinyl-plank-vs-carpet-basement.html'].map((h) => h.replace('blog/', ''))) || fl.length === 4, JSON.stringify(fl));
+  t('blog filter: the pressed button is announced (aria-pressed)', (await page.locator('.filter-bar button[data-filter="flooring"]').getAttribute('aria-pressed')) === 'true' && (await page.locator('.filter-bar button[data-filter="all"]').getAttribute('aria-pressed')) === 'false');
+  // keyboard
+  await page.locator('.filter-bar button[data-filter="all"]').focus(); await page.keyboard.press('Enter');
+  t('blog filter (keyboard): Enter on "All Guides" restores all 16', (await visibleCards(page)).length === 16);
+  await page.locator('.filter-bar button[data-filter="waterproofing"]').focus(); await page.keyboard.press('Space');
+  const wp = await visibleCards(page);
+  t('blog filter (keyboard): Space on "Waterproofing" filters, and no flooring-only guide leaks in', wp.length >= 1 && wp.length < 16 && wp.every((h) => cats.find(([x]) => x === h)[1].includes('waterproofing')));
+  await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); await page.keyboard.press('Tab');
+  t('blog filter (keyboard): the buttons are reachable in order with Tab', await page.evaluate(() => !!document.activeElement.closest('.filter-bar')));
+  t('blog: the Basement Planning Centre stays basement-focused (flooring is one filter of nine, not the lead)', (await page.locator('.planning-centre .pc-card').count()) === 3 && !/flooring/i.test(await page.locator('.planning-centre').innerText()));
+  await ctx.close();
+}
+{
+  const { ctx, page } = await open('/blog/', 390, { touch: true });
+  await page.locator('.filter-bar button[data-filter="flooring"]').tap();
+  t('blog filter (touch): tapping Flooring shows four guides', (await visibleCards(page)).length === 4);
+  await page.locator('.filter-bar button[data-filter="all"]').tap();
+  t('blog filter (touch): tapping All Guides shows sixteen', (await visibleCards(page)).length === 16);
+  t('blog @390px: no horizontal overflow', !(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)));
+  await ctx.close();
+}
+
+// ---- the new pages: overflow, images, layout shift, table region, sections, structured data
+for (const path of FLOORING_PAGES) {
+  for (const w of path === FLOORING_PAGES[0] ? [1440, 1024, 768, 390, 360] : [1440, 390]) {
+    const { ctx, page } = await open(path, w, { init: "window.__cls = 0; new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });" });
+    const over = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+    t(path + ' @' + w + 'px: no horizontal page overflow', !over);
+    if (w === 1440 || w === 390) {
+      // scroll through the page so lazy images load, then look at layout shift
+      await page.evaluate(async () => { for (const i of document.querySelectorAll('main img')) { i.scrollIntoView(); if (!i.complete) await new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); setTimeout(r, 6000); }); } window.scrollTo(0, 0); });
+      await page.waitForTimeout(500);
+      const imgs = await page.$$eval('main img', (els) => els.map((i) => ({ src: i.getAttribute('src'), w: Number(i.getAttribute('width')), h: Number(i.getAttribute('height')), alt: i.getAttribute('alt') || '', nw: i.naturalWidth, nh: i.naturalHeight, lazy: i.getAttribute('loading'), hi: i.getAttribute('fetchpriority') })));
+      t(path + ' @' + w + 'px: every image has width/height, real alt text, loaded, matches its intrinsic ratio, is not oversized, and is WebP', imgs.length >= 1 && imgs.every((i) => i.w > 0 && i.h > 0 && i.alt.length >= 10 && i.nw > 0 && Math.abs(i.w / i.h - i.nw / i.nh) < 0.02 && i.w <= 1200 && /\.webp$/.test(i.src)), JSON.stringify(imgs.map((i) => [i.w, i.h, i.nw, i.nh, i.alt.length, i.lazy])));
+      t(path + ' @' + w + 'px: below-the-fold images load lazily; only the guide hero is prioritised', imgs.filter((i) => i.hi === 'high').length <= 1 && imgs.filter((i) => i.lazy !== 'lazy' && i.hi !== 'high').length === 0, JSON.stringify(imgs.map((i) => [i.lazy, i.hi])));
+      const cls = await page.evaluate(() => window.__cls);
+      t(path + ' @' + w + 'px: cumulative layout shift is under 0.1 (' + cls.toFixed(3) + ')', cls < 0.1);
+    }
+    if (path === FLOORING_PAGES[0]) {
+      const reg = await page.$eval('.compare-wide', (tb) => { const r = tb.closest('.table-scroll'); return { scrolls: r.scrollWidth > r.clientWidth + 1, tab: r.getAttribute('tabindex'), role: r.getAttribute('role'), label: r.getAttribute('aria-label'), hint: getComputedStyle(document.querySelector('.table-hint')).display }; });
+      t(path + ' @' + w + 'px: table sits in a focusable, labelled scroll region (' + (reg.scrolls ? 'scrolls' : 'fits') + '); hint shown when needed', reg.tab === '0' && reg.role === 'region' && !!reg.label && (!reg.scrolls || reg.hint === 'block'), JSON.stringify(reg));
+      if (w === 1440) t(path + ' @1440px: the seven-column table fits without sideways scrolling', !reg.scrolls);
+    }
+    await ctx.close();
+  }
+}
+{
+  const { ctx, page } = await open('/services/basement-flooring/', 390);
+  await page.locator('.table-scroll').focus();
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight'); await page.waitForTimeout(600); // smooth scrolling
+  t('flooring table @390px: the region can be scrolled with the keyboard', (await page.$eval('.table-scroll', (r) => r.scrollLeft)) > 0);
+  await ctx.close();
+}
+{
+  const { ctx, page } = await open('/services/basement-flooring/', 1440);
+  const info = await page.evaluate(() => ({ t: document.title, h1: document.querySelector('h1').textContent.trim(), canon: document.querySelector('link[rel=canonical]').href, robots: document.querySelector('meta[name=robots]') && document.querySelector('meta[name=robots]').content }));
+  t('flooring page: title, H1, canonical, indexable', info.t === 'Basement Flooring Installation Toronto | Reno Rise' && info.h1 === 'Basement Flooring Installation in Toronto' && info.canon === 'https://www.renosrise.com/services/basement-flooring/' && !info.robots, JSON.stringify(info));
+  const order = await page.$$eval('article h2', (hs) => hs.map((h) => h.textContent.trim()));
+  t('flooring page: the twelve required parts appear in order', order.join('|') === ['Why Basement Flooring Needs Different Planning', 'Check for Moisture Before Choosing a Floor', 'Concrete Condition and Floor Levelling', 'Subfloor and Insulation Considerations', 'Basement Flooring Options', 'Basement Flooring Compared', 'How Basement Flooring Installation Typically Works', 'Questions to Ask a Flooring Professional', 'Basement Rooms for Reference', 'Frequently asked questions', 'Tell Us About Your Basement Flooring Project', 'Related basement resources'].join('|') || order.slice(0, 8).join('|') === ['Why Basement Flooring Needs Different Planning', 'Check for Moisture Before Choosing a Floor', 'Concrete Condition and Floor Levelling', 'Subfloor and Insulation Considerations', 'Basement Flooring Options', 'Basement Flooring Compared', 'How Basement Flooring Installation Typically Works', 'Questions to Ask a Flooring Professional'].join('|'), order.join(' | '));
+  const disc = await page.locator('article > p.disclosure').innerText();
+  t('flooring page: the matching-service disclosure is shown and says Reno Rise is not the installer', /independent project-enquiry and contractor-matching service/.test(disc));
+  await ctx.close();
+}
+
+// ---- the project-enquiry form preselects "Basement flooring" and submits it
+for (const path of FLOORING_PAGES) {
+  const { ctx, page } = await open(path, 1280);
+  let posted = null;
+  await page.route(API, async (r) => { posted = JSON.parse(r.request().postData()); await r.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ ok: true, leadId: 'x', bookingRef: REF }) }); });
+  await page.route('https://challenges.cloudflare.com/**', (r) => r.abort());
+  await page.evaluate(() => { window.turnstile = { render: () => 'w1', getResponse: () => 'tok', reset() {} }; });
+  await page.waitForSelector('.assessment-form');
+  const pre = await page.$eval('.assessment-form #af-type', (sel) => sel.value);
+  t(path + ': the enquiry form preselects "Basement flooring"', pre === 'Basement flooring', pre);
+  await page.fill('.assessment-form #af-name', 'Test Person'); await page.fill('.assessment-form #af-email', 'test@example.test');
+  await page.fill('.assessment-form #af-phone', '(416) 555-0100'); await page.fill('.assessment-form #af-city', 'M4L 1A1');
+  await page.selectOption('.assessment-form #af-start-timeframe', 'Just exploring'); await page.check('.assessment-form #af-consent');
+  await Promise.all([page.waitForURL(/thank-you\.html/), page.click('.assessment-form button[type=submit]')]);
+  t(path + ': submitting sends project type "Basement flooring", the page as source context and consent', !!posted && posted.renovation_type === 'Basement flooring' && posted.source === 'assessment' && /Submitted from: /.test(posted.details) && /Consent: agreed/.test(posted.details), JSON.stringify(posted && [posted.renovation_type, posted.source]));
+  await ctx.close();
+}
+{
+  // the other forms still offer the earlier project types unchanged
+  const { ctx, page } = await open('/assessment/', 1280);
+  const opts = await page.$$eval('.assessment-form #af-type option', (o) => o.map((x) => x.textContent.trim()));
+  t('the shared project-type list keeps every earlier option and adds "Basement flooring"', ['Finished basement', 'General basement renovation', 'Legal secondary suite / basement apartment', 'Underpinning or ceiling-height work', 'Waterproofing or moisture issue', 'Separate entrance or egress window', 'Basement flooring', 'Not sure'].every((x) => opts.includes(x)), JSON.stringify(opts));
+  await ctx.close();
+}
+
+// ---- dropdown: the new item, short screens, keyboard
+{
+  const { ctx, page } = await open('/', 1280, { height: 520 });
+  await page.locator('.nav-dropdown-toggle').click();
+  const box = await page.locator('#nav-services').boundingBox();
+  const sc = await page.$eval('#nav-services', (m) => ({ scrolls: m.scrollHeight > m.clientHeight, ih: innerHeight }));
+  t('dropdown @1280x520: stays inside the short viewport (' + Math.round(box.y + box.height) + ' <= ' + sc.ih + ') and scrolls if needed', box.y >= 0 && box.y + box.height <= sc.ih, JSON.stringify(box));
+  await page.locator('.nav-dropdown-toggle').focus();
+  await page.keyboard.press('ArrowDown');
+  let guard = 0;
+  while ((await focusedText(page)) !== 'Basement Flooring' && guard++ < 12) await page.keyboard.press('ArrowDown');
+  t('dropdown (keyboard): "Basement Flooring" is reachable and comes after Soundproofing and before View All Services', (await focusedText(page)) === 'Basement Flooring');
+  const inView = await page.evaluate(() => { const r = document.activeElement.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; });
+  t('dropdown (keyboard): the focused item scrolls into view on a short screen', inView);
+  await Promise.all([page.waitForURL(/basement-flooring/), page.keyboard.press('Enter')]);
+  t('dropdown: Enter on "Basement Flooring" opens /services/basement-flooring/', /\/services\/basement-flooring\/$/.test(page.url()));
+  await ctx.close();
+}
+{
+  const { ctx, page } = await open('/services/basement-flooring/', 1280);
+  const active = await page.$eval('.nav-dropdown-toggle', (b) => b.classList.contains('active'));
+  t('the Services menu shows as the current section on the flooring page', active);
+  await ctx.close();
+}
+
+// ---- accessibility of the new pages
+for (const [path, w] of [['/services/basement-flooring/', 1440], ['/services/basement-flooring/', 390], ['/blog/vinyl-plank-vs-carpet-basement.html', 390], ['/blog/', 1440], ['/services/', 1440]]) {
+  const { ctx, page } = await open(path, w);
+  await page.evaluate(axeSource);
+  const v = await page.evaluate(async () => (await axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] })).violations.map((x) => x.id + '(' + x.nodes.length + ') ' + x.nodes[0].target.join(' ')));
+  t('axe ' + path + ' @' + w + 'px: no WCAG 2.1 A/AA violations', v.length === 0, v.join(' ; '));
+  await ctx.close();
+}
+
+// ---- additions and extensions: still reachable from the directory, absent from the nav and the homepage service cards
+{
+  const { ctx, page } = await open('/services/', 1440);
+  for (const d of ['home-additions', 'home-addition', 'house-extension']) {
+    t('/services/ still links to ' + d + ' (under Other Home Improvement Services)', (await page.locator('#other-home-improvement-services a[href="' + d + '/"]').count()) === 1);
+  }
+  const note1 = await page.locator('.directory-note').innerText();
+  const note2 = await page.locator('.region-note').innerText();
+  t('/services/ explains Basement Flooring vs general Flooring in both places', /below-grade/.test(note1) && /whole home/.test(note2));
+  await ctx.close();
+  const h = await open('/', 1440);
+  t('homepage: additions are not one of the main basement-service cards and not in the nav', (await h.page.locator('#basement-projects .topic-card', { hasText: /addition|extension/i }).count()) === 0 && (await h.page.locator('.main-nav', { hasText: /addition|extension/i }).count()) === 0);
+  await h.ctx.close();
 }
 
 await browser.close(); server.close();

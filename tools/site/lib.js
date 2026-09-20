@@ -45,6 +45,7 @@ const SERVICES_MENU = [
   ['Egress Windows', 'services/egress-windows/'],
   ['Separate Entrances', 'services/walkout-construction/'],
   ['Soundproofing', 'services/basement-soundproofing/'],
+  ['Basement Flooring', 'services/basement-flooring/'],
 ];const up = (depth) => (depth === 0 ? './' : '../'.repeat(depth));
 const href = (depth, target) => (target === '' ? up(depth) : up(depth) + target);
 

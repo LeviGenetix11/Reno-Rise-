@@ -17,6 +17,7 @@ const FILTERS = [
   ['permits', 'Permits & Code'],
   ['waterproofing', 'Waterproofing'],
   ['underpinning', 'Underpinning'],
+  ['flooring', 'Flooring'],
   ['general', 'General Renovations'],
 ];
 
@@ -69,7 +70,7 @@ const stockCard = (p) => `      <article class="post-card" data-category="${p.ca
           <span class="tag">${p.tag}</span>
         </div>
         <div class="body">
-          <div class="meta"><span>${clock} Sep 19, 2026</span></div>
+          <div class="meta"><span>${clock} ${p.dateShort || 'Sep 19, 2026'}</span></div>
           <h3>${p.title}</h3>
           <p>${p.excerpt}</p>
           <a class="readmore" href="${p.file}">Read guide ${arrow}</a>
