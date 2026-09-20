@@ -16,6 +16,7 @@ run('pages/cluster.js');
 run('pages/landing.js');
 run('pages/services-index.js');
 run('pages/misc.js');
+run('pages/book.js');
 run('pages/posts.js');
 run('legacy.js');
 run('pages/blog-index.js');

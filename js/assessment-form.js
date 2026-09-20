@@ -328,6 +328,10 @@
         // confirmed the lead is actually saved — never on a guess.
         if (response.ok && data && data.ok === true) {
           try { sessionStorage.setItem(SESSION_FLAG, '1'); } catch (err) { /* storage unavailable — redirect still works */ }
+          // Opaque reference for the optional consultation booking (a hint only; no contact details, no database id).
+          try {
+            if (typeof data.bookingRef === 'string' && /^[A-Za-z0-9_-]{20,64}$/.test(data.bookingRef)) sessionStorage.setItem('renoriseBookingRef', data.bookingRef);
+          } catch (err) { /* ignore */ }
           if (thankYouHref) {
             window.location.href = thankYouHref;
           } else {

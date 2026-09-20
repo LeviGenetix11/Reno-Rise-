@@ -1700,3 +1700,22 @@ body.nav-open { overflow: hidden; }
 .section-tight ul.check-list li svg, .panel ul.check-list li svg { width: 18px; height: 18px; color: var(--orange-a11y); flex-shrink: 0; margin-top: 2px; }
 .panel ul.check-list li:last-child { border-bottom: 0; }
 .section-tight ul.check-list li a, .panel p a, .lede a { color: var(--orange-a11y); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Consultation booking (/book/ and the thank-you button) ---------- */
+.book-wrap { max-width: 860px; margin-left: auto; margin-right: auto; }
+.book-intro { margin-bottom: 24px; }
+.book-intro h2 { font-size: 24px; margin-bottom: 10px; }
+.book-intro ul.check-list { margin: 16px 0 0; padding: 0; list-style: none; }
+.book-intro ul.check-list li { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; color: var(--text); }
+.book-intro ul.check-list li svg { width: 18px; height: 18px; color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+.book-embed-wrap { margin: 0 0 12px; }
+.book-embed { min-height: 640px; width: 100%; background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.book-status { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+.book-status[hidden] { display: none; }
+.book-fallback { font-size: 15px; margin: 8px 0 18px; }
+.book-fallback.is-failed { padding: 14px 16px; border: 1.5px solid var(--orange-a11y); border-radius: var(--radius); background: var(--orange-light); font-weight: 600; }
+.book-note { max-width: none; }
+.ty-book { margin: 22px 0 26px; padding: 22px 22px 24px; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--cream, #f7f5f1); text-align: center; }
+.ty-book h2 { font-size: 20px; margin: 0 0 8px; }
+.ty-book p { color: var(--muted); margin: 0 0 16px; }
+@media (max-width: 560px) { .book-embed { min-height: 560px; } }

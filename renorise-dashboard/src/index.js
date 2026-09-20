@@ -35,6 +35,9 @@ import { streamVoicemail, voicemailConfigured, checkPlayback } from './voicemail
 import { getCallById } from '../../renorise-shared/calls-db.js';
 import { STAGE_LABEL, SOURCE_LABEL, QUALIFICATION_LABEL, PRIORITY_LABEL, MARKETING_SOURCE_LABEL } from './crm-constants.js';
 import { loadSettings } from '../../renorise-shared/followup-db.js';
+import * as ad from './appt-db.js';
+import * as av from './appt-views.js';
+import { assignBookingToLead, dismissBooking, bookingHealth, linkPendingBookings } from '../../renorise-shared/bookings-db.js';
 
 const MAX_FORM_BYTES = 60_000;
 
@@ -84,6 +87,10 @@ export default {
       if (request.method === 'POST') return await handlePost(request, ctx);
       return respond(errorPage('Method not allowed', 'That method is not supported.', nonce), 405, nonce, { Allow: 'GET, HEAD, POST' });
     } catch (err) {
+      if (/no such (table|column)/i.test(String(err.message))) {
+        // A page that needs a newer migration than the database has (for example booking, 0006). Additive, so nothing is lost.
+        return respond(errorPage('Database update needed', 'This page needs the latest database updates (migration 0006 for consultation booking). Apply them, then reload. Nothing has been lost.', nonce), 503, nonce);
+      }
       console.log('Dashboard error:', err.message);
       return respond(errorPage('Something went wrong', 'The dashboard hit an error. Try again, or check the Worker logs.', nonce), 500, nonce);
     }
@@ -217,6 +224,37 @@ async function handleGet(request, ctx) {
     const q = (url.searchParams.get('q') || '').trim().slice(0, 60);
     const [csrf, results] = await Promise.all([ctx.csrf(), q && !detail.call.contact_id ? cdb.searchContactsToLink(ctx.db, q) : []]);
     return page(ctx, { title: 'Call', active: 'calls', body: clv.callPage({ detail, csrf, playback: voicemailConfigured(ctx.env), results, q, today: torontoToday() }) });
+  }
+
+  // ---- appointments (Cal.com phone consultations + manual entries)
+  if (path === '/appointments') {
+    const filters = ad.parseApptFilters(url);
+    try {
+      await linkPendingBookings(ctx.db); // retries bookings whose inquiry had no CRM project yet (idempotent)
+      const now = new Date();
+      const [counts, result, cal, health, review, settings, csrf] = await Promise.all([
+        ad.appointmentCounts(ctx.db, now),
+        filters.view === 'list' ? ad.listAppointments(ctx.db, filters, now) : null,
+        filters.view === 'calendar' ? ad.monthOfAppointments(ctx.db, filters.month) : null,
+        bookingHealth(ctx.db, now),
+        ad.bookingsNeedingReview(ctx.db),
+        ad.bookingSettingsOf(ctx.db),
+        ctx.csrf(),
+      ]);
+      return page(ctx, { title: 'Appointments', active: 'appointments', body: av.appointmentsPage({ filters, counts, result, cal, health, review, settings, csrf }) });
+    } catch (err) {
+      if (/no such (table|column)/i.test(String(err.message))) return page(ctx, { title: 'Appointments', active: 'appointments', body: av.migrationNeeded(), status: 503 });
+      throw err;
+    }
+  }
+
+  if ((m = /^\/appointments\/bookings\/([A-Za-z0-9-]+)$/.exec(path))) {
+    const booking = await ad.getBooking(ctx.db, m[1]);
+    if (!booking) return notFound(ctx);
+    const q = (url.searchParams.get('q') || '').trim().slice(0, 60);
+    const already = ['matched', 'manual'].includes(booking.match_status);
+    const [candidates, results, events, csrf] = await Promise.all([already ? [] : ad.candidateLeads(ctx.db, booking), !already && q ? ad.searchLeads(ctx.db, q) : [], ad.bookingEvents(ctx.db, booking.provider_uid), ctx.csrf()]);
+    return page(ctx, { title: 'Booking', active: 'appointments', body: av.bookingPage({ booking, candidates, results, q, events, csrf }) });
   }
 
   if (path === '/contractors') {
@@ -461,12 +499,22 @@ async function handlePost(request, ctx) {
     return back(ctx, target, res.code);
   }
 
+  // ---- appointments: booking matching and the booking-page setting (Cal.com bookings are never created by hand here)
+  if ((m = /^\/appointments\/bookings\/([A-Za-z0-9-]+)\/(assign|dismiss)$/.exec(path))) {
+    const res = m[2] === 'assign' ? await assignBookingToLead(ctx.db, m[1], String(form.get('lead_id') || ''), actor) : await dismissBooking(ctx.db, m[1], actor);
+    return back(ctx, res.ok ? '/appointments' : `/appointments/bookings/${m[1]}`, res.code);
+  }
+  if (path === '/appointments/settings') {
+    const res = await ad.saveBookingSettings(ctx.db, form, actor);
+    return back(ctx, '/appointments#booking-settings', res.code);
+  }
+
   // ---- CRM: appointments (redirects to the appointment's own project, never a supplied address)
   if ((m = /^\/appointments\/([A-Za-z0-9-]+)\/(status|reschedule)$/.exec(path))) {
     const appt = await work.getAppointment(ctx.db, m[1]);
     if (!appt) return back(ctx, '/leads', 'not_found');
     const res = m[2] === 'status' ? await work.setAppointmentStatus(ctx.db, appt.id, String(form.get('status') || ''), actor) : await work.rescheduleAppointment(ctx.db, appt.id, String(form.get('starts_at') || ''), actor);
-    return back(ctx, `/leads/${appt.opportunity_id}`, res.code);
+    return back(ctx, form.get('back') === 'appointments' ? '/appointments' : `/leads/${appt.opportunity_id}`, res.code);
   }
 
   // ---- CRM: contacts

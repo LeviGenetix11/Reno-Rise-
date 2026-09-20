@@ -46,6 +46,8 @@ export const DEFAULT_SETTINGS = {
   business_legal_name: '',
   business_mailing_address: '',
   unsubscribe_base_url: 'https://renorise-forms.levi-gene-ous.workers.dev',
+  booking_url: '', // the public booking page, e.g. https://www.renosrise.com/book/ ; empty = no booking link in emails
+  booking_link_tested: '0', // '1' once staff confirmed the link works; the link is only added to emails when this is '1'
 };
 
 export function getVersion(id) {

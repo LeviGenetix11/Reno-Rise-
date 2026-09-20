@@ -297,3 +297,12 @@ If something goes wrong after deploying this Worker:
   revert, redeploying the previous commit of `js/assessment-form.js`
   (the Formspree version) restores the old behavior immediately, since
   Formspree's form (`xqpaanag`) hasn't been deleted or altered.
+
+## 7. Consultation booking webhook (Cal.com)
+
+`POST /webhooks/calcom` receives Cal.com's signed booking notices. It verifies `X-Cal-Signature-256` (HMAC-SHA256 of the
+raw body) against the Worker secret `CAL_WEBHOOK_SECRET`, refuses everything else (503 without the secret, 401 for a bad
+signature), and is idempotent and order-safe. Set the secret with `npx wrangler secret put CAL_WEBHOOK_SECRET`; never put it
+in Git or logs. Requires migration `0006_cal_booking.sql` (additive). The cron also links pending bookings and prunes
+`booking_events` older than 90 days. Full setup, deploy order, rollback and test checklist: `docs/cal-booking.md`.
+Tests: `node test/booking-tests.mjs`.

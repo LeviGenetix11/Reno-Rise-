@@ -23,6 +23,8 @@ import { runCallAlerts } from './calls/alerts.js';
 import { finalizeStaleCalls } from '../../renorise-shared/calls-db.js';
 import { handleUnsubscribe } from './followups/unsubscribe.js';
 import { handleResendWebhook } from './followups/webhook.js';
+import { handleCalWebhook } from './bookings/webhook.js';
+import { ensureBookingRef, linkPendingBookings, pruneBookingEvents } from '../../renorise-shared/bookings-db.js';
 
 const MAX_BODY_BYTES = 20_000; // generous for this form; blocks absurd payloads
 // A job left in 'sending' longer than this means the invocation that
@@ -41,6 +43,7 @@ export default {
     const unsub = /^\/u\/([A-Za-z0-9_-]{1,80})$/.exec(url.pathname);
     if (unsub) return handleUnsubscribe(request, env, unsub[1]);
     if (url.pathname === '/webhooks/resend') return handleResendWebhook(request, env);
+    if (url.pathname === '/webhooks/calcom') return handleCalWebhook(request, env);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(allowedOrigin) });
@@ -109,7 +112,14 @@ export default {
         console.log('Background email send threw:', err.message);
       }));
 
-      return jsonResponse({ ok: true, leadId: lead.id }, 201, headers);
+      // An opaque reference the thank-you page can put on the booking link. It is not a lead id and proves nothing by itself.
+      let bookingRef = null;
+      try {
+        bookingRef = await ensureBookingRef(db, lead.id);
+      } catch (err) {
+        console.log('Booking reference not created:', err.message);
+      }
+      return jsonResponse({ ok: true, leadId: lead.id, bookingRef }, 201, headers);
     } catch (err) {
       console.log('Unhandled error in POST /api/leads:', err.message);
       return jsonResponse({ ok: false, error: 'server_error' }, 500, headers);
@@ -128,6 +138,13 @@ export default {
         await runCallAlerts(env, db);
       } catch (err) {
         console.log('Call alert job error:', err.message);
+      }
+      // Consultation bookings: link any that were waiting for a CRM project, and trim old delivery records.
+      try {
+        await linkPendingBookings(db);
+        await pruneBookingEvents(db);
+      } catch (err) {
+        console.log('Booking job error:', err.message);
       }
       // Follow-ups run AFTER confirmations/notifications, and can never break them.
       try {

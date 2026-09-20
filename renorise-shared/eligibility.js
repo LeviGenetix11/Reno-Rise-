@@ -41,7 +41,9 @@ export function stopReasonFor({ lead, consent, suppression }) {
   if (lead.archived_at) return 'archived';
   if (lead.status === 'won') return 'won';
   if (lead.status === 'lost') return 'lost';
-  if (lead.status === 'assessment_booked' || lead.assessment_at) return 'booked';
+  // consultation_at = a confirmed phone consultation booked through Cal.com (or recorded by staff). It is kept apart from
+  // assessment_at (an on-site assessment) but ends the unbooked-lead follow-ups just the same.
+  if (lead.status === 'assessment_booked' || lead.assessment_at || lead.consultation_at) return 'booked';
   return null;
 }
 

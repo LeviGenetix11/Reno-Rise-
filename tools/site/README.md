@@ -21,3 +21,8 @@ Rules: Reno Rise is an independent enquiry and contractor-matching service. Do n
 licences, warranties, reviews, customer counts or quote turnaround. Regulatory content must cite official sources and
 stay qualified. `check.js` fails the build when known unsupported claims reappear.
 Tools are excluded from deployment by `.vercelignore`.
+
+Consultation booking: `booking-config.json` (disabled by default) controls the `/book/` page, the thank-you button and the
+privacy-page wording. Nothing about booking is published until it is enabled with a real Cal.com link. `RENORISE_BOOKING_DEV=1`
+builds with placeholder values for layout checks only; `check.js` fails while any page contains the placeholder, and a
+normal build removes them. See `docs/cal-booking.md`.

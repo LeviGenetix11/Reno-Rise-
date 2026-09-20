@@ -80,6 +80,7 @@ const NAV = [
   ['/leads', 'Leads', 'leads', 'users'],
   ['/contacts', 'Contacts', 'contacts', 'user'],
   ['/calls', 'Calls', 'calls', 'phone'],
+  ['/appointments', 'Appointments', 'appointments', 'event'],
   ['/follow-ups', 'Follow-ups', 'follow-ups', 'calendar'],
   ['/contractors', 'Contractors', 'contractors', 'tool'],
   ['/sequence', 'Follow-up emails', 'sequence', 'send'],
