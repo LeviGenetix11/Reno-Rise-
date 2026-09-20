@@ -1359,7 +1359,7 @@ body.nav-open { overflow: hidden; }
   flex: 1 1 auto;
   min-width: 0;
   justify-content: center;
-  gap: clamp(0.7rem, 1.1vw, 1.4rem);
+  gap: clamp(1.1rem, 2vw, 2.25rem);
 }
 .main-nav > a, .nav-dropdown-toggle {
   font-size: var(--nav-fs);
@@ -1368,17 +1368,17 @@ body.nav-open { overflow: hidden; }
 }
 .header-cta { flex: 0 0 auto; gap: 14px; }
 .header-cta .btn {
-  padding: 0.75rem clamp(1rem, 1.5vw, 1.6rem);
+  padding: 0.8rem clamp(1.1rem, 1.6vw, 1.7rem);
   font-size: var(--nav-fs);
   font-weight: 700;
   white-space: nowrap;
 }
 .header-slogan { display: none; }
-:root { --nav-fs: clamp(0.78rem, 0.5rem + 0.4vw, 0.95rem); }
+:root { --nav-fs: clamp(0.9375rem, 0.8rem + 0.25vw, 1rem); }
 .nav-dropdown-toggle { line-height: inherit; } /* a <button> defaults to line-height: normal, which sat its text lower than the links */
-/* Hamburger breakpoint: measured, not guessed. At 1120px the full nav still has ~120px of spare room and ~78px gaps at the
-   12.48px minimum font size, so the desktop nav is used from 1120px up and the mobile menu below it. */
-@media (max-width: 1119px) {
+/* Hamburger breakpoint: measured, not guessed. With six short labels the full nav still has ~150px of spare room and ~90px
+   gaps at 1024px (15.4px text), so the desktop nav is used from 1024px up and the mobile menu below it. */
+@media (max-width: 1023px) {
   .main-nav { display: none; }
   .nav-toggle { display: flex; }
 }
@@ -1755,3 +1755,24 @@ body.nav-open { overflow: hidden; }
   .diagram-caption { font-size: 12.5px; }
 }
 .inspiration { margin-top: 52px; }
+
+/* ---------- Homepage hero background video ---------- */
+/* Same dark overlay as the original video hero (heaviest behind the text), with the faint grid kept on top. */
+.hero.hero-has-video::before {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(100deg, rgba(15,17,22,0.95) 0%, rgba(15,17,22,0.88) 38%, rgba(15,17,22,0.78) 70%, rgba(15,17,22,0.7) 100%);
+  background-size: 44px 44px, 44px 44px, auto;
+}
+.hero-video-toggle {
+  margin-top: 14px; padding: 8px 16px; min-height: 40px;
+  border: 1.5px solid rgba(255,255,255,0.4); border-radius: 999px; background: rgba(15,17,22,0.55);
+  color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.hero-video-toggle:hover { background: rgba(255,255,255,0.14); border-color: #fff; }
+.hero-video-toggle[hidden] { display: none; }
+/* Phones and tablets: no video file, just the poster behind the same overlay */
+@media (max-width: 860px) {
+  .hero.hero-has-video { background: var(--dark) url('../videos/hero-poster.jpg') center/cover no-repeat; }
+}

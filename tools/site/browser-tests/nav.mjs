@@ -37,10 +37,12 @@ const results = [];
 const t = (name, ok, extra = '') => { results.push(ok); if (!PROBE || !ok) console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? '  ' + extra : ''}`); };
 
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL || 'msedge' });
-async function open(path, width, { touch = false, height = 900 } = {}) {
-  const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: false });
+async function open(path, width, { touch = false, height = 900, reduced = false } = {}) {
+  const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: false, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const page = await ctx.newPage();
   const errs = [];
+  const reqs = [];
+  page.on('request', (r) => reqs.push(r.url()));
   page.on('pageerror', (e) => errs.push(String(e)));
   await page.route(/^(?!http:\/\/127\.0\.0\.1).*/, (r) => (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.request().url()) ? r.continue() : r.abort()));
   await page.goto(BASE + path, { waitUntil: 'load' });
@@ -54,7 +56,7 @@ async function open(path, width, { touch = false, height = 900 } = {}) {
     await page.evaluate(() => document.fonts.load('600 14px "Plus Jakarta Sans"').then(() => document.fonts.ready)).catch(() => {});
     await page.waitForFunction(() => document.fonts.check('600 14px "Plus Jakarta Sans"'), null, { timeout: 8000 }).catch(() => {});
   }
-  return { ctx, page, errs };
+  return { ctx, page, errs, reqs };
 }
 
 // Everything measured in the page, so the numbers are what the browser really laid out.
@@ -115,7 +117,7 @@ const MEASURE = () => {
 };
 
 const WIDTHS = PROBE
-  ? [1920, 1600, 1440, 1366, 1300, 1280, 1240, 1200, 1180, 1160, 1140, 1120, 1100, 1080, 1024, 900, 768, 390, 360]
+  ? [1920, 1440, 1366, 1280, 1180, 1120, 1080, 1040, 1024, 1000, 980, 960, 940, 920, 900, 860, 768, 390, 360]
   : [1920, 1440, 1366, 1280, 1180, 1024, 768, 390, 360];
 const PAGES = PROBE ? ['/'] : ['/', '/assessment/', '/services/legal-basement-apartment-toronto/'];
 
@@ -145,10 +147,10 @@ for (const path of PAGES) {
     if (desktop) {
       t(`${tag}: no nav label wraps or breaks`, m.wrapped.length === 0, m.wrapped.join(', '));
       t(`${tag}: nav content fits its space (slack ${m.slack}px)`, !m.navOverflow && m.slack >= 0);
-      t(`${tag}: nav font ${m.fontPx.toFixed(2)}px is at least 12.5px`, m.fontPx >= 12.48);
+      t(`${tag}: nav font ${m.fontPx.toFixed(2)}px is at least 15px`, m.fontPx >= 14.95);
       const c = m.centres;
       t(`${tag}: nav labels share one baseline (spread ${(Math.max(...c.items) - Math.min(...c.items)).toFixed(1)}px) and line up with the logo and CTA`, Math.max(...c.items) - Math.min(...c.items) <= 0.75 && Math.abs(c.logo - c.cta) <= 1.5 && Math.abs(c.items[0] - c.cta) <= 2, JSON.stringify({ logo: c.logo, cta: c.cta, items: c.items.map((x) => +x.toFixed(1)) }));
-      t(`${tag}: visible gaps around the nav are at least 16px (${m.gaps.join('/')})`, m.gaps.every((g) => g >= 16));
+      t(`${tag}: visible gaps around the nav are at least 40px (${m.gaps.join('/')})`, m.gaps.every((g) => g >= 40));
       t(`${tag}: CTA "Get Matched" fully visible inside the viewport`, m.ctaVisible && m.ctaText === 'Get Matched' && m.ctaBox.r <= m.vw - 8 && m.ctaBox.l >= 0);
     } else {
       t(`${tag}: hamburger menu button is visible and 44px`, m.toggleVisible);
@@ -169,40 +171,41 @@ if (PROBE) {
 // -------------------------------------------------------------------- dropdown: mouse, keyboard, touch
 const MENU_ITEMS = [
   ['Basement Renovations', '/services/basement-renovation/'],
+  ['Legal Secondary Suites', '/services/legal-basement-apartment-toronto/'],
   ['Basement Finishing', '/services/basement-finishing/'],
   ['Underpinning', '/services/underpinning/'],
   ['Waterproofing', '/services/basement-waterproofing/'],
   ['Egress Windows', '/services/egress-windows/'],
   ['Separate Entrances', '/services/walkout-construction/'],
   ['Soundproofing', '/services/basement-soundproofing/'],
-  ['View All Basement Services', '/services/#basement-renovations-secondary-suites'],
+  ['View All Services', '/services/'],
 ];
 const expanded = (page) => page.getAttribute('.nav-dropdown-toggle', 'aria-expanded');
-const menuVisible = (page) => page.isVisible('#nav-basement-services');
+const menuVisible = (page) => page.isVisible('#nav-services');
 const focusedText = (page) => page.evaluate(() => (document.activeElement ? document.activeElement.textContent.replace(/\s+/g, ' ').trim() : ''));
 
 {
   const { ctx, page } = await open('/', 1440);
   const toggleBtn = page.locator('.nav-dropdown-toggle');
-  t('dropdown: closed by default, aria-expanded=false, aria-controls points at the menu', (await expanded(page)) === 'false' && !(await menuVisible(page)) && (await toggleBtn.getAttribute('aria-controls')) === 'nav-basement-services' && (await page.locator('#nav-basement-services').count()) === 1);
-  t('dropdown: the menu has an accessible name', (await page.getAttribute('#nav-basement-services', 'aria-label')) === 'Basement services');
-  const links = await page.$$eval('#nav-basement-services a', (as) => as.map((a) => [a.textContent.trim(), new URL(a.href).pathname + new URL(a.href).hash]));
+  t('dropdown: closed by default, aria-expanded=false, aria-controls points at the menu', (await expanded(page)) === 'false' && !(await menuVisible(page)) && (await toggleBtn.getAttribute('aria-controls')) === 'nav-services' && (await page.locator('#nav-services').count()) === 1);
+  t('dropdown: the menu has an accessible name', (await page.getAttribute('#nav-services', 'aria-label')) === 'Services');
+  const links = await page.$$eval('#nav-services a', (as) => as.map((a) => [a.textContent.trim(), new URL(a.href).pathname + new URL(a.href).hash]));
   t('dropdown: exactly the requested items, in order, mapped to existing pages', JSON.stringify(links) === JSON.stringify(MENU_ITEMS), JSON.stringify(links));
 
   await toggleBtn.focus(); await page.keyboard.press('Enter');
   t('dropdown (keyboard): Enter opens it and sets aria-expanded=true', (await expanded(page)) === 'true' && (await menuVisible(page)));
-  const mr = await page.locator('#nav-basement-services').boundingBox();
+  const mr = await page.locator('#nav-services').boundingBox();
   t('dropdown: stays inside the viewport', mr.x >= 0 && mr.x + mr.width <= 1440 && mr.y + mr.height <= 900, JSON.stringify(mr));
   await page.keyboard.press('Escape');
-  t('dropdown (keyboard): Escape closes it and returns focus to the button', (await expanded(page)) === 'false' && !(await menuVisible(page)) && (await focusedText(page)).startsWith('Basement Services'));
+  t('dropdown (keyboard): Escape closes it and returns focus to the button', (await expanded(page)) === 'false' && !(await menuVisible(page)) && (await focusedText(page)).startsWith('Services'));
   await page.keyboard.press('ArrowDown');
   t('dropdown (keyboard): ArrowDown opens it and focuses the first item', (await expanded(page)) === 'true' && (await focusedText(page)) === 'Basement Renovations');
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('End');
-  t('dropdown (keyboard): arrows and End move through the items', (await focusedText(page)) === 'View All Basement Services');
+  t('dropdown (keyboard): arrows and End move through the items', (await focusedText(page)) === 'View All Services');
   await page.keyboard.press('Home'); await page.keyboard.press('ArrowUp');
-  t('dropdown (keyboard): ArrowUp from the first item wraps to the last', (await focusedText(page)) === 'View All Basement Services');
+  t('dropdown (keyboard): ArrowUp from the first item wraps to the last', (await focusedText(page)) === 'View All Services');
   await page.keyboard.press('Tab');
-  t('dropdown (keyboard): tabbing out of the last item closes it and moves on to the next nav link', (await expanded(page)) === 'false' && (await focusedText(page)) === 'Legal Secondary Suites', await focusedText(page));
+  t('dropdown (keyboard): tabbing out of the last item closes it and moves on to the next nav link', (await expanded(page)) === 'false' && (await focusedText(page)) === 'Guides', await focusedText(page));
   await toggleBtn.click();
   t('dropdown (mouse): click opens it', (await expanded(page)) === 'true');
   await page.mouse.click(700, 600);
@@ -234,7 +237,7 @@ const focusedText = (page) => page.evaluate(() => (document.activeElement ? docu
 {
   const { ctx, page } = await open('/', 1440);
   const items = await page.$$eval('.main-nav > a, .main-nav .nav-dropdown-toggle', (els) => els.map((e) => [e.textContent.replace(/\s+/g, ' ').trim(), e.tagName === 'A' ? new URL(e.href).pathname : '(dropdown)']));
-  const want = [['Home', '/'], ['Basement Services', '(dropdown)'], ['Legal Secondary Suites', '/services/legal-basement-apartment-toronto/'], ['Cost & Permit Guides', '/blog/'], ['Service Areas', '/locations/'], ['About', '/about.html'], ['Contact', '/contact.html']];
+  const want = [['Home', '/'], ['Services', '(dropdown)'], ['Guides', '/blog/'], ['Service Areas', '/locations/'], ['About', '/about.html'], ['Contact', '/contact.html']];
   t('desktop nav: labels and destinations match the brief, in order', JSON.stringify(items) === JSON.stringify(want), JSON.stringify(items));
   t('desktop nav: no "Other Services" item', !items.some(([l]) => /other services/i.test(l)));
   const cta = await page.$eval('.header-cta .btn', (e) => [e.textContent.replace(/\s+/g, ' ').trim(), new URL(e.href).pathname]);
@@ -247,14 +250,14 @@ const focusedText = (page) => page.evaluate(() => (document.activeElement ? docu
 }
 
 // -------------------------------------------------------------------- mobile menu
-for (const w of [768, 390, 360, 1024, 1119]) {
+for (const w of [768, 390, 360, 900, 1023]) {
   const { ctx, page } = await open('/', w);
   const tg = page.locator('.nav-toggle');
   t(`mobile menu @${w}: starts closed with aria-expanded=false`, (await tg.getAttribute('aria-expanded')) === 'false' && !(await page.isVisible('.mobile-nav')));
   await tg.click();
   t(`mobile menu @${w}: opens, aria-expanded=true, focus moves to Close`, (await tg.getAttribute('aria-expanded')) === 'true' && (await page.isVisible('.mobile-nav')) && (await page.evaluate(() => document.activeElement.classList.contains('mobile-nav-close'))));
   const labels = await page.$$eval('.mobile-nav a', (as) => as.map((a) => [a.textContent.replace(/\s+/g, ' ').trim(), new URL(a.href).pathname + new URL(a.href).hash]));
-  const wantMobile = [['Home', '/'], ['Basement Services', '/services/#basement-renovations-secondary-suites'], ...MENU_ITEMS.slice(0, 7), ['Legal Secondary Suites', '/services/legal-basement-apartment-toronto/'], ['Cost & Permit Guides', '/blog/'], ['Service Areas', '/locations/'], ['About', '/about.html'], ['Contact', '/contact.html'], ['Get Matched', '/assessment/']];
+  const wantMobile = [['Home', '/'], ['Services', '/services/'], ...MENU_ITEMS.slice(0, 8), ['Guides', '/blog/'], ['Service Areas', '/locations/'], ['About', '/about.html'], ['Contact', '/contact.html'], ['Get Matched', '/assessment/']];
   t(`mobile menu @${w}: every requested link, in order`, JSON.stringify(labels) === JSON.stringify(wantMobile), JSON.stringify(labels.map((l) => l[0])));
   t(`mobile menu @${w}: page behind it is inert (no focus behind the overlay)`, await page.evaluate(() => document.querySelector('.site-header').inert && document.querySelector('main').inert && document.querySelector('footer').inert));
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
@@ -306,6 +309,44 @@ for (const w of [768, 390, 360, 1024, 1119]) {
   t('hero button scrolls to the form', (await page.evaluate(() => location.hash)) === '#assessment-form');
   await ctx.close();
 }
+// -------------------------------------------------------------------- hero background video
+{
+  const { ctx, page } = await open('/', 1440);
+  const info = await page.$eval('[data-hero-video]', (v) => ({ muted: v.muted, loop: v.loop, aria: v.getAttribute('aria-hidden'), poster: v.getAttribute('poster'), preload: v.getAttribute('preload'), src: v.getAttribute('data-src') }));
+  t('hero video: muted, looping, decorative (aria-hidden), poster set, lazy source', info.muted && info.loop && info.aria === 'true' && /hero-poster\.jpg$/.test(info.poster) && info.preload === 'none' && /videos\/hero-interior\.mp4$/.test(info.src), JSON.stringify(info));
+  await page.waitForFunction(() => { const v = document.querySelector('[data-hero-video]'); return v && !v.paused && v.currentTime > 0; }, null, { timeout: 15000 }).catch(() => {});
+  const playing = await page.$eval('[data-hero-video]', (v) => ({ paused: v.paused, time: v.currentTime, ready: v.readyState }));
+  t('hero video @1440px: plays on its own', !playing.paused && playing.time > 0, JSON.stringify(playing));
+  const btn = page.locator('.hero-video-toggle');
+  t('hero video: a visible pause button is offered', (await btn.isVisible()) && (await btn.textContent()) === 'Pause background video');
+  await btn.click();
+  t('hero video: the button pauses it and says Play', (await page.$eval('[data-hero-video]', (v) => v.paused)) && (await btn.textContent()) === 'Play background video');
+  await btn.click();
+  t('hero video: the button plays it again', !(await page.$eval('[data-hero-video]', (v) => v.paused)) && (await btn.textContent()) === 'Pause background video');
+  const overlay = await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage);
+  t('hero video: the dark overlay sits over it', /rgba\(15, 17, 22, 0\.9/.test(overlay), overlay.slice(0, 90));
+  const colours = await page.$$eval('.hero-copy h1, .hero-copy > p, .hero-copy .btn-outline', (els) => els.map((e) => getComputedStyle(e).color));
+  t('hero video: hero text stays light', colours.every((c) => /rgb\(255, 255, 255\)|rgba\(255, 255, 255/.test(c)), JSON.stringify(colours));
+  await ctx.close();
+}
+{
+  const { ctx, page, reqs } = await open('/', 390);
+  await page.waitForTimeout(800);
+  const st = await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); const h = document.querySelector('.hero-has-video'); const b = document.querySelector('.hero-video-toggle'); return { display: getComputedStyle(v).display, paused: v.paused, sources: v.querySelectorAll('source').length, btnHidden: b.hidden || getComputedStyle(b).display === 'none', bg: getComputedStyle(h).backgroundImage }; });
+  t('hero video @390px: not shown, not downloaded, poster image used instead', st.display === 'none' && st.paused && st.sources === 0 && st.btnHidden && /hero-poster\.jpg/.test(st.bg) && !reqs.some((u) => /hero-interior\.mp4/.test(u)), JSON.stringify(st));
+  await ctx.close();
+}
+{
+  const { ctx, page, reqs } = await open('/', 1440, { reduced: true });
+  await page.waitForTimeout(1000);
+  const st = await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); return { paused: v.paused, sources: v.querySelectorAll('source').length, label: document.querySelector('.hero-video-toggle').textContent }; });
+  t('hero video (reduced motion): does not autoplay or download; offers Play', st.paused && st.sources === 0 && st.label === 'Play background video' && !reqs.some((u) => /hero-interior\.mp4/.test(u)), JSON.stringify(st));
+  await page.locator('.hero-video-toggle').click();
+  await page.waitForFunction(() => !document.querySelector('[data-hero-video]').paused, null, { timeout: 15000 }).catch(() => {});
+  t('hero video (reduced motion): plays only when the visitor asks', !(await page.$eval('[data-hero-video]', (v) => v.paused)));
+  await ctx.close();
+}
+
 {
   // Diagram legibility on phones.
   const { ctx, page } = await open('/', 360);

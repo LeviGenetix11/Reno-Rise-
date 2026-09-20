@@ -116,6 +116,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   });
 
+  // ---------- Homepage hero background video ----------
+  // Muted, looping and decorative. The file is only fetched on wider screens (phones keep the still poster), it does not
+  // start for people who prefer reduced motion or have Data Saver on, and a visible button pauses or plays it at any time.
+  const heroVideo = document.querySelector('[data-hero-video]');
+  const videoBtn = document.querySelector('.hero-video-toggle');
+  if (heroVideo && videoBtn) {
+    const wide = window.matchMedia('(min-width: 861px)');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const saveData = !!(navigator.connection && navigator.connection.saveData);
+    let userPaused = reduced.matches || saveData;
+    let attached = false;
+    const label = () => { videoBtn.textContent = heroVideo.paused ? 'Play background video' : 'Pause background video'; };
+    const play = () => {
+      if (!attached) {
+        attached = true;
+        const src = document.createElement('source');
+        src.src = heroVideo.getAttribute('data-src');
+        src.type = 'video/mp4';
+        heroVideo.appendChild(src);
+        heroVideo.load();
+      }
+      const p = heroVideo.play();
+      if (p && p.catch) p.catch(() => {}); // blocked autoplay just leaves the poster showing
+    };
+    const sync = () => {
+      videoBtn.hidden = !wide.matches;
+      if (!wide.matches) { heroVideo.pause(); return; }
+      if (userPaused) heroVideo.pause(); else play();
+      label();
+    };
+    heroVideo.addEventListener('play', label);
+    heroVideo.addEventListener('pause', label);
+    videoBtn.addEventListener('click', () => {
+      userPaused = !heroVideo.paused;
+      if (userPaused) heroVideo.pause(); else play();
+      label();
+    });
+    wide.addEventListener('change', sync);
+    sync();
+  }
+
   // ---------- Sticky header shadow on scroll ----------
   const header = document.querySelector('.site-header');
   if (header && header.classList.contains('solid')) {

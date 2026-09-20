@@ -42,7 +42,8 @@ const plainCard = ({ icon, title, text }) => `      <article class="topic-card p
 
 // ---------------------------------------------------------------- 1. hero
 const hero = `<!-- ========== HERO ========== -->
-<section class="hero hero-basement">
+<section class="hero hero-basement hero-has-video">
+  <video class="hero-video" data-hero-video data-src="${h('videos/hero-interior.mp4')}" poster="${h('videos/hero-poster.jpg')}" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
   <div class="container hero-split">
     <div class="hero-copy">
       <span class="eyebrow on-dark">Toronto basement renovations &amp; secondary suites</span>
@@ -53,6 +54,7 @@ const hero = `<!-- ========== HERO ========== -->
         <a href="${h('services/legal-basement-apartment-toronto/')}" class="btn btn-outline">Explore Legal Suite Requirements</a>
       </div>
       <p class="hero-note">Reno Rise helps Toronto homeowners plan projects and connect with independent renovation professionals. You review the options and choose who, if anyone, to hire.</p>
+      <button type="button" class="hero-video-toggle" hidden>Pause background video</button>
     </div>
     ${L.diagramCard({ id: 'dgh' })}
   </div>

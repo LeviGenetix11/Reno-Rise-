@@ -50,9 +50,7 @@ function slugOf(urlPath) {
 function activeKey(urlPath) {
   if (urlPath === '') return 'home';
   const slug = slugOf(urlPath);
-  if (slug === 'basement-renovation') return 'basement-services';
-  if (slug === 'legal-basement-apartment-toronto') return 'suite';
-  if (slug && BASEMENT_SLUGS.has(slug)) return 'basement-services';
+  if (slug || urlPath === 'services/') return 'services'; // every service page, and the directory, sits under the Services menu
   if (urlPath.startsWith('blog/')) return 'guides';
   if (urlPath.startsWith('locations/')) return 'areas';
   if (urlPath === 'about.html') return 'about';

@@ -33,19 +33,19 @@ const P = {
   torontoBasement: 'services/basement-renovation-toronto/',
 };
 
-// Basement Services dropdown (desktop) and its flat list in the mobile menu. Each item maps to an existing canonical page.
-// "View All Basement Services" is P.basementServices. Sump pumps, backwater valves, wet basement repair and the
-// Toronto page stay reachable through that hub and the footer.
-const BASEMENT_MENU = [
+// Services dropdown (desktop) and its flat list in the mobile menu. Each item maps to an existing canonical page, and
+// "View All Services" is the services directory (P.services), which also reaches sump pumps, backwater valves, wet basement
+// repair and the broader home-improvement categories.
+const SERVICES_MENU = [
   ['Basement Renovations', 'services/basement-renovation/'],
+  ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'],
   ['Basement Finishing', 'services/basement-finishing/'],
   ['Underpinning', 'services/underpinning/'],
   ['Waterproofing', 'services/basement-waterproofing/'],
   ['Egress Windows', 'services/egress-windows/'],
   ['Separate Entrances', 'services/walkout-construction/'],
   ['Soundproofing', 'services/basement-soundproofing/'],
-];
-const up = (depth) => (depth === 0 ? './' : '../'.repeat(depth));
+];const up = (depth) => (depth === 0 ? './' : '../'.repeat(depth));
 const href = (depth, target) => (target === '' ? up(depth) : up(depth) + target);
 
 const ICON = {
@@ -63,8 +63,8 @@ const ICON = {
 function header(depth, { solid = true, active = '' } = {}) {
   const a = (key, target, label) =>
     `<a href="${href(depth, target)}"${active === key ? ' class="active" aria-current="page"' : ''}>${label}</a>`;
-  const menu = BASEMENT_MENU.map(([label, t]) => `          <li><a href="${href(depth, t)}">${label.replace(/&/g, '&amp;')}</a></li>`).join('\n');
-  const mobileSub = BASEMENT_MENU.map(([label, t]) => `    <a href="${href(depth, t)}" class="mobile-sub">${label.replace(/&/g, '&amp;')}</a>`).join('\n');
+  const menu = SERVICES_MENU.map(([label, t]) => `          <li><a href="${href(depth, t)}">${label.replace(/&/g, '&amp;')}</a></li>`).join('\n');
+  const mobileSub = SERVICES_MENU.map(([label, t]) => `    <a href="${href(depth, t)}" class="mobile-sub">${label.replace(/&/g, '&amp;')}</a>`).join('\n');
   return `<!-- ========== HEADER ========== -->
 <header class="site-header${solid ? ' solid' : ''}">
   <div class="container header-inner">
@@ -76,14 +76,13 @@ function header(depth, { solid = true, active = '' } = {}) {
     <nav class="main-nav" aria-label="Main">
       ${a('home', P.home, 'Home')}
       <div class="nav-dropdown">
-        <button type="button" class="nav-dropdown-toggle${active === 'basement-services' ? ' active' : ''}" aria-expanded="false" aria-controls="nav-basement-services">Basement Services ${ICON.chevron}</button>
-        <ul class="nav-dropdown-menu" id="nav-basement-services" aria-label="Basement services">
+        <button type="button" class="nav-dropdown-toggle${active === 'services' ? ' active' : ''}" aria-expanded="false" aria-controls="nav-services">Services ${ICON.chevron}</button>
+        <ul class="nav-dropdown-menu" id="nav-services" aria-label="Services">
 ${menu}
-          <li class="nav-dropdown-all"><a href="${href(depth, P.basementServices)}">View All Basement Services</a></li>
+          <li class="nav-dropdown-all"><a href="${href(depth, P.services)}">View All Services</a></li>
         </ul>
       </div>
-      ${a('suite', P.suite, 'Legal Secondary Suites')}
-      ${a('guides', P.guides, 'Cost &amp; Permit Guides')}
+      ${a('guides', P.guides, 'Guides')}
       ${a('areas', P.areas, 'Service Areas')}
       ${a('about', P.about, 'About')}
       ${a('contact', P.contact, 'Contact')}
@@ -114,10 +113,9 @@ ${menu}
   </div>
   <p class="logo-tagline">Basement &amp; Legal Suite Planning</p>
   <a href="${href(depth, P.home)}">Home</a>
-  <a href="${href(depth, P.basementServices)}">Basement Services</a>
+  <a href="${href(depth, P.services)}">Services</a>
 ${mobileSub}
-  <a href="${href(depth, P.suite)}">Legal Secondary Suites</a>
-  <a href="${href(depth, P.guides)}">Cost &amp; Permit Guides</a>
+  <a href="${href(depth, P.guides)}">Guides</a>
   <a href="${href(depth, P.areas)}">Service Areas</a>
   <a href="${href(depth, P.about)}">About</a>
   <a href="${href(depth, P.contact)}">Contact</a>
@@ -359,6 +357,6 @@ ${cards}
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 module.exports = {
-  SITE, PHONE_DISPLAY, PHONE_TEL, EMAIL, DISCLOSURE, POSITIONING, P, BASEMENT_MENU, ICON,
+  SITE, PHONE_DISPLAY, PHONE_TEL, EMAIL, DISCLOSURE, POSITIONING, P, SERVICES_MENU, ICON,
   up, href, header, footer, ctaBand, howItWorks, disclosure, diagramCard, customerQuotes, quoteFigure, photoCard, splitHero, CUSTOMER_QUOTES, escapeHtml,
 };

@@ -34,21 +34,21 @@ function resolve(fromRel, href) {
 // What the brief asks for, as canonical destinations (folder pages end in "/", flat pages keep ".html").
 const NAV = [
   ['Home', ''],
-  ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'],
-  ['Cost & Permit Guides', 'blog/'],
+  ['Guides', 'blog/'],
   ['Service Areas', 'locations/'],
   ['About', 'about.html'],
   ['Contact', 'contact.html'],
 ];
 const DROPDOWN = [
   ['Basement Renovations', 'services/basement-renovation/'],
+  ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'],
   ['Basement Finishing', 'services/basement-finishing/'],
   ['Underpinning', 'services/underpinning/'],
   ['Waterproofing', 'services/basement-waterproofing/'],
   ['Egress Windows', 'services/egress-windows/'],
   ['Separate Entrances', 'services/walkout-construction/'],
   ['Soundproofing', 'services/basement-soundproofing/'],
-  ['View All Basement Services', 'services/#basement-renovations-secondary-suites'],
+  ['View All Services', 'services/'],
 ];
 const CTA = ['Get Matched', 'assessment/'];
 const FOOTER_REQUIRED = [
@@ -78,7 +78,7 @@ for (const { rel, html, urlPath } of pages.values()) {
   const topLinks = links(navOuter);
   const topLabels = topLinks.map((l) => l.text);
   const toggleLabel = decode((navBlock.match(/<button[^>]*class="nav-dropdown-toggle[^"]*"[^>]*>([\s\S]*?)<\/button>/) || [])[1] || '');
-  const expected = ['Home', 'Basement Services', ...NAV.slice(1).map(([l]) => l)];
+  const expected = ['Home', 'Services', ...NAV.slice(1).map(([l]) => l)];
   const actual = [];
   let ti = 0;
   for (const chunk of navOuter.split(/(?=<a |<div class="nav-dropdown">)/)) {
@@ -91,7 +91,7 @@ for (const { rel, html, urlPath } of pages.values()) {
     const l = topLinks.find((x) => x.text === label);
     ok(l && rendered(l.href).url === `${SITE}/${target}`.replace(/index\.html$/, ''), `${at} nav "${label}" should go to /${target}, goes to ${l ? l.href : '(missing)'}`);
   }
-  ok(/aria-expanded="false"/.test(navBlock) && /aria-controls="nav-basement-services"/.test(navBlock) && /id="nav-basement-services"/.test(menuBlock + navBlock), `${at} dropdown lacks aria-expanded / aria-controls / matching id`);
+  ok(/aria-expanded="false"/.test(navBlock) && /aria-controls="nav-services"/.test(navBlock) && /id="nav-services"/.test(menuBlock + navBlock), `${at} dropdown lacks aria-expanded / aria-controls / matching id`);
 
   // ---- dropdown: exact items and canonical destinations
   const dd = links(menuBlock);
@@ -110,7 +110,7 @@ for (const { rel, html, urlPath } of pages.values()) {
 
   // ---- mobile menu carries the same destinations
   const mob = links(mobileBlock);
-  const mobWant = ['Home', 'Basement Services', ...DROPDOWN.slice(0, 7).map(([l]) => l), 'Legal Secondary Suites', 'Cost & Permit Guides', 'Service Areas', 'About', 'Contact', 'Get Matched'];
+  const mobWant = ['Home', 'Services', ...DROPDOWN.slice(0, 8).map(([l]) => l), 'Guides', 'Service Areas', 'About', 'Contact', 'Get Matched'];
   ok(JSON.stringify(mob.map((l) => l.text)) === JSON.stringify(mobWant), `${at} mobile menu is ${JSON.stringify(mob.map((l) => l.text))}`);
   ok(/id="site-menu"/.test(mobileBlock) && /aria-controls="site-menu"/.test(html) && /role="dialog"/.test(mobileBlock) && /aria-modal="true"/.test(mobileBlock), `${at} mobile menu lacks id/aria-controls/dialog semantics`);
 
@@ -157,6 +157,11 @@ ok(decode((main.match(/<p class="hero-note">([\s\S]*?)<\/p>/) || [])[1] || '') =
 ok(decode((main.match(/<figcaption class="diagram-caption">([\s\S]*?)<\/figcaption>/) || [])[1] || '') === 'Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.', 'diagram fine print is not the requested text');
 ok((main.match(/class="dg-num"/g) || []).length === 5, 'diagram numbered topics changed');
 ok(/id="assessment-form"[\s\S]*data-assessment-form-mount data-source="homepage"/.test(main), 'homepage enquiry form mount is missing');
+const heroVideo = (main.match(/<video class="hero-video"[^>]*>/) || [''])[0];
+ok(/data-src="\.\/videos\/hero-interior\.mp4"/.test(heroVideo) && /poster="\.\/videos\/hero-poster\.jpg"/.test(heroVideo) && / muted /.test(heroVideo) && / loop /.test(heroVideo) && /aria-hidden="true"/.test(heroVideo) && /preload="none"/.test(heroVideo), `hero background video markup is wrong: ${heroVideo}`);
+ok(/<button type="button" class="hero-video-toggle"/.test(main), 'hero video needs its pause/play button');
+ok(fs.existsSync(path.join(ROOT, 'videos', 'hero-interior.mp4')) && fs.existsSync(path.join(ROOT, 'videos', 'hero-poster.jpg')), 'hero video files are missing from /videos');
+ok(!/<video/.test(pages.get('services/legal-basement-apartment-toronto/index.html').html), 'only the homepage hero should carry the video');
 
 const order = [...main.matchAll(/<section[^>]*>[\s\S]*?<(?:h1|h2)[^>]*>([\s\S]*?)<\/(?:h1|h2)>/g)].map((m) => decode(m[1]));
 const wantOrder = ['Basement Renovations & Legal Secondary Suites in Toronto', 'How Reno Rise Works', 'What Would You Like to Do With Your Basement?', 'Finished Basement or Legal Secondary Suite?', 'Cost, Permit & Planning Guides', 'Why Homeowners Use Reno Rise'];
