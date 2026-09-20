@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   closeBtn?.addEventListener('click', () => setMobileNav(false));
   mobileNav?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMobileNav(false)));
 
-  // ---------- Desktop "Basement Services" dropdown ----------
+  // ---------- Desktop "Services" dropdown ----------
   const dropdowns = Array.from(document.querySelectorAll('.nav-dropdown'));
   const menuLinks = (dd) => Array.from(dd.querySelectorAll('.nav-dropdown-menu a'));
   const closeDropdown = (dd, returnFocus) => {
@@ -117,18 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---------- Homepage hero background video ----------
-  // Muted, looping and decorative. The file is only fetched on wider screens (phones keep the still poster), it does not
-  // start for people who prefer reduced motion or have Data Saver on, and a visible button pauses or plays it at any time.
+  // Muted, looping and decorative. The file is only fetched on wider screens (phones and tablets keep the still poster) and it
+  // never starts for visitors who prefer reduced motion or have Data Saver on.
   const heroVideo = document.querySelector('[data-hero-video]');
-  const videoBtn = document.querySelector('.hero-video-toggle');
-  if (heroVideo && videoBtn) {
+  if (heroVideo) {
     const wide = window.matchMedia('(min-width: 861px)');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const saveData = !!(navigator.connection && navigator.connection.saveData);
-    let userPaused = reduced.matches || saveData;
     let attached = false;
-    const label = () => { videoBtn.textContent = heroVideo.paused ? 'Play background video' : 'Pause background video'; };
-    const play = () => {
+    const sync = () => {
+      if (!wide.matches || reduced.matches || saveData) { heroVideo.pause(); return; }
       if (!attached) {
         attached = true;
         const src = document.createElement('source');
@@ -140,20 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const p = heroVideo.play();
       if (p && p.catch) p.catch(() => {}); // blocked autoplay just leaves the poster showing
     };
-    const sync = () => {
-      videoBtn.hidden = !wide.matches;
-      if (!wide.matches) { heroVideo.pause(); return; }
-      if (userPaused) heroVideo.pause(); else play();
-      label();
-    };
-    heroVideo.addEventListener('play', label);
-    heroVideo.addEventListener('pause', label);
-    videoBtn.addEventListener('click', () => {
-      userPaused = !heroVideo.paused;
-      if (userPaused) heroVideo.pause(); else play();
-      label();
-    });
     wide.addEventListener('change', sync);
+    reduced.addEventListener('change', sync);
     sync();
   }
 

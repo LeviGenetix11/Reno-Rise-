@@ -1454,12 +1454,7 @@ body.nav-open { overflow: hidden; }
     radial-gradient(900px 500px at 82% 30%, rgba(240,120,42,0.20), transparent 60%),
     linear-gradient(135deg, #14171d 0%, #1b1f27 55%, #232833 100%);
 }
-.hero.hero-basement::before {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
+.hero.hero-basement::before { background: none; } /* no overlay and no grid lines on the split heroes */
 .hero-split {
   position: relative;
   z-index: 2;
@@ -1757,21 +1752,16 @@ body.nav-open { overflow: hidden; }
 .inspiration { margin-top: 52px; }
 
 /* ---------- Homepage hero background video ---------- */
-/* Same dark overlay as the original video hero (heaviest behind the text), with the faint grid kept on top. */
+/* A lighter overlay so the footage shows through, strongest behind the text column. Even against the brightest possible frame
+   the white text stays above 4.5:1 (checked in browser-tests/nav.mjs). */
 .hero.hero-has-video::before {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(100deg, rgba(15,17,22,0.95) 0%, rgba(15,17,22,0.88) 38%, rgba(15,17,22,0.78) 70%, rgba(15,17,22,0.7) 100%);
-  background-size: 44px 44px, 44px 44px, auto;
+  background: linear-gradient(100deg, rgba(15,17,22,0.72) 0%, rgba(15,17,22,0.66) 55%, rgba(15,17,22,0.42) 80%, rgba(15,17,22,0.32) 100%);
 }
-.hero-video-toggle {
-  margin-top: 14px; padding: 8px 16px; min-height: 40px;
-  border: 1.5px solid rgba(255,255,255,0.4); border-radius: 999px; background: rgba(15,17,22,0.55);
-  color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+.hero.hero-has-video .hero-copy > p { color: #fff; }
+/* One column (the text spans the full width): keep the overlay even */
+@media (max-width: 960px) {
+  .hero.hero-has-video::before { background: rgba(15,17,22,0.66); }
 }
-.hero-video-toggle:hover { background: rgba(255,255,255,0.14); border-color: #fff; }
-.hero-video-toggle[hidden] { display: none; }
 /* Phones and tablets: no video file, just the poster behind the same overlay */
 @media (max-width: 860px) {
   .hero.hero-has-video { background: var(--dark) url('../videos/hero-poster.jpg') center/cover no-repeat; }

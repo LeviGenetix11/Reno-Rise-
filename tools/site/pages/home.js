@@ -53,8 +53,6 @@ const hero = `<!-- ========== HERO ========== -->
         <a href="#assessment-form" class="btn btn-primary">Tell Us About Your Project ${L.ICON.arrow}</a>
         <a href="${h('services/legal-basement-apartment-toronto/')}" class="btn btn-outline">Explore Legal Suite Requirements</a>
       </div>
-      <p class="hero-note">Reno Rise helps Toronto homeowners plan projects and connect with independent renovation professionals. You review the options and choose who, if anyone, to hire.</p>
-      <button type="button" class="hero-video-toggle" hidden>Pause background video</button>
     </div>
     ${L.diagramCard({ id: 'dgh' })}
   </div>

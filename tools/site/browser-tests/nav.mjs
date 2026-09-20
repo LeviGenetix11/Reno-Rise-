@@ -298,7 +298,7 @@ for (const w of [768, 390, 360, 900, 1023]) {
   t('hero: new supporting copy', (await txt('.hero-copy > p')).replace(/’/g, "'") === "Whether you're finishing your basement, creating more living space or exploring a legal secondary suite, Reno Rise helps you understand the project and connect with independent local renovation professionals.");
   const btns = await page.$$eval('.hero-actions a', (as) => as.map((a) => { const h = a.getAttribute('href'); return [a.textContent.trim(), h.startsWith('./') ? h.slice(2) : h]; }));
   t('hero: primary "Tell Us About Your Project" -> the enquiry form; secondary -> legal suite page', JSON.stringify(btns) === JSON.stringify([['Tell Us About Your Project', '#assessment-form'], ['Explore Legal Suite Requirements', 'services/legal-basement-apartment-toronto/']]), JSON.stringify(btns));
-  t('hero: new disclosure line', (await txt('.hero-note')) === 'Reno Rise helps Toronto homeowners plan projects and connect with independent renovation professionals. You review the options and choose who, if anyone, to hire.');
+  t('hero: no disclosure line above/below the buttons, no grid lines, no video button', (await page.locator('.hero .hero-note').count()) === 0 && (await page.locator('.hero-video-toggle').count()) === 0 && (await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage.includes('linear-gradient(rgba(255, 255, 255') === false)));
   t('diagram: new fine print, numbered key kept', (await txt('.diagram-caption')) === 'Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.' && (await page.locator('.diagram-legend li').count()) === 5);
   const order = await page.$$eval('main > section', (ss) => ss.map((s) => (s.querySelector('h1, h2') || {}).textContent?.replace(/\s+/g, ' ').trim()));
   t('homepage sections are in the requested order', ['Basement Renovations & Legal Secondary Suites in Toronto', 'How Reno Rise Works', 'What Would You Like to Do With Your Basement?', 'Finished Basement or Legal Secondary Suite?', 'Cost, Permit & Planning Guides', 'Why Homeowners Use Reno Rise'].every((h, i) => order[i] === h) && order[order.length - 2] === 'Frequently Asked Questions' && order[order.length - 1] === 'Tell Us About Your Project', JSON.stringify(order));
@@ -317,14 +317,8 @@ for (const w of [768, 390, 360, 900, 1023]) {
   await page.waitForFunction(() => { const v = document.querySelector('[data-hero-video]'); return v && !v.paused && v.currentTime > 0; }, null, { timeout: 15000 }).catch(() => {});
   const playing = await page.$eval('[data-hero-video]', (v) => ({ paused: v.paused, time: v.currentTime, ready: v.readyState }));
   t('hero video @1440px: plays on its own', !playing.paused && playing.time > 0, JSON.stringify(playing));
-  const btn = page.locator('.hero-video-toggle');
-  t('hero video: a visible pause button is offered', (await btn.isVisible()) && (await btn.textContent()) === 'Pause background video');
-  await btn.click();
-  t('hero video: the button pauses it and says Play', (await page.$eval('[data-hero-video]', (v) => v.paused)) && (await btn.textContent()) === 'Play background video');
-  await btn.click();
-  t('hero video: the button plays it again', !(await page.$eval('[data-hero-video]', (v) => v.paused)) && (await btn.textContent()) === 'Pause background video');
   const overlay = await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage);
-  t('hero video: the dark overlay sits over it', /rgba\(15, 17, 22, 0\.9/.test(overlay), overlay.slice(0, 90));
+  t('hero video: a lighter overlay (at most 72% dark) lets the footage show', (() => { const alphas = [...overlay.matchAll(/rgba\(15, 17, 22, ([0-9.]+)\)/g)].map((m) => Number(m[1])); return alphas.length >= 3 && Math.max(...alphas) <= 0.72 && Math.min(...alphas) >= 0.3; })(), overlay.slice(0, 120));
   const colours = await page.$$eval('.hero-copy h1, .hero-copy > p, .hero-copy .btn-outline', (els) => els.map((e) => getComputedStyle(e).color));
   t('hero video: hero text stays light', colours.every((c) => /rgb\(255, 255, 255\)|rgba\(255, 255, 255/.test(c)), JSON.stringify(colours));
   await ctx.close();
@@ -332,18 +326,44 @@ for (const w of [768, 390, 360, 900, 1023]) {
 {
   const { ctx, page, reqs } = await open('/', 390);
   await page.waitForTimeout(800);
-  const st = await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); const h = document.querySelector('.hero-has-video'); const b = document.querySelector('.hero-video-toggle'); return { display: getComputedStyle(v).display, paused: v.paused, sources: v.querySelectorAll('source').length, btnHidden: b.hidden || getComputedStyle(b).display === 'none', bg: getComputedStyle(h).backgroundImage }; });
-  t('hero video @390px: not shown, not downloaded, poster image used instead', st.display === 'none' && st.paused && st.sources === 0 && st.btnHidden && /hero-poster\.jpg/.test(st.bg) && !reqs.some((u) => /hero-interior\.mp4/.test(u)), JSON.stringify(st));
+  const st = await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); const h = document.querySelector('.hero-has-video'); return { display: getComputedStyle(v).display, paused: v.paused, sources: v.querySelectorAll('source').length, bg: getComputedStyle(h).backgroundImage }; });
+  t('hero video @390px: not shown, not downloaded, poster image used instead', st.display === 'none' && st.paused && st.sources === 0 && /hero-poster\.jpg/.test(st.bg) && !reqs.some((u) => /hero-interior\.mp4/.test(u)), JSON.stringify(st));
   await ctx.close();
 }
 {
   const { ctx, page, reqs } = await open('/', 1440, { reduced: true });
   await page.waitForTimeout(1000);
-  const st = await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); return { paused: v.paused, sources: v.querySelectorAll('source').length, label: document.querySelector('.hero-video-toggle').textContent }; });
-  t('hero video (reduced motion): does not autoplay or download; offers Play', st.paused && st.sources === 0 && st.label === 'Play background video' && !reqs.some((u) => /hero-interior\.mp4/.test(u)), JSON.stringify(st));
-  await page.locator('.hero-video-toggle').click();
-  await page.waitForFunction(() => !document.querySelector('[data-hero-video]').paused, null, { timeout: 15000 }).catch(() => {});
-  t('hero video (reduced motion): plays only when the visitor asks', !(await page.$eval('[data-hero-video]', (v) => v.paused)));
+  const st = await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); return { paused: v.paused, sources: v.querySelectorAll('source').length }; });
+  t('hero video (reduced motion): does not autoplay or download', st.paused && st.sources === 0 && !reqs.some((u) => /hero-interior\.mp4/.test(u)), JSON.stringify(st));
+  await ctx.close();
+}
+
+// Worst case for a video is a pure-white frame. Render the hero over white, hide the text, and measure the brightest
+// pixel behind each text block: the light text must still reach WCAG contrast (4.5:1 body copy, 3:1 the large heading).
+for (const [w, label] of [[1440, 'two columns'], [1000, 'one column, video on'], [390, 'phone poster']]) {
+  const { ctx, page } = await open('/', w);
+  await page.addStyleTag({ content: '.hero-video{display:none!important}.hero-has-video{background:#fff!important}' });
+  const blocks = await page.$$eval('.hero-copy h1, .hero-copy > p, .hero-copy .btn-outline', (els) => els.map((e) => { const r = e.getBoundingClientRect(); const c = getComputedStyle(e).color.match(/[0-9.]+/g).map(Number); return { name: e.tagName + '.' + e.className, x: r.left, y: r.top + scrollY, w: r.width, h: r.height, rgb: c.slice(0, 3), a: c.length > 3 ? c[3] : 1 }; }));
+  await page.addStyleTag({ content: '.hero-copy *{color:transparent!important;background:transparent!important;border-color:transparent!important;text-shadow:none!important}' });
+  const results = [];
+  for (const bk of blocks) {
+    const png = await page.screenshot({ clip: { x: bk.x, y: bk.y, width: Math.max(1, bk.w), height: Math.max(1, bk.h) }, fullPage: true });
+    const lum = await page.evaluate(async (b64) => {
+      const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
+      const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+      const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data; let max = 0;
+      for (let i = 0; i < d.length; i += 4) { max = Math.max(max, 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]); }
+      return max;
+    }, png.toString('base64'));
+    // light text with alpha, composited over the brightest background pixel
+    const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    const text = bk.rgb.map((ch) => bk.a * ch + (1 - bk.a) * lum);
+    const Lt = 0.2126 * lin(text[0]) + 0.7152 * lin(text[1]) + 0.0722 * lin(text[2]);
+    const Lb = lin(lum);
+    results.push({ name: bk.name, ratio: (Lt + 0.05) / (Lb + 0.05), need: bk.name.startsWith('H1') ? 3 : 4.5 });
+  }
+  t('hero text stays readable over even a white video frame @' + w + 'px (' + label + ')', results.every((r) => r.ratio >= r.need), results.map((r) => r.name.slice(0, 12) + ' ' + r.ratio.toFixed(1) + '(need ' + r.need + ')').join(', '));
   await ctx.close();
 }
 

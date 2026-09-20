@@ -153,13 +153,13 @@ ok(decode(between(main, '<div class="hero-copy">', '<div class="hero-actions">')
 const heroActions = links(between(main, '<div class="hero-actions">', '</div>'));
 ok(heroActions[0] && heroActions[0].text === 'Tell Us About Your Project' && heroActions[0].href === '#assessment-form', 'hero primary button should be "Tell Us About Your Project" -> #assessment-form');
 ok(heroActions[1] && heroActions[1].text === 'Explore Legal Suite Requirements' && resolve('index.html', heroActions[1].href).url === `${SITE}/services/legal-basement-apartment-toronto/`, 'hero secondary button changed');
-ok(decode((main.match(/<p class="hero-note">([\s\S]*?)<\/p>/) || [])[1] || '') === 'Reno Rise helps Toronto homeowners plan projects and connect with independent renovation professionals. You review the options and choose who, if anyone, to hire.', 'hero disclosure is not the requested text');
+ok(!/class="hero-note"/.test(between(main, '<section class="hero', '</section>')), 'the hero disclosure line above the button was asked to be removed');
 ok(decode((main.match(/<figcaption class="diagram-caption">([\s\S]*?)<\/figcaption>/) || [])[1] || '') === 'Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.', 'diagram fine print is not the requested text');
 ok((main.match(/class="dg-num"/g) || []).length === 5, 'diagram numbered topics changed');
 ok(/id="assessment-form"[\s\S]*data-assessment-form-mount data-source="homepage"/.test(main), 'homepage enquiry form mount is missing');
 const heroVideo = (main.match(/<video class="hero-video"[^>]*>/) || [''])[0];
 ok(/data-src="\.\/videos\/hero-interior\.mp4"/.test(heroVideo) && /poster="\.\/videos\/hero-poster\.jpg"/.test(heroVideo) && / muted /.test(heroVideo) && / loop /.test(heroVideo) && /aria-hidden="true"/.test(heroVideo) && /preload="none"/.test(heroVideo), `hero background video markup is wrong: ${heroVideo}`);
-ok(/<button type="button" class="hero-video-toggle"/.test(main), 'hero video needs its pause/play button');
+ok(!/hero-video-toggle/.test(main), 'the hero pause button was asked to be removed');
 ok(fs.existsSync(path.join(ROOT, 'videos', 'hero-interior.mp4')) && fs.existsSync(path.join(ROOT, 'videos', 'hero-poster.jpg')), 'hero video files are missing from /videos');
 ok(!/<video/.test(pages.get('services/legal-basement-apartment-toronto/index.html').html), 'only the homepage hero should carry the video');
 
