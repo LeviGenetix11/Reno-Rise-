@@ -13,7 +13,7 @@ const DISCLOSURE =
   'Reno Rise is an independent project-enquiry and contractor-matching service. Renovation services, estimates, contracts, warranties, and regulatory responsibilities are provided by the professional you choose. Confirm credentials, insurance, references, and permit responsibilities before hiring.';
 
 const POSITIONING =
-  'Reno Rise helps Toronto homeowners plan basement renovations and legal secondary suites and connect with qualified local professionals.';
+  'Reno Rise helps Toronto homeowners plan basement renovations and legal secondary suites and connect with independent local renovation professionals.';
 
 // Canonical destinations (relative to site root). Folder pages end in "/".
 const P = {
@@ -33,19 +33,18 @@ const P = {
   torontoBasement: 'services/basement-renovation-toronto/',
 };
 
+// Basement Services dropdown (desktop) and its flat list in the mobile menu. Each item maps to an existing canonical page.
+// "View All Basement Services" is P.basementServices. Sump pumps, backwater valves, wet basement repair and the
+// Toronto page stay reachable through that hub and the footer.
 const BASEMENT_MENU = [
+  ['Basement Renovations', 'services/basement-renovation/'],
   ['Basement Finishing', 'services/basement-finishing/'],
-  ['Underpinning & Bench Footing', 'services/underpinning/'],
-  ['Interior Waterproofing', 'services/interior-waterproofing/'],
-  ['Exterior Waterproofing', 'services/exterior-waterproofing/'],
-  ['Wet Basement Repair', 'services/wet-basement-repair/'],
+  ['Underpinning', 'services/underpinning/'],
+  ['Waterproofing', 'services/basement-waterproofing/'],
   ['Egress Windows', 'services/egress-windows/'],
-  ['Walkout & Separate Entrances', 'services/walkout-construction/'],
-  ['Basement Soundproofing', 'services/basement-soundproofing/'],
-  ['Sump Pumps & Backwater Valves', 'services/sump-pump/'],
-  ['Basement Renovation in Toronto', 'services/basement-renovation-toronto/'],
+  ['Separate Entrances', 'services/walkout-construction/'],
+  ['Soundproofing', 'services/basement-soundproofing/'],
 ];
-
 const up = (depth) => (depth === 0 ? './' : '../'.repeat(depth));
 const href = (depth, target) => (target === '' ? up(depth) : up(depth) + target);
 
@@ -76,56 +75,57 @@ function header(depth, { solid = true, active = '' } = {}) {
 
     <nav class="main-nav" aria-label="Main">
       ${a('home', P.home, 'Home')}
-      ${a('basement', P.basement, 'Basement Renovations')}
-      ${a('suite', P.suite, 'Legal Secondary Suites')}
       <div class="nav-dropdown">
         <button type="button" class="nav-dropdown-toggle${active === 'basement-services' ? ' active' : ''}" aria-expanded="false" aria-controls="nav-basement-services">Basement Services ${ICON.chevron}</button>
-        <ul class="nav-dropdown-menu" id="nav-basement-services">
+        <ul class="nav-dropdown-menu" id="nav-basement-services" aria-label="Basement services">
 ${menu}
-          <li class="nav-dropdown-all"><a href="${href(depth, P.basementServices)}">All basement services</a></li>
+          <li class="nav-dropdown-all"><a href="${href(depth, P.basementServices)}">View All Basement Services</a></li>
         </ul>
       </div>
+      ${a('suite', P.suite, 'Legal Secondary Suites')}
       ${a('guides', P.guides, 'Cost &amp; Permit Guides')}
-      ${a('other', P.otherServices, 'Other Services')}
+      ${a('areas', P.areas, 'Service Areas')}
+      ${a('about', P.about, 'About')}
+      ${a('contact', P.contact, 'Contact')}
     </nav>
 
     <div class="header-cta">
       <a href="${href(depth, P.assessment)}" class="btn btn-primary">
-        Request a Basement Assessment
+        Get Matched
         ${ICON.arrow}
       </a>
-      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
     </div>
   </div>
 </header>
 
 <!-- ========== MOBILE NAV ========== -->
-<div class="mobile-nav" role="dialog" aria-modal="true" aria-label="Site menu">
+<div class="mobile-nav" id="site-menu" role="dialog" aria-modal="true" aria-label="Site menu">
   <div class="mobile-nav-head">
     <span class="logo">
       <span class="logo-mark"><img src="${up(depth)}images/favicon.png" alt="Reno Rise logo"></span>
       <span class="logo-text"><b style="color:#fff">Reno Rise</b></span>
     </span>
     <button class="mobile-nav-close icon-btn" type="button" style="background:transparent;border-color:rgba(255,255,255,.3);color:#fff" aria-label="Close menu">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
   </div>
   <p class="logo-tagline">Basement &amp; Legal Suite Planning</p>
   <a href="${href(depth, P.home)}">Home</a>
-  <a href="${href(depth, P.basement)}">Basement Renovations</a>
-  <a href="${href(depth, P.suite)}">Legal Secondary Suites</a>
   <a href="${href(depth, P.basementServices)}">Basement Services</a>
 ${mobileSub}
+  <a href="${href(depth, P.suite)}">Legal Secondary Suites</a>
   <a href="${href(depth, P.guides)}">Cost &amp; Permit Guides</a>
-  <a href="${href(depth, P.otherServices)}">Other Services</a>
-  <a href="${href(depth, P.assessment)}" class="btn btn-primary">Request a Basement Assessment</a>
+  <a href="${href(depth, P.areas)}">Service Areas</a>
+  <a href="${href(depth, P.about)}">About</a>
+  <a href="${href(depth, P.contact)}">Contact</a>
+  <a href="${href(depth, P.assessment)}" class="btn btn-primary">Get Matched</a>
 </div>
 
 `;
 }
-
 function footer(depth) {
   const li = (t, label) => `        <li><a href="${href(depth, t)}">${label}</a></li>`;
   return `<footer class="site-footer">
@@ -144,6 +144,7 @@ function footer(depth) {
       <ul>
 ${li(P.basement, 'Basement Renovations')}
 ${li(P.suite, 'Legal Secondary Suites')}
+${li(P.basementServices, 'Basement Services')}
 ${li('services/basement-finishing/', 'Basement Finishing')}
 ${li('services/underpinning/', 'Underpinning')}
 ${li('services/interior-waterproofing/', 'Interior Waterproofing')}
@@ -156,8 +157,8 @@ ${li('services/egress-windows/', 'Egress Windows')}
       <ul>
 ${li(P.guides, 'Basement Planning Centre')}
 ${li(P.otherServices, 'Other Home Improvement Services')}
-${li(P.areas, 'Areas Served')}
-${li(P.about, 'About Reno Rise')}
+${li(P.areas, 'Service Areas')}
+${li(P.about, 'About')}
 ${li(P.contact, 'Contact')}
 ${li(P.assessment, 'Request an Assessment')}
       </ul>
@@ -207,8 +208,15 @@ function ctaBand(depth, { heading, text, tight = true } = {}) {
 </section>`;
 }
 
+const DEFAULT_STEPS = [
+  ['You share your project', 'Tell us about your basement, your goals and your timeline using the assessment form.'],
+  ['Reno Rise reviews requirements', 'We look at what you have submitted to understand the scope and what needs to be confirmed.'],
+  ['You are connected with an independent professional', 'When there is a suitable fit, you are introduced to an appropriate professional. There is no guarantee of a match.'],
+  ['The professional takes it from there', 'Estimates, contracts, credentials, warranties and the construction itself are provided by the professional you select.'],
+];
+
 /** Four-step "how it works" block: what Reno Rise does and what the professional does. */
-function howItWorks({ heading = 'How Reno Rise Works', intro = '' } = {}) {
+function howItWorks({ heading = 'How Reno Rise Works', intro = '', steps = null } = {}) {
   const step = (n, h, p) => `      <div class="process-step">
         <span class="num-circle num-text" aria-hidden="true">${n}</span>
         <h3>${h}</h3>
@@ -218,10 +226,7 @@ function howItWorks({ heading = 'How Reno Rise Works', intro = '' } = {}) {
     <h2>${heading}</h2>
     ${intro ? `<p class="how-works-intro">${intro}</p>` : ''}
     <div class="how-steps">
-${step(1, 'You share your project', 'Tell us about your basement, your goals and your timeline using the assessment form.')}
-${step(2, 'Reno Rise reviews requirements', 'We look at what you have submitted to understand the scope and what needs to be confirmed.')}
-${step(3, 'You are connected with an independent professional', 'When there is a suitable fit, you are introduced to an appropriate professional. There is no guarantee of a match.')}
-${step(4, 'The professional takes it from there', 'Estimates, contracts, credentials, warranties and the construction itself are provided by the professional you select.')}
+${(steps || DEFAULT_STEPS).map(([h, p], i) => step(i + 1, h, p)).join('\n')}
     </div>
   </div>`;
 }
@@ -273,7 +278,7 @@ function diagramCard({ id = 'dg', caption = true } = {}) {
         ${marker(5, 348, 268)}
       </svg>
       <ol class="diagram-legend" aria-label="Diagram key">${legend}</ol>
-      ${caption ? '<figcaption class="diagram-caption">Illustration only: a generic diagram, not to scale and not any specific property. Requirements vary; confirm details with Toronto Building.</figcaption>' : ''}
+      ${caption ? '<figcaption class="diagram-caption">Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.</figcaption>' : ''}
     </figure>`;
 }
 

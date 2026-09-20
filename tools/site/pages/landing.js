@@ -27,7 +27,7 @@ const card = ([icon, title, text]) => `      <article class="topic-card">
         <p>${text}</p>
       </article>`;
 
-const list = (items) => `<ul class="check-list">\n${items.map((t) => `      <li>${L.ICON.check} ${t}</li>`).join('\n')}\n    </ul>`;
+const list = (items) => `<ul class="check-list">\n${items.map((t) => `      <li>${L.ICON.check} <span>${t}</span></li>`).join('\n')}\n    </ul>`;
 
 function build(d) {
   const path = `services/${d.slug}/`;

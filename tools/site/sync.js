@@ -50,11 +50,13 @@ function slugOf(urlPath) {
 function activeKey(urlPath) {
   if (urlPath === '') return 'home';
   const slug = slugOf(urlPath);
-  if (slug === 'basement-renovation') return 'basement';
+  if (slug === 'basement-renovation') return 'basement-services';
   if (slug === 'legal-basement-apartment-toronto') return 'suite';
   if (slug && BASEMENT_SLUGS.has(slug)) return 'basement-services';
   if (urlPath.startsWith('blog/')) return 'guides';
-  if (slug) return 'other';
+  if (urlPath.startsWith('locations/')) return 'areas';
+  if (urlPath === 'about.html') return 'about';
+  if (urlPath === 'contact.html') return 'contact';
   return '';
 }
 

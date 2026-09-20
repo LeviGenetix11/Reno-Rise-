@@ -20,7 +20,7 @@ function orgNode() {
       { '@type': 'AdministrativeArea', name: 'Greater Toronto Area' },
     ],
     description:
-      'Reno Rise is an independent project-enquiry and contractor-matching service that helps Toronto homeowners plan basement renovations and legal secondary suites and connect with qualified local professionals.',
+      'Reno Rise is an independent project-enquiry and contractor-matching service that helps Toronto homeowners plan basement renovations and legal secondary suites and connect with independent local renovation professionals.',
   };
 }
 

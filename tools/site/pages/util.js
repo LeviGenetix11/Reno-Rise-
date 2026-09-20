@@ -17,7 +17,7 @@ const notice = (html, strong = false) =>
   `<div class="notice${strong ? ' notice-strong' : ''}" role="note">${L.ICON.info}<div>${html}</div></div>`;
 
 const checkList = (items) =>
-  `<ul class="check-list">\n${items.map((t) => `      <li>${L.ICON.check} ${t}</li>`).join('\n')}\n    </ul>`;
+  `<ul class="check-list">\n${items.map((t) => `      <li>${L.ICON.check} <span>${t}</span></li>`).join('\n')}\n    </ul>`;
 
 const faqItems = (qas) => qas.map(([q, a]) => `    <div class="faq-item">\n      <h3>${q}</h3>\n      <p>${a}</p>\n    </div>`).join('\n');
 

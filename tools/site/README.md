@@ -26,3 +26,9 @@ Consultation booking: `booking-config.json` (disabled by default) controls the `
 privacy-page wording. Nothing about booking is published until it is enabled with a real Cal.com link. `RENORISE_BOOKING_DEV=1`
 builds with placeholder values for layout checks only; `check.js` fails while any page contains the placeholder, and a
 normal build removes them. See `docs/cal-booking.md`.
+
+Navigation tests: `nav-check.js` (runs inside `build.js`) checks the header, dropdown, mobile menu, CTA, footer links, canonical
+targets and the homepage hero/structure on every page. `browser-tests/nav.mjs` drives a real browser (fit at nine widths,
+dropdown and mobile-menu keyboard/mouse/touch behaviour, forms, axe): run it with
+`PW_DIR=<folder with node_modules/playwright-core and axe-core> node tools/site/browser-tests/nav.mjs`
+(`--probe` prints a fit table to help choose the hamburger breakpoint).

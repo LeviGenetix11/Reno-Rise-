@@ -25,3 +25,4 @@ run('pages/locations.js');
 run('sync.js');
 run('sitemap.js');
 run('check.js');
+run('nav-check.js');

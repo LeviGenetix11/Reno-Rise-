@@ -1337,9 +1337,6 @@ body.nav-open { overflow: hidden; }
 }
 .nav-dropdown-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -18px; height: 18px; }
 .nav-dropdown.open .nav-dropdown-menu { display: block; }
-@media (hover: hover) {
-  .nav-dropdown:hover .nav-dropdown-menu { display: block; }
-}
 .nav-dropdown-menu a {
   display: block;
   padding: 10px 14px;
@@ -1353,12 +1350,35 @@ body.nav-open { overflow: hidden; }
 .nav-dropdown-menu .nav-dropdown-all { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
 .nav-dropdown-menu .nav-dropdown-all a { color: var(--orange-a11y); font-weight: 800; }
 .header-cta .btn { white-space: nowrap; }
-.site-header .container.header-inner { max-width: 1360px; }
-.main-nav { gap: 22px; }
-.main-nav > a, .nav-dropdown-toggle { font-size: 13.5px; }
+/* Header layout. The nav is the flexible middle: it may shrink (min-width: 0) but its labels never wrap, and the logo and
+   CTA never shrink. Type and gaps scale with the viewport; below the hamburger breakpoint the whole nav moves into the
+   mobile menu instead of being squeezed further. Nothing here scrolls horizontally. */
+.site-header .container.header-inner { max-width: 1360px; gap: clamp(0.75rem, 1.4vw, 1.75rem); }
+.header-inner .logo { flex: 0 0 auto; }
+.main-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  gap: clamp(0.7rem, 1.1vw, 1.4rem);
+}
+.main-nav > a, .nav-dropdown-toggle {
+  font-size: var(--nav-fs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.header-cta { flex: 0 0 auto; gap: 14px; }
+.header-cta .btn {
+  padding: 0.75rem clamp(1rem, 1.5vw, 1.6rem);
+  font-size: var(--nav-fs);
+  font-weight: 700;
+  white-space: nowrap;
+}
 .header-slogan { display: none; }
-.header-cta .btn { padding: 12px 20px; font-size: 13.5px; }
-@media (max-width: 1299px) {
+:root { --nav-fs: clamp(0.78rem, 0.5rem + 0.4vw, 0.95rem); }
+.nav-dropdown-toggle { line-height: inherit; } /* a <button> defaults to line-height: normal, which sat its text lower than the links */
+/* Hamburger breakpoint: measured, not guessed. At 1120px the full nav still has ~120px of spare room and ~78px gaps at the
+   12.48px minimum font size, so the desktop nav is used from 1120px up and the mobile menu below it. */
+@media (max-width: 1119px) {
   .main-nav { display: none; }
   .nav-toggle { display: flex; }
 }
@@ -1719,3 +1739,19 @@ body.nav-open { overflow: hidden; }
 .ty-book h2 { font-size: 20px; margin: 0 0 8px; }
 .ty-book p { color: var(--muted); margin: 0 0 16px; }
 @media (max-width: 560px) { .book-embed { min-height: 560px; } }
+
+/* ---------- Homepage sections added with the navigation / hero update ---------- */
+.topic-card.plain:hover { transform: none; box-shadow: none; border-color: var(--border); }
+.topic-card.plain p { margin-bottom: 0; }
+.section-more { margin: 28px 0 0; }
+.other-resources { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--border); }
+.other-resources h3, .why-areas h3 { font-size: 20px; margin: 0 0 8px; }
+.other-resources p, .why-areas p { color: var(--muted); max-width: 720px; margin: 0 0 16px; font-size: 15px; }
+.why-areas { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--border); }
+
+/* Diagram key and fine print stay legible on phones */
+@media (max-width: 640px) {
+  .diagram-legend li { font-size: 13.5px; }
+  .diagram-caption { font-size: 12.5px; }
+}
+.inspiration { margin-top: 52px; }
