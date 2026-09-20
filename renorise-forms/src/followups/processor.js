@@ -18,6 +18,7 @@
 
 import { sendViaResend } from '../email.js';
 import { renderFollowup, FROM, REPLY_TO } from '../../../renorise-shared/templates.js';
+import { bookingLinkFor, bookingPreviewUrl } from '../../../renorise-shared/bookings-db.js';
 import { TEST_RECIPIENTS, inSendWindow } from '../../../renorise-shared/sequence.js';
 import { stopReasonFor, deferReasonFor } from '../../../renorise-shared/eligibility.js';
 import {
@@ -173,7 +174,10 @@ async function attemptFollowupSend(env, db, settings, { send, step, enrollment, 
     const token = await db.prepare('SELECT token FROM unsubscribe_tokens WHERE enrollment_id = ?').bind(enrollment.id).first();
     if (!token) throw Object.assign(new Error('missing_unsubscribe_token'), { permanent: true });
     const base = String(settings.unsubscribe_base_url).replace(/\/+$/, '');
+    // The booking link is added only when the owner has set AND tested it; the sender never invents one.
+    const bookingUrl = await bookingLinkFor(db, settings, lead);
     const email = renderFollowup({
+      bookingUrl,
       templateKey: step.template,
       variant: enrollment.source_kind === 'call' ? 'call' : 'website',
       name: lead.name,
@@ -259,6 +263,7 @@ async function processTests(env, db, settings, now) {
         legalName: settings.business_legal_name,
         mailingAddress: settings.business_mailing_address,
         unsubscribeUrl: `${base}/u/test-preview-link-not-active`,
+        bookingUrl: bookingPreviewUrl(settings), // lets the owner click the real link from a test email before marking it tested
         preview: true, // tests may show clearly-marked placeholders for missing business details
         test: true,
       });

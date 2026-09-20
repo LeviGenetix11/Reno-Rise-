@@ -5,8 +5,8 @@
 //   free-consultation invitation)  ->  signature (The RenoRise Team / email)  ->
 //   required footer (business name, mailing address, why you got this, unsubscribe).
 //
-// There is deliberately NO booking link (none exists yet), no discounts, no
-// testimonials, no urgency, no pricing and no response-time promise.
+// A booking link is added ONLY when the caller passes one (the sender does so once the owner has set the booking page
+// URL and marked it tested). No discounts, no testimonials, no urgency, no pricing and no response-time promise.
 //
 // Two source variants exist so the copy never claims something untrue:
 //   call    - the person phoned; recorded as a call
@@ -124,11 +124,13 @@ export function renderFollowup(o) {
   const sentences = bodySentences(o.templateKey, variant);
   const subject = (o.test ? '[TEST] ' : '') + subjectFor(o.templateKey);
   const why = 'You’re receiving this follow-up because you agreed to hear from RenoRise about your inquiry.';
+  const bookingUrl = /^https:\/\//.test(String(o.bookingUrl || '')) ? String(o.bookingUrl) : '';
 
   const text = [
     greeting,
     '',
     ...sentences.map((s) => s),
+    ...(bookingUrl ? ['', `Or book a time that suits you: ${bookingUrl}`] : []),
     '',
     ...SIGNATURE_LINES,
     '',
@@ -143,6 +145,7 @@ export function renderFollowup(o) {
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#14171d;font-size:15px;line-height:1.55;">
 <p>${esc(greeting)}</p>
 ${sentences.map((s) => `<p>${esc(s)}</p>`).join('\n')}
+${bookingUrl ? `<p style="margin:18px 0;"><a href="${esc(bookingUrl)}" style="display:inline-block;background:#f0782a;color:#14171d;font-weight:700;padding:11px 20px;border-radius:999px;text-decoration:none;">Book Your Free Consultation</a></p>` : ''}
 <p style="margin-top:24px;">${SIGNATURE_LINES.map(esc).join('<br>')}</p>
 <hr style="border:0;border-top:1px solid #d9dde3;margin:24px 0 12px;">
 <p style="font-size:12px;color:#5b6472;line-height:1.5;">${esc(footerName)}<br>${esc(footerAddress)}<br>${esc(why)}<br><a href="${esc(unsubscribeUrl)}" style="color:#5b6472;">Unsubscribe from these follow-up emails</a> &middot; or reply with the word STOP.</p>
