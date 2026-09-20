@@ -13,7 +13,8 @@ const DEFAULT_ASIDE = [
 
 /**
  * opts: depth, path, title, description, h1, sub, crumbs, active, body (html), faq [[q,a]],
- *       formType, asideLinks, ctaOpts, ogImage, noticeTop (html), updated (string), related [[label,target]]
+ *       formType, asideLinks, ctaOpts, ogImage, noticeTop (html), updated (string), related [[label,target]],
+ *       after (html placed last in the article, e.g. the matching-service disclosure)
  */
 function guidePage(o) {
   const { depth } = o;
@@ -34,6 +35,7 @@ ${o.body}
 ${faq}
     ${U.formBand(depth, { type: o.formType || 'Not sure', title: o.formTitle, text: o.formText })}
 ${related}
+    ${o.after || ''}
   </article>
   ${U.guideAside(depth, { links: o.asideLinks || DEFAULT_ASIDE })}
   </div>

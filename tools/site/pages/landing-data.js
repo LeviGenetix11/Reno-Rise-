@@ -66,7 +66,7 @@ const LANDINGS = [
       ['foundation', 'Exterior waterproofing', 'Works from outside: excavation, wall repair, a waterproofing membrane and drainage, so water is stopped at the wall.'],
       ['tool', 'Targeted repairs', 'A single crack, a blocked downspout or poor grading can be a smaller fix than a full system.'],
       ['plan', 'Sump pumps and valves', 'A sump pump and, in some homes, a backwater valve protect against groundwater and sewer backup.'],
-      ['check', 'Proof before finishing', 'Test the result through a heavy rain or thaw before drywall and flooring go over it.'],
+      ['check', 'Proof before finishing', 'Test the result through a heavy rain or thaw before drywall and flooring go over it. Once it is proven dry, <a href="../basement-flooring/">floors suited to a below-grade slab</a> are the next decision.'],
     ],
     sections: [
       {
@@ -93,7 +93,7 @@ const LANDINGS = [
       ['Can Reno Rise help with basement waterproofing near me in Etobicoke, Scarborough or North York?', 'Reno Rise focuses on Toronto and welcomes enquiries from across the GTA. Submit your details and Reno Rise will review them. Availability in a given area cannot be guaranteed.'],
     ],
     formType: 'Waterproofing or moisture issue',
-    related: [['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Foundation Crack Repair', 'services/foundation-crack-repair/'], ['Sump Pumps', 'services/sump-pump/'], ['Weeping Tile', 'services/weeping-tile/'], ['Waterproofing Before Renovation', 'blog/basement-waterproofing-before-renovation.html']],
+    related: [['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Foundation Crack Repair', 'services/foundation-crack-repair/'], ['Sump Pumps', 'services/sump-pump/'], ['Weeping Tile', 'services/weeping-tile/'], ['Waterproofing Before Renovation', 'blog/basement-waterproofing-before-renovation.html'], ['Basement Flooring', 'services/basement-flooring/']],
     ctaHeading: 'Dealing With a Wet Basement?',
   },
 
@@ -123,7 +123,7 @@ const LANDINGS = [
         h2: 'Choose Your Scope',
         html: `<p>Most basement projects fall into one of three broad scopes. These are not price tiers, and every house is different.</p>
     <div class="tier-grid">
-      <div class="tier-card"><div class="tier-label">Scope 1</div><div class="tier-price" style="font-size:19px">Finish &amp; refresh</div><p>A dry, tall-enough basement that mainly needs walls, flooring, lighting and paint. See <a href="../basement-finishing/">basement finishing</a>.</p></div>
+      <div class="tier-card"><div class="tier-label">Scope 1</div><div class="tier-price" style="font-size:19px">Finish &amp; refresh</div><p>A dry, tall-enough basement that mainly needs walls, flooring, lighting and paint. See <a href="../basement-finishing/">basement finishing</a>, and <a href="../basement-flooring/">how to choose a floor for a concrete slab</a>.</p></div>
       <div class="tier-card mid"><div class="tier-label">Scope 2</div><div class="tier-price" style="font-size:19px">Renovate &amp; add rooms</div><p>A bedroom, bathroom or laundry area, which usually brings plumbing, electrical and egress considerations.</p></div>
       <div class="tier-card"><div class="tier-label">Scope 3</div><div class="tier-price" style="font-size:19px">Convert to a suite</div><p>A separate dwelling with its own kitchen and bathroom. See the <a href="../legal-basement-apartment-toronto/">legal secondary suite guide</a>.</p></div>
     </div>`,
@@ -157,7 +157,7 @@ const LANDINGS = [
       ['Does Reno Rise do the renovation?', 'No. Reno Rise is an independent project-enquiry and contractor-matching service. Estimates, contracts, warranties, permits and construction are handled by the professional you choose.'],
     ],
     formType: 'General basement renovation',
-    related: [['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Basement Finishing', 'services/basement-finishing/'], ['Underpinning', 'services/underpinning/'], ['Interior Waterproofing', 'services/interior-waterproofing/'], ['Egress Windows', 'services/egress-windows/'], ['Basement Soundproofing', 'services/basement-soundproofing/'], ['Toronto Neighbourhoods', 'services/basement-renovation-toronto/']],
+    related: [['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Basement Finishing', 'services/basement-finishing/'], ['Underpinning', 'services/underpinning/'], ['Interior Waterproofing', 'services/interior-waterproofing/'], ['Egress Windows', 'services/egress-windows/'], ['Basement Soundproofing', 'services/basement-soundproofing/'], ['Toronto Neighbourhoods', 'services/basement-renovation-toronto/'], ['Basement Flooring', 'services/basement-flooring/']],
     ctaHeading: 'Planning a Toronto Basement Renovation?',
   },
 
@@ -288,7 +288,7 @@ const LANDINGS = [
       ['tool', 'Sewer backup', 'During severe storms, sewers can back up into a basement. A backwater valve is one protection.'],
       ['check', 'Repair options', 'Drainage fixes, crack repair, a sump system, interior drainage or exterior waterproofing, depending on the cause.'],
       ['plan', 'Prevention', 'Downspout extensions, grading, a sump pump with battery backup and a backwater valve reduce the risk.'],
-      ['home', 'Before finishing', 'Confirm the fix works before drywall and flooring go over the area.'],
+      ['home', 'Before finishing', 'Confirm the fix works before drywall goes up, and before you settle on a <a href="../basement-flooring/">basement floor finish</a>.'],
     ],
     sections: [
       {
@@ -319,7 +319,7 @@ const LANDINGS = [
       ['Does Reno Rise offer an emergency basement flooding service?', 'No. Reno Rise is not an emergency service. For active flooding, contact your insurer and an emergency plumber or restoration company, then come back to plan the repair.'],
     ],
     formType: 'Waterproofing or moisture issue',
-    related: [['Sump Pumps', 'services/sump-pump/'], ['Backwater Valves', 'services/backwater-valve/'], ['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Weeping Tile', 'services/weeping-tile/'], ['Waterproofing Before Renovation', 'blog/basement-waterproofing-before-renovation.html']],
+    related: [['Sump Pumps', 'services/sump-pump/'], ['Backwater Valves', 'services/backwater-valve/'], ['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Weeping Tile', 'services/weeping-tile/'], ['Waterproofing Before Renovation', 'blog/basement-waterproofing-before-renovation.html'], ['Basement Flooring', 'services/basement-flooring/']],
     ctaHeading: 'Has Your Basement Flooded?',
   },
 
@@ -500,7 +500,7 @@ const LANDINGS = [
       ['tool', 'Sump pit and pump', 'The channel connects to a sump pit, and a pump sends water outside, away from the house.'],
       ['foundation', 'Wall-face membrane', 'Dimple board or a membrane on the wall directs seepage down into the drain, and the floor-wall joint is sealed.'],
       ['plan', 'Backup', 'A battery backup keeps the pump running in a power outage.'],
-      ['home', 'Testing', 'A good installer tests the system before the area is closed up and finished.'],
+      ['home', 'Testing', 'A good installer tests the system before the area is closed up and finished. Then plan the <a href="../basement-flooring/">subfloor and flooring</a> around it, keeping access to the drain and pit.'],
     ],
     sections: [
       {
@@ -519,7 +519,7 @@ const LANDINGS = [
       ['How much does interior waterproofing cost in Toronto?', 'It scales with how much of the perimeter needs a system, whether a pit and pump exist, and access. Reno Rise does not publish prices. Get itemized quotes and compare what each includes.'],
     ]),
     formType: 'Waterproofing or moisture issue',
-    related: [['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Sump Pumps', 'services/sump-pump/'], ['Weeping Tile', 'services/weeping-tile/'], ['Waterproofing Guide', 'services/basement-waterproofing/']],
+    related: [['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Sump Pumps', 'services/sump-pump/'], ['Weeping Tile', 'services/weeping-tile/'], ['Waterproofing Guide', 'services/basement-waterproofing/'], ['Basement Flooring', 'services/basement-flooring/']],
     ctaHeading: 'Need Interior Waterproofing?',
   },
 

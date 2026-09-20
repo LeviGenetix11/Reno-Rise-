@@ -38,7 +38,7 @@ function loadSource() {
 const src = loadSource();
 const words = (s) => s.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
 const report = [];
-const list = (items) => `<ul class="check-list">\n${items.map((t) => `      <li>${L.ICON.check} ${t}</li>`).join('\n')}\n    </ul>`;
+const list = (items) => `<ul class="check-list">\n${items.map((t) => `      <li>${L.ICON.check} <span>${t}</span></li>`).join('\n')}\n    </ul>`;
 
 const SUITE = `<a href="${h('services/legal-basement-apartment-toronto/')}">legal secondary suite guide</a>`;
 const PERMITS = `<a href="${h('blog/basement-renovation-permits-toronto.html')}">permit guide</a>`;

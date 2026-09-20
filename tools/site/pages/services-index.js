@@ -35,7 +35,7 @@ const GROUPS = [
   ['Structure, height & entrances', ['underpinning', 'bench-footing', 'walkout-construction', 'egress-windows', 'window-well-installation', 'basement-window-replacement', 'crawl-space-conversion']],
   ['Waterproofing & moisture control', ['basement-waterproofing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair', 'foundation-crack-repair', 'weeping-tile', 'french-drain', 'sump-pump', 'backwater-valve', 'parging', 'waterproofing-contractor']],
   ['Electrical & plumbing for basement projects', ['panel-upgrade', 'knob-and-tube-removal', 'aluminum-wiring-replacement', 'pot-light-installation', 'water-line-replacement']],
-  ['Finishing, comfort & planning', ['basement-finishing', 'basement-soundproofing', 'design-planning', 'laundry-room-renovation']],
+  ['Finishing, comfort & planning', ['basement-finishing', 'basement-flooring', 'basement-soundproofing', 'design-planning', 'laundry-room-renovation']],
   ['Toronto & GTA basement pages', ['basement-renovation-toronto', 'basement-renovation-ajax', 'basement-renovation-oakville', 'basement-renovation-pickering', 'basement-renovation-richmond-hill', 'basement-renovation-vaughan']],
 ];
 const CORE = new Set(['basement-renovation', 'legal-basement-apartment-toronto']);
@@ -92,7 +92,9 @@ const primary = `
       </div>
 ${GROUPS.map(([title, slugs]) => {
   const present = slugs.filter((s) => allSlugs.includes(s));
-  return `      <p class="directory-subhead">${title}</p>
+  const note = title.startsWith('Finishing') ? `
+      <p class="directory-note"><strong>Basement Flooring</strong> covers material selection and installation considerations for below-grade spaces. Flooring for the rest of the home is under <a href="#flooring">Flooring</a> in Other Home Improvement Services.</p>` : '';
+  return `      <p class="directory-subhead">${title}</p>${note}
       <div class="city-chip-grid">
 ${present.map((s) => `        <a href="${s}/" class="city-chip">${label(s)}</a>`).join('\n')}
       </div>`;
@@ -124,7 +126,8 @@ ${otherCats.map((c) => `    <div class="region-block" id="${c.id}">
       <div class="region-head">
         <h3>${c.title}</h3>
         <span>${c.chips.length} ${c.chips.length === 1 ? 'page' : 'pages'}</span>
-      </div>
+      </div>${c.id === 'flooring' ? `
+      <p class="region-note">These pages are general flooring information for the whole home. For floors over a concrete basement slab, see <a href="basement-flooring/">Basement Flooring</a>.</p>` : ''}
       <div class="city-chip-grid">
 ${c.chips.map(([s, l]) => `        <a href="${s}/" class="city-chip">${l}</a>`).join('\n')}
       </div>

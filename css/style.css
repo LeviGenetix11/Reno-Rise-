@@ -1334,12 +1334,11 @@ body.nav-open { overflow: hidden; }
   border-radius: 14px;
   box-shadow: var(--shadow);
   z-index: 150;
+  max-height: calc(100vh - 120px); /* short screens: the list scrolls instead of running off the bottom */
+  overflow-y: auto;
 }
 .nav-dropdown-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -18px; height: 18px; }
 .nav-dropdown.open .nav-dropdown-menu { display: block; }
-@media (hover: hover) {
-  .nav-dropdown:hover .nav-dropdown-menu { display: block; }
-}
 .nav-dropdown-menu a {
   display: block;
   padding: 10px 14px;
@@ -1353,12 +1352,35 @@ body.nav-open { overflow: hidden; }
 .nav-dropdown-menu .nav-dropdown-all { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
 .nav-dropdown-menu .nav-dropdown-all a { color: var(--orange-a11y); font-weight: 800; }
 .header-cta .btn { white-space: nowrap; }
-.site-header .container.header-inner { max-width: 1360px; }
-.main-nav { gap: 22px; }
-.main-nav > a, .nav-dropdown-toggle { font-size: 13.5px; }
+/* Header layout. The nav is the flexible middle: it may shrink (min-width: 0) but its labels never wrap, and the logo and
+   CTA never shrink. Type and gaps scale with the viewport; below the hamburger breakpoint the whole nav moves into the
+   mobile menu instead of being squeezed further. Nothing here scrolls horizontally. */
+.site-header .container.header-inner { max-width: 1360px; gap: clamp(0.75rem, 1.4vw, 1.75rem); }
+.header-inner .logo { flex: 0 0 auto; }
+.main-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  gap: clamp(1.1rem, 2vw, 2.25rem);
+}
+.main-nav > a, .nav-dropdown-toggle {
+  font-size: var(--nav-fs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.header-cta { flex: 0 0 auto; gap: 14px; }
+.header-cta .btn {
+  padding: 0.8rem clamp(1.1rem, 1.6vw, 1.7rem);
+  font-size: var(--nav-fs);
+  font-weight: 700;
+  white-space: nowrap;
+}
 .header-slogan { display: none; }
-.header-cta .btn { padding: 12px 20px; font-size: 13.5px; }
-@media (max-width: 1299px) {
+:root { --nav-fs: clamp(0.9375rem, 0.8rem + 0.25vw, 1rem); }
+.nav-dropdown-toggle { line-height: inherit; } /* a <button> defaults to line-height: normal, which sat its text lower than the links */
+/* Hamburger breakpoint: measured, not guessed. With six short labels the full nav still has ~150px of spare room and ~90px
+   gaps at 1024px (15.4px text), so the desktop nav is used from 1024px up and the mobile menu below it. */
+@media (max-width: 1023px) {
   .main-nav { display: none; }
   .nav-toggle { display: flex; }
 }
@@ -1434,12 +1456,7 @@ body.nav-open { overflow: hidden; }
     radial-gradient(900px 500px at 82% 30%, rgba(240,120,42,0.20), transparent 60%),
     linear-gradient(135deg, #14171d 0%, #1b1f27 55%, #232833 100%);
 }
-.hero.hero-basement::before {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
+.hero.hero-basement::before { background: none; } /* no overlay and no grid lines on the split heroes */
 .hero-split {
   position: relative;
   z-index: 2;
@@ -1719,3 +1736,54 @@ body.nav-open { overflow: hidden; }
 .ty-book h2 { font-size: 20px; margin: 0 0 8px; }
 .ty-book p { color: var(--muted); margin: 0 0 16px; }
 @media (max-width: 560px) { .book-embed { min-height: 560px; } }
+
+/* ---------- Homepage sections added with the navigation / hero update ---------- */
+.topic-card.plain:hover { transform: none; box-shadow: none; border-color: var(--border); }
+.topic-card.plain p { margin-bottom: 0; }
+.section-more { margin: 28px 0 0; }
+.other-resources { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--border); }
+.other-resources h3, .why-areas h3 { font-size: 20px; margin: 0 0 8px; }
+.other-resources p, .why-areas p { color: var(--muted); max-width: 720px; margin: 0 0 16px; font-size: 15px; }
+.why-areas { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--border); }
+
+/* Diagram key and fine print stay legible on phones */
+@media (max-width: 640px) {
+  .diagram-legend li { font-size: 13.5px; }
+  .diagram-caption { font-size: 12.5px; }
+}
+.inspiration { margin-top: 52px; }
+
+/* ---------- Homepage hero background video ---------- */
+/* A lighter overlay so the footage shows through, strongest behind the text column. Even against the brightest possible frame
+   the white text stays above 4.5:1 (checked in browser-tests/nav.mjs). */
+.hero.hero-has-video::before {
+  background: linear-gradient(100deg, rgba(15,17,22,0.64) 0%, rgba(15,17,22,0.58) 55%, rgba(15,17,22,0.34) 80%, rgba(15,17,22,0.24) 100%);
+}
+.hero.hero-has-video .hero-copy > p { color: #fff; }
+/* One column (the text spans the full width): keep the overlay even */
+@media (max-width: 1100px) {
+  .hero.hero-has-video::before { background: rgba(15,17,22,0.6); }
+}
+/* Phones and tablets: no video file, just the poster behind the same overlay */
+@media (max-width: 860px) {
+  .hero.hero-has-video { background: var(--dark) url('../videos/hero-poster.jpg') center/cover no-repeat; }
+}
+
+/* ---------- Basement flooring page ---------- */
+.compare-table caption { text-align: left; font-size: 13px; color: var(--muted); padding: 0 0 10px; caption-side: top; position: sticky; left: 0; max-width: calc(100vw - 48px); }
+.compare-table.compare-wide { min-width: 800px; font-size: 13.5px; }
+.compare-table.compare-wide th, .compare-table.compare-wide td { padding: 10px 10px; }
+.table-hint { display: none; font-size: 13px; color: var(--muted); margin: -6px 0 8px; }
+@media (max-width: 1279px) { .table-hint { display: block; } }
+.compare-table.compare-wide tbody th { width: 13%; }
+.table-scroll:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.article-wrap ol.steps { margin: 0 0 24px; padding-left: 22px; }
+.article-wrap ol.steps li { padding: 8px 0; font-size: 15px; }
+.sources-note { font-size: 13.5px; color: var(--muted); }
+.sources-note a { color: var(--orange-a11y); text-decoration: underline; }
+.directory-note { color: rgba(255,255,255,0.78); font-size: 14px; max-width: 720px; margin: 0 0 14px; }
+.directory-note a, .directory-note strong { color: #fff; }
+.directory-note a { text-decoration: underline; }
+.region-note { color: var(--muted); font-size: 14px; max-width: 720px; margin: 0 0 14px; }
+.region-note a { color: var(--orange-a11y); text-decoration: underline; }
+.post-hero img { aspect-ratio: 3 / 2; object-fit: cover; } /* reserve the box so any photo shape loads without shifting the page */
