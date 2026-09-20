@@ -272,3 +272,11 @@ what the tests rely on, and it handled it correctly.
 ## CRM (branch `crm-stage-a`)
 
 Contacts, projects, the pipeline, timeline, tasks and the Today view are documented in [CRM.md](CRM.md): what already existed, what changed, the migration and deploy commands, rollback, tests and open decisions. Try it locally with sample data: `npm run preview`.
+
+## Appointments (Cal.com consultation booking)
+
+`/appointments` lists upcoming, past and cancelled consultations and assessments (list and month-calendar views, Toronto time),
+shows bookings that could not be matched to one inquiry (attach or dismiss), the webhook connection health, and the booking
+page address used in follow-up emails (it is used only once marked tested). Provider status (booked, cancelled, moved) comes
+from Cal.com's verified webhook; staff record only the outcome (completed, no-show). Cal.com bookings are moved or
+cancelled in Cal.com. Needs migration 0006. See `docs/cal-booking.md`. Tests: `node test/appointments-tests.mjs`.

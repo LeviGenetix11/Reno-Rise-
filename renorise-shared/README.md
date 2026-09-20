@@ -233,3 +233,10 @@ the Resend account is on the **Free** plan (the Usage page shows 3,000 a month a
 
 1. A **mailing address** for the footer. It does **not** have to be a street address or a place customers visit: the CRTC accepts a street address, a **PO box**, a rural route, or general delivery, valid for at least 60 days after each message (source: CRTC guidance on Canada's Anti-Spam Legislation). If you would rather not use a home address, a Canada Post PO box is the usual choice (a paid service; Canada Post lists prices from about $69 for 3 months, varying by location and box size; check current pricing). Also confirm that "Reno Rise" is the name you want in the footer. It is entered on the dashboard **Settings** page, stored in the database, and deliberately **not written into this Git repository** (the repository is public). The system refuses to enable customer sending (and the sender refuses to send) unless the address is a street number and name, a PO box, a rural route, or general delivery: a postal code plus city alone is not accepted. This is not legal advice.
 2. Approve the migration, the deploy, and (after previews and tests) turning the switch ON.
+
+## Consultation bookings
+
+`bookings.js` (pure: signature check, payload parsing) and `bookings-db.js` (idempotent, order-safe application of
+Cal.com events, lead matching by opaque reference plus email or phone, CRM appointment sync, follow-up stop, health,
+booking links for follow-up emails). `leads.consultation_at` is checked by `eligibility.js` before every follow-up send.
+See `docs/cal-booking.md`.
