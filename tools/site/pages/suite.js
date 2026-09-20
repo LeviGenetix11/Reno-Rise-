@@ -133,7 +133,7 @@ ${TOC.map(([id, label], i) => `        <li><a href="#${id}"><span class="toc-num
 
     <h2 id="systems">Plumbing, electrical, heating and ventilation</h2>
     ${U.checkList([
-      `<strong>Plumbing.</strong> A kitchen and bathroom need drainage, and below-grade drains may require breaking the slab. A <a href="${h('services/backwater-valve-installation/')}">backwater valve</a> is often part of the conversation. Toronto Building notes that plumbing work can call for a permit.`,
+      `<strong>Plumbing.</strong> A kitchen and bathroom need drainage, and below-grade drains may require breaking the slab. A <a href="${h('services/backwater-valve/')}">backwater valve</a> is often part of the conversation. Toronto Building notes that plumbing work can call for a permit.`,
       '<strong>Electrical.</strong> Separate circuits, an adequate panel and safe wiring are needed, and older wiring may be a concern. Electrical work is typically inspected separately.',
       '<strong>Heating.</strong> Ontario&rsquo;s guide notes a single furnace can serve both units when it meets the Code&rsquo;s smoke-detection conditions, while separate systems are often recommended.',
       '<strong>Ventilation.</strong> Bathrooms and kitchens need exhaust ventilation and the living space needs fresh air.',
@@ -181,7 +181,7 @@ ${TOC.map(([id, label], i) => `        <li><a href="#${id}"><span class="toc-num
       'Weather, if exterior excavation or a new entrance is involved.',
     ])}
 
-    <h2 id="questions">Questions to ask contractors</h2>
+    <h2 id="questions">Questions to ask legal basement contractors</h2>
     <p>Reno Rise introduces homeowners to independent professionals but does not vet their credentials on your behalf. Ask directly:</p>
     ${U.checkList([
       'Have you completed secondary-suite projects in Toronto, and can I speak to recent clients?',
@@ -251,19 +251,15 @@ ${U.faqItems(FAQ)}
 </section>
 `;
 
-const hero = PG.pageHero({
-  depth,
+const heroWithActions = L.splitHero(depth, {
+  crumbs: [['Home', ''], ['Services', 'services/'], ['Legal Secondary Suites', '']],
+  eyebrow: 'Legal secondary suites in Toronto',
   h1: 'Legal Basement Apartments &amp; Secondary Suites in Toronto',
   sub: 'Plan a code-compliant secondary suite: what it involves, what to confirm with the City, and how to connect with qualified Toronto professionals.',
-  crumbs: [['Home', ''], ['Services', 'services/'], ['Legal Secondary Suites', '']],
-  variant: 'hero-dark',
+  primary: ['Request a Basement Assessment', '#assessment-form'],
+  secondary: ['Explore Legal Suite Requirements', '#what-makes-legal'],
+  visual: L.diagramCard({ id: 'dgh' }),
 });
-// The hero variant has no image; add action buttons under the subhead.
-const heroWithActions = hero.replace(
-  '<div class="breadcrumb"',
-  `<div class="hero-actions"><a href="#assessment-form" class="btn btn-primary">Request a Basement Assessment ${L.ICON.arrow}</a><a href="#what-makes-legal" class="btn btn-outline">Explore Legal Suite Requirements</a></div>
-    <div class="breadcrumb"`
-);
 
 const title = 'Legal Basement Apartment Toronto | Secondary Suite Guide & Quotes';
 const description = 'What makes a Toronto basement apartment legal? Plan a secondary suite: permits, ceiling height, fire separation and egress. Request a basement assessment.';
@@ -276,6 +272,7 @@ const html = PG.renderPage({
   ogImage: `${L.SITE}/images/og/legal-secondary-suite-toronto.png`,
   ldGraph: [PG.faqNode(FAQ.map(([q, a]) => [q, U.strip(a)]))],
   active: 'suite',
+  solid: false,
   hero: heroWithActions,
   script: `<script src="${L.up(depth)}js/assessment-form.js"></script>
 `,

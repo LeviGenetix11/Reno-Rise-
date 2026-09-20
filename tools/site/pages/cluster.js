@@ -102,7 +102,7 @@ const pages = [
     ask: ['How did you determine where the water is coming from?', 'Is a cheaper drainage or grading fix enough, or is a full system needed?', 'What does the warranty cover, in writing, and who honours it?', 'How will the work be tested before finishes go over it?'],
     notFit: 'If you are only planning cosmetic finishing over a dry basement, waterproofing is not required, but any past moisture should still be understood.',
     faq: [['Should I waterproof before finishing a basement?', 'If there is any history of water or dampness, yes. Finishing over an unresolved moisture problem hides it and can lead to mould and repairs.'], ['Do I need a permit for a sump pump?', 'Toronto Building states that installing a sump pump does not require a building permit.']],
-    related: [['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Waterproofing Before Renovation', 'blog/basement-waterproofing-before-renovation.html'], ['Sump Pumps', 'services/sump-pump-installation/']],
+    related: [['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Waterproofing Before Renovation', 'blog/basement-waterproofing-before-renovation.html'], ['Sump Pumps', 'services/sump-pump/']],
   },
   {
     slug: 'interior-waterproofing',
@@ -120,7 +120,7 @@ const pages = [
     ask: ['Is an interior system the right fit, or would exterior work or a smaller repair address the cause?', 'How much of the perimeter is covered and why?', 'What backup do you provide if power fails (battery or water-powered backup), and is it included?', 'What is warranted, for how long, and in writing?'],
     notFit: `If water is entering through a visible crack, ${link('foundation-crack-repair', 'a targeted crack repair')} may be smaller and better. If exterior grading is pushing water toward the foundation, ${link('exterior-waterproofing', 'exterior waterproofing')} addresses the source.`,
     faq: [['What is the difference between interior and exterior waterproofing?', 'Exterior waterproofing works from outside to keep water away from the foundation wall and needs excavation. Interior waterproofing collects and redirects water that has already reached the foundation.'], ['Will interior waterproofing stop water entering the walls?', 'It manages water at the floor level. It does not seal the foundation wall itself, so an actively leaking crack may need separate repair.']],
-    related: [['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Sump Pumps', 'services/sump-pump-installation/'], ['Basement Renovation', 'services/basement-renovation/']],
+    related: [['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Sump Pumps', 'services/sump-pump/'], ['Basement Renovation', 'services/basement-renovation/']],
   },
   {
     slug: 'exterior-waterproofing',
@@ -156,7 +156,7 @@ const pages = [
     ask: ['What do you believe is causing the water and how did you confirm it?', 'Is there a lower-cost fix I should try first, such as downspout or grading work?', 'What is warranted, and what would void it?', 'How will you test that the repair worked?'],
     notFit: `If you are planning a renovation, resolve moisture first: read <a href="${h('blog/basement-waterproofing-before-renovation.html')}">Basement Waterproofing Before You Renovate</a>.`,
     faq: [['Why does my basement leak after heavy rain?', 'Common reasons are downspouts and grading that direct water toward the foundation, blocked weeping tile or wall cracks. A professional can help identify which applies.']],
-    related: [['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Sump Pumps', 'services/sump-pump-installation/'], ['Foundation Crack Repair', 'services/foundation-crack-repair/']],
+    related: [['Interior Waterproofing', 'services/interior-waterproofing/'], ['Exterior Waterproofing', 'services/exterior-waterproofing/'], ['Sump Pumps', 'services/sump-pump/'], ['Foundation Crack Repair', 'services/foundation-crack-repair/']],
   },
   {
     slug: 'walkout-construction',
@@ -197,7 +197,12 @@ const pages = [
   },
 ];
 
+// Pages that are now built by pages/landing.js (homepage-style keyword landing pages) reuse this data.
+const LANDING_SLUGS = new Set(['underpinning', 'egress-windows', 'basement-waterproofing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair']);
+module.exports = { pages };
+
 for (const p of pages) {
+  if (LANDING_SLUGS.has(p.slug)) continue;
   const body = `
     <p>${p.intro.join('</p>\n    <p>')}</p>
 
