@@ -318,7 +318,7 @@ for (const w of [768, 390, 360, 900, 1023]) {
   const playing = await page.$eval('[data-hero-video]', (v) => ({ paused: v.paused, time: v.currentTime, ready: v.readyState }));
   t('hero video @1440px: plays on its own', !playing.paused && playing.time > 0, JSON.stringify(playing));
   const overlay = await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage);
-  t('hero video: a lighter overlay (at most 72% dark) lets the footage show', (() => { const alphas = [...overlay.matchAll(/rgba\(15, 17, 22, ([0-9.]+)\)/g)].map((m) => Number(m[1])); return alphas.length >= 3 && Math.max(...alphas) <= 0.72 && Math.min(...alphas) >= 0.3; })(), overlay.slice(0, 120));
+  t('hero video: a lighter overlay (at most 72% dark) lets the footage show', (() => { const alphas = [...overlay.matchAll(/rgba\(15, 17, 22, ([0-9.]+)\)/g)].map((m) => Number(m[1])); return alphas.length >= 3 && Math.max(...alphas) <= 0.72 && Math.min(...alphas) >= 0.2; })(), overlay.slice(0, 120));
   const colours = await page.$$eval('.hero-copy h1, .hero-copy > p, .hero-copy .btn-outline', (els) => els.map((e) => getComputedStyle(e).color));
   t('hero video: hero text stays light', colours.every((c) => /rgb\(255, 255, 255\)|rgba\(255, 255, 255/.test(c)), JSON.stringify(colours));
   await ctx.close();

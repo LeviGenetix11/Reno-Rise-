@@ -1755,12 +1755,12 @@ body.nav-open { overflow: hidden; }
 /* A lighter overlay so the footage shows through, strongest behind the text column. Even against the brightest possible frame
    the white text stays above 4.5:1 (checked in browser-tests/nav.mjs). */
 .hero.hero-has-video::before {
-  background: linear-gradient(100deg, rgba(15,17,22,0.72) 0%, rgba(15,17,22,0.66) 55%, rgba(15,17,22,0.42) 80%, rgba(15,17,22,0.32) 100%);
+  background: linear-gradient(100deg, rgba(15,17,22,0.64) 0%, rgba(15,17,22,0.58) 55%, rgba(15,17,22,0.34) 80%, rgba(15,17,22,0.24) 100%);
 }
 .hero.hero-has-video .hero-copy > p { color: #fff; }
 /* One column (the text spans the full width): keep the overlay even */
 @media (max-width: 960px) {
-  .hero.hero-has-video::before { background: rgba(15,17,22,0.66); }
+  .hero.hero-has-video::before { background: rgba(15,17,22,0.6); }
 }
 /* Phones and tablets: no video file, just the poster behind the same overlay */
 @media (max-width: 860px) {
