@@ -192,6 +192,7 @@ console.log('Setting up isolated environment...');
 if (existsSync(STATE)) rmSync(STATE, { recursive: true, force: true });
 const mig = execFileSync(process.execPath, [WRANGLER, 'd1', 'migrations', 'apply', 'renorise-leads', '--local', '--persist-to', STATE], { encoding: 'utf8' });
 ok(/0002_dashboard\.sql/.test(mig), 'migration 0002 was not applied');
+ok(/0004_crm_core\.sql/.test(mig), 'migration 0004 (CRM) was not applied by wrangler on a real local D1');
 seed();
 await new Promise((r) => jwks.listen(JWKS_PORT, '127.0.0.1', r));
 await new Promise((r) => mockResend.listen(MOCK_RESEND_PORT, '127.0.0.1', r));
@@ -328,7 +329,7 @@ await test('PUT / DELETE are not supported (405); there is no delete route for l
 console.log('\n[reading data]');
 await test('overview shows correct counts', async () => {
   const t = (await get('/')).text;
-  ok(/<div class="n">63<\/div><div class="l">New leads/.test(t), 'new leads = 63');
+  ok(/<div class="n">63<\/div><div class="l">New inquiries/.test(t), 'new inquiries = 63');
   ok(/<div class="n">1<\/div><div class="l">Email failures/.test(t), 'email failures = 1');
   ok(/<div class="n">0<\/div><div class="l">Overdue follow-ups/.test(t), 'overdue = 0');
 });
@@ -371,19 +372,25 @@ await test('contact links are safe (mailto/tel built from escaped values only)',
 });
 
 console.log('\n[lead updates]');
-await test('update stage: saved, activity + updated_at recorded; same value is a no-op', async () => {
-  const r = await post('/leads/L-ALICE/stage', { stage: 'contacted' });
+await test('update stage: saved, history + updated_at recorded, older status kept in step; same value is a no-op', async () => {
+  const r = await post('/leads/L-ALICE/stage', { stage: 'in_conversation' });
   eq(r.status, 303); eq(notice(r), 'stage_saved');
-  eq(one("SELECT status FROM leads WHERE id='L-ALICE'").status, 'contacted', 'status');
-  ok(one("SELECT updated_at FROM leads WHERE id='L-ALICE'").updated_at, 'updated_at');
-  ok(/Stage changed from New to Contacted/.test((await get('/leads/L-ALICE')).text), 'activity shown');
-  const n = one("SELECT COUNT(*) n FROM lead_activity WHERE lead_id='L-ALICE'").n;
-  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'contacted' })), 'no_change');
-  eq(one("SELECT COUNT(*) n FROM lead_activity WHERE lead_id='L-ALICE'").n, n, 'no duplicate activity');
+  eq(one("SELECT stage FROM opportunities WHERE id='op-L-ALICE'").stage, 'in_conversation', 'stage');
+  eq(one("SELECT status FROM leads WHERE id='L-ALICE'").status, 'contacted', 'older six-value status kept in step for the email sender');
+  ok(one("SELECT updated_at FROM opportunities WHERE id='op-L-ALICE'").updated_at, 'updated_at');
+  ok(/Stage changed from New inquiry to In conversation/.test((await get('/leads/L-ALICE')).text), 'history shown (the old lead link still opens the project)');
+  const n = one("SELECT COUNT(*) n FROM crm_events WHERE opportunity_id='op-L-ALICE' AND kind='stage_changed'").n;
+  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'in_conversation' })), 'no_change');
+  eq(one("SELECT COUNT(*) n FROM crm_events WHERE opportunity_id='op-L-ALICE' AND kind='stage_changed'").n, n, 'no duplicate history');
 });
-await test('all six stages are accepted; an invented stage is rejected', async () => {
-  for (const s of ['assessment_booked', 'quote_sent', 'won', 'lost', 'new']) eq(notice(await post('/leads/L-ALICE/stage', { stage: s })), 'stage_saved', s);
-  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'hacked' })), 'bad_stage'); eq(one("SELECT status FROM leads WHERE id='L-ALICE'").status, 'new');
+await test('all twelve stages are accepted (Lost and On hold with their reasons); an invented stage is rejected', async () => {
+  for (const s of ['contact_attempted', 'qualified', 'consultation_booked', 'contractor_matching', 'referred', 'quote_pending', 'quote_sent', 'won']) eq(notice(await post('/leads/L-ALICE/stage', { stage: s })), 'stage_saved', s);
+  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'lost' })), 'reason_required', 'lost needs a reason');
+  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'lost', lost_reason: 'price' })), 'stage_saved', 'lost');
+  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'on_hold', hold_reason: 'seasonal', review_on: '2099-01-01' })), 'stage_saved', 'on hold');
+  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'new_inquiry' })), 'stage_saved', 'new_inquiry');
+  eq(notice(await post('/leads/L-ALICE/stage', { stage: 'hacked' })), 'bad_stage'); eq(notice(await post('/leads/L-ALICE/stage', { stage: 'contacted' })), 'bad_stage', 'the retired stage name is not accepted');
+  eq(one("SELECT status FROM leads WHERE id='L-ALICE'").status, 'new'); eq(one("SELECT stage FROM opportunities WHERE id='op-L-ALICE'").stage, 'new_inquiry');
 });
 await test('email delivery state is untouched by stage changes (kept separate)', async () => {
   eq(one("SELECT customer_email_status c, internal_email_status i FROM leads WHERE id='L-ALICE'"), { c: 'sent', i: 'sent' });
@@ -393,7 +400,8 @@ await test('notes: add, preserved verbatim, shown escaped; empty and >5000 rejec
   const d = (await get('/leads/L-ALICE')).text; ok(d.includes('Called back &lt;b&gt;twice&lt;/b&gt;'), 'escaped note'); ok(d.includes(ADMIN), 'author');
   eq(notice(await post('/leads/L-ALICE/notes', { body: '   ' })), 'note_empty');
   eq(notice(await post('/leads/L-ALICE/notes', { body: 'x'.repeat(5001) })), 'note_long');
-  eq(one("SELECT COUNT(*) n FROM lead_notes WHERE lead_id='L-ALICE'").n, 1, 'one note stored');
+  eq(one("SELECT COUNT(*) n FROM crm_events WHERE opportunity_id='op-L-ALICE' AND kind='note' AND summary LIKE 'Called back%'").n, 1, 'the accepted note is stored once, verbatim; the empty and oversized ones were not stored');
+  eq(one("SELECT summary s FROM crm_events WHERE opportunity_id='op-L-ALICE' AND kind='note' AND summary LIKE 'Called back%'").s, 'Called back <b>twice</b>\nLeft voicemail', 'stored verbatim (escaped only when displayed)');
 });
 let contractorId;
 await test('contractors: create (name required, email validated), edit, list', async () => {
@@ -411,7 +419,7 @@ await test('assign contractor: recorded internally, NO email is sent to anyone',
   eq(one("SELECT contractor_id c FROM leads WHERE id='L-ALICE'").c, contractorId, 'assigned');
   eq(one('SELECT COUNT(*) n FROM email_jobs').n, jobsBefore, 'no email job created');
   eq(mockLog.length, 0, 'no outbound email');
-  ok(/nothing was sent to them/.test((await get('/leads/L-ALICE')).text), 'activity says internal only');
+  ok(/nothing was sent to the contractor/.test((await get('/leads/L-ALICE')).text), 'history says internal only');
   eq(notice(await post('/leads/L-ALICE/contractor', { contractor_id: 'nonexistent' })), 'bad_contractor');
 });
 await test('archived contractors cannot be newly assigned; existing assignment kept; can be restored', async () => {
@@ -424,55 +432,57 @@ await test('archived contractors cannot be newly assigned; existing assignment k
 await test('follow-ups: add, appear as due today/overdue/upcoming, complete once (double click safe)', async () => {
   const today = one("SELECT strftime('%Y-%m-%d','now','-4 hours') d").d; // close enough to Toronto for seeding relative dates
   const day = (offset) => new Date(Date.parse(`${today}T12:00:00Z`) + offset * 86400000).toISOString().slice(0, 10);
-  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: day(-3), note: 'overdue one' })), 'followup_saved');
-  eq(notice(await post('/leads/L-PEND/follow-ups', { due_on: day(5), note: 'later' })), 'followup_saved');
+  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: day(-3), note: 'overdue one' })), 'task_saved');
+  eq(notice(await post('/leads/L-PEND/follow-ups', { due_on: day(5), note: 'later' })), 'task_saved');
   eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: 'not-a-date' })), 'bad_date'); eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2026-02-30' })), 'bad_date');
   const page = (await get('/follow-ups')).text;
   ok(/Overdue \(1\)/.test(page) && /Upcoming \(1\)/.test(page), 'sections counted'); ok((await get('/')).text.includes('<div class="n">1</div><div class="l">Overdue follow-ups'), 'overview overdue');
-  const fu = one("SELECT id FROM follow_ups WHERE note='overdue one'").id;
+  const fu = one("SELECT id FROM tasks WHERE title='overdue one'").id;
   const [a, b] = await Promise.all([post(`/leads/L-ALICE/follow-ups/${fu}/complete`, { back: 'followups' }), post(`/leads/L-ALICE/follow-ups/${fu}/complete`, { back: 'followups' })]);
-  eq([notice(a), notice(b)].sort(), ['followup_done', 'no_change'], 'exactly one completes');
-  eq(one("SELECT COUNT(*) n FROM lead_activity WHERE type='follow_up_completed'").n, 1, 'one activity entry');
-  ok(/Recently completed \(1\)/.test((await get('/follow-ups')).text), 'in completed');
+  eq([notice(a), notice(b)].sort(), ['no_change', 'task_done'], 'exactly one completes');
+  eq(one("SELECT COUNT(*) n FROM tasks WHERE title='overdue one' AND status='done'").n, 1, 'completed once');
+  ok(/Recently finished \(1\)/.test((await get('/follow-ups')).text), 'in finished');
 });
 await test('adding the SAME follow-up twice (double click / resubmit / retry) creates exactly one row and one activity entry', async () => {
-  const acts = () => one("SELECT COUNT(*) n FROM lead_activity WHERE lead_id='L-ALICE' AND type='follow_up_set'").n;
+  const acts = () => one("SELECT COUNT(*) n FROM tasks WHERE opportunity_id='op-L-ALICE' AND source='manual'").n;
   const before = acts();
   const rs = await Promise.all([1, 2, 3].map(() => post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'dup check' })));
-  eq(rs.map(notice).sort(), ['followup_saved', 'no_change', 'no_change'], 'one saved, two no-ops');
-  eq(one("SELECT COUNT(*) n FROM follow_ups WHERE lead_id='L-ALICE' AND due_on='2031-01-15' AND note='dup check'").n, 1, 'rows');
-  eq(acts(), before + 1, 'activity entries');
+  eq(rs.map(notice).sort(), ['no_change', 'no_change', 'task_saved'], 'one saved, two no-ops');
+  eq(one("SELECT COUNT(*) n FROM tasks WHERE opportunity_id='op-L-ALICE' AND due_on='2031-01-15' AND title='dup check'").n, 1, 'rows');
+  eq(acts(), before + 1, 'task rows');
   eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'dup check' })), 'no_change', 'sequential repeat');
-  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'a different note' })), 'followup_saved', 'a genuinely different follow-up is still allowed');
-  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-16', note: 'dup check' })), 'followup_saved', 'a different date is still allowed');
-  sql("DELETE FROM follow_ups WHERE due_on IN ('2031-01-15','2031-01-16')"); sql("DELETE FROM lead_activity WHERE lead_id='L-ALICE' AND type='follow_up_set' AND summary LIKE '%2031%'");
+  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-15', note: 'a different note' })), 'task_saved', 'a genuinely different follow-up is still allowed');
+  eq(notice(await post('/leads/L-ALICE/follow-ups', { due_on: '2031-01-16', note: 'dup check' })), 'task_saved', 'a different date is still allowed');
+  sql("DELETE FROM tasks WHERE due_on IN ('2031-01-15','2031-01-16')");
 });
-await test('assessment date: entered in Toronto time, stored UTC, shown back in Toronto (EST and EDT)', async () => {
-  eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: '2026-11-05T09:00' })), 'assessment_saved');
-  eq(one("SELECT assessment_at a FROM leads WHERE id='L-ALICE'").a, '2026-11-05T14:00:00.000Z', 'EST = UTC-5');
-  eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: '2026-07-15T09:00' })), 'assessment_saved');
-  eq(one("SELECT assessment_at a FROM leads WHERE id='L-ALICE'").a, '2026-07-15T13:00:00.000Z', 'EDT = UTC-4');
-  ok(/value="2026-07-15T09:00"/.test((await get('/leads/L-ALICE')).text), 'round-trips to the form as 09:00');
-  ok(/Jul 15, 2026, 9:00 a\.m\./.test((await get('/leads/L-ALICE')).text) || /Jul 15, 2026, 9:00 AM/i.test((await get('/leads/L-ALICE')).text), 'displayed in Toronto time');
+await test('appointments: entered in Toronto time, stored UTC, shown back in Toronto (EST and EDT)', async () => {
+  eq(notice(await post('/leads/L-ALICE/appointments', { kind: 'onsite_assessment', starts_at: '2026-11-05T09:00' })), 'appointment_saved');
+  eq(notice(await post('/leads/L-ALICE/appointments', { kind: 'phone_consultation', starts_at: '2026-07-15T09:00' })), 'appointment_saved');
+  eq(one("SELECT starts_at a FROM appointments WHERE kind='onsite_assessment' AND opportunity_id='op-L-ALICE'").a, '2026-11-05T14:00:00.000Z', 'EST = UTC-5');
+  eq(one("SELECT starts_at a FROM appointments WHERE kind='phone_consultation' AND opportunity_id='op-L-ALICE'").a, '2026-07-15T13:00:00.000Z', 'EDT = UTC-4');
+  const page = (await get('/leads/L-ALICE')).text;
+  ok(/value="2026-07-15T09:00"/.test(page), 'round-trips to the reschedule form as 09:00'); ok(/Jul 15, 2026, 9:00 a\.m\./.test(page) || /Jul 15, 2026, 9:00 AM/i.test(page), 'displayed in Toronto time');
+  ok(/Phone consultation/.test(page) && /On-site assessment/.test(page), 'the two kinds are shown separately');
 });
-await test('assessment date: DST edge cases (skipped hour rejected; repeated hour accepted) and junk rejected', async () => {
-  eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: '2027-03-14T02:30' })), 'bad_datetime', 'spring-forward gap');
-  eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: '2026-11-01T01:30' })), 'assessment_saved', 'fall-back repeated hour');
-  for (const junk of ['tomorrow', '2026-13-01T10:00', '2026-02-30T10:00', '2026-01-01T25:00']) eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: junk })), 'bad_datetime', junk);
-  eq(notice(await post('/leads/L-ALICE/assessment', { assessment_at: '' })), 'assessment_saved'); eq(one("SELECT assessment_at a FROM leads WHERE id='L-ALICE'").a, null, 'cleared');
+await test('appointments: DST edge cases (skipped hour rejected; repeated hour accepted) and junk rejected', async () => {
+  eq(notice(await post('/leads/L-ALICE/appointments', { kind: 'onsite_assessment', starts_at: '2027-03-14T02:30' })), 'bad_datetime', 'spring-forward gap');
+  eq(notice(await post('/leads/L-ALICE/appointments', { kind: 'onsite_assessment', starts_at: '2026-11-01T01:30' })), 'appointment_saved', 'fall-back repeated hour');
+  for (const junk of ['tomorrow', '2026-13-01T10:00', '2026-02-30T10:00', '2026-01-01T25:00', '']) eq(notice(await post('/leads/L-ALICE/appointments', { kind: 'onsite_assessment', starts_at: junk })), 'bad_datetime', junk || 'blank');
+  eq(notice(await post('/leads/L-ALICE/appointments', { kind: 'skype', starts_at: '2026-11-05T09:00' })), 'bad_request', 'unknown kind');
 });
-await test('recording an assessment does not change the stage or email anyone', async () => {
-  mockLog.length = 0; const before = one("SELECT status s FROM leads WHERE id='L-PEND'").s;
-  await post('/leads/L-PEND/assessment', { assessment_at: '2027-05-05T10:00' });
-  eq(one("SELECT status s FROM leads WHERE id='L-PEND'").s, before, 'stage'); eq(mockLog.length, 0, 'emails');
+await test('recording an appointment (without asking to move the stage) does not change the stage and emails nobody', async () => {
+  mockLog.length = 0; const before = one("SELECT stage s FROM opportunities WHERE id='op-L-PEND'").s; const jobs = one('SELECT COUNT(*) n FROM email_jobs').n;
+  eq(notice(await post('/leads/L-PEND/appointments', { kind: 'onsite_assessment', starts_at: '2027-05-05T10:00' })), 'appointment_saved');
+  eq(one("SELECT stage s FROM opportunities WHERE id='op-L-PEND'").s, before, 'stage'); eq(mockLog.length, 0, 'emails'); eq(one('SELECT COUNT(*) n FROM email_jobs').n, jobs, 'no email job');
+  eq((await post('/leads/L-PEND/assessment', { assessment_at: '2027-05-05T10:00' })).status, 404, 'the earlier single assessment-date form is retired');
 });
 await test('archive hides from default list but keeps the row; restore brings it back; nothing is deleted', async () => {
   eq(notice(await post('/leads/L-PEND/archive', {})), 'archived');
-  ok(!(await get('/leads?q=Pending%20Person')).text.includes('href="/leads/L-PEND"'), 'hidden by default');
-  ok((await get('/leads?q=Pending%20Person&archived=only')).text.includes('href="/leads/L-PEND"'), 'visible in archived');
+  ok(!(await get('/leads?q=Pending%20Person')).text.includes('href="/leads/op-L-PEND"'), 'hidden by default');
+  ok((await get('/leads?q=Pending%20Person&archived=only')).text.includes('href="/leads/op-L-PEND"'), 'visible in archived');
   ok(/Restore from archive/.test((await get('/leads/L-PEND')).text), 'detail still reachable');
   eq(one("SELECT COUNT(*) n FROM leads WHERE id='L-PEND'").n, 1, 'row exists');
-  eq(notice(await post('/leads/L-PEND/unarchive', {})), 'unarchived'); ok((await get('/leads?q=Pending%20Person')).text.includes('href="/leads/L-PEND"'), 'restored');
+  eq(notice(await post('/leads/L-PEND/unarchive', {})), 'unarchived'); ok((await get('/leads?q=Pending%20Person')).text.includes('href="/leads/op-L-PEND"'), 'restored');
 });
 await test('archived leads are excluded from follow-up dashboards', async () => {
   await post('/leads/L-PEND/archive', {}); ok(!/Upcoming \(1\)/.test((await get('/follow-ups')).text), 'archived lead follow-up hidden'); await post('/leads/L-PEND/unarchive', {});

@@ -183,7 +183,7 @@ await test('pause / resume work and are logged; skipping a step is allowed and r
 });
 await test('the lead page stage change to Booked/Won ends the sequence (the same dashboard forms staff already use)', async () => {
   const { db, env } = await fresh(); await post(env, '/leads/L1/sequence/enroll', CONSENT);
-  await post(env, '/leads/L1/stage', { stage: 'assessment_booked' }); eq(db.one('SELECT stop_reason r FROM enrollments').r, 'booked');
+  await post(env, '/leads/L1/stage', { stage: 'consultation_booked' }); eq(db.one('SELECT stop_reason r FROM enrollments').r, 'booked');
 });
 
 console.log('\n[settings, switch, test emails]');

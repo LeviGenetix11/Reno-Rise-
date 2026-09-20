@@ -268,3 +268,7 @@ Test-environment note: the local emulator can report `SQLITE_BUSY` when two
 local Workers and a test reader share one file. Production D1 does not behave
 this way. The public Worker's design (job stays `pending`, cron retries) is
 what the tests rely on, and it handled it correctly.
+
+## CRM (branch `crm-stage-a`)
+
+Contacts, projects, the pipeline, timeline, tasks and the Today view are documented in [CRM.md](CRM.md): what already existed, what changed, the migration and deploy commands, rollback, tests and open decisions. Try it locally with sample data: `npm run preview`.

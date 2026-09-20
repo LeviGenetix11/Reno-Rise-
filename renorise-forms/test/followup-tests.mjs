@@ -16,7 +16,12 @@ import { planEnrollment, reproject, VERSIONS, CURRENT_VERSION, maxEmailsPerLead,
 import { renderFollowup, firstNameOf, greetingFor, bodySentences, TEMPLATE_KEYS } from '../../renorise-shared/templates.js';
 import { saveSetting, businessDetailsOk } from '../../renorise-shared/followup-db.js';
 import { createEnrollment, approveStep, skipStep, setPaused, stopByStaff, queueTestSend, retryFailedSend, planFor, setGlobalSwitch, saveSettings } from '../../renorise-dashboard/src/seq-db.js';
-import { setStage, setArchived, setAssessment } from '../../renorise-dashboard/src/db.js';
+import { ensureCrmRecords, setStage as crmSetStage, setArchived as crmSetArchived, setQualification } from '../../renorise-dashboard/src/crm-db.js';
+import { addAppointment } from '../../renorise-dashboard/src/crm-work.js';
+// The dashboard now works on projects (opportunities) that wrap each submission; these helpers apply the same real actions to lead L1's project.
+const setStage = async (db, _lead, stage) => { await ensureCrmRecords(db); return crmSetStage(db, 'op-L1', { stage, reason: stage === 'lost' ? 'price' : undefined }, 'a'); };
+const setArchived = async (db, _lead, on) => { await ensureCrmRecords(db); return crmSetArchived(db, 'op-L1', on, 'a'); };
+const setAssessment = async (db, _lead, when, kind = 'onsite_assessment') => { await ensureCrmRecords(db); return addAppointment(db, 'op-L1', { kind, startsLocal: when }, 'a'); };
 import { verifySvix } from '../src/followups/webhook.js';
 
 const results = [];
@@ -331,11 +336,14 @@ await stopCase('a customer reply is recorded', (s) => stopByStaff(s.db, s.eid, '
 await stopCase('the customer declines', (s) => stopByStaff(s.db, s.eid, 'declined', 'a'), 'declined');
 await stopCase('staff stops the sequence', (s) => stopByStaff(s.db, s.eid, 'staff', 'a'), 'staff');
 await stopCase('permission is withdrawn', (s) => stopByStaff(s.db, s.eid, 'withdrawn', 'a'), 'withdrawn');
-await stopCase('an assessment is booked (stage change in the dashboard)', (s) => setStage(s.db, 'L1', 'assessment_booked', 'a'), 'booked');
-await stopCase('an assessment date is recorded', (s) => setAssessment(s.db, 'L1', '2026-10-01T10:00', 'a'), 'booked');
-await stopCase('the lead is marked Won', (s) => setStage(s.db, 'L1', 'won', 'a'), 'won');
-await stopCase('the lead is marked Lost', (s) => setStage(s.db, 'L1', 'lost', 'a'), 'lost');
-await stopCase('the lead is archived', (s) => setArchived(s.db, 'L1', true, 'a'), 'archived');
+await stopCase('an assessment is booked (stage change in the dashboard)', (s) => setStage(s.db, 'L1', 'consultation_booked'), 'booked');
+await stopCase('an on-site assessment is recorded', (s) => setAssessment(s.db, 'L1', '2026-10-01T10:00'), 'booked');
+await stopCase('a phone consultation is recorded', (s) => setAssessment(s.db, 'L1', '2026-10-01T10:00', 'phone_consultation'), 'booked');
+await stopCase('the project is referred to a contractor', (s) => setStage(s.db, 'L1', 'referred'), 'progressed');
+await stopCase('the project is marked Not a fit', async (s) => { await ensureCrmRecords(s.db); return setQualification(s.db, 'op-L1', { value: 'not_a_fit', reason: 'outside_area' }, 'a'); }, 'not_a_fit');
+await stopCase('the lead is marked Won', (s) => setStage(s.db, 'L1', 'won'), 'won');
+await stopCase('the lead is marked Lost', (s) => setStage(s.db, 'L1', 'lost'), 'lost');
+await stopCase('the lead is archived', (s) => setArchived(s.db, 'L1', true), 'archived');
 await test('sender ALSO re-checks: a direct database change to Won/Archived/booked/withdrawn stops it before sending (defence in depth)', async () => {
   for (const [patch, reason] of [["UPDATE leads SET status='won'", 'won'], ["UPDATE leads SET archived_at='2026-09-20T00:00:00Z'", 'archived'], ["UPDATE leads SET assessment_at='2026-10-01T15:00:00Z'", 'booked'], ["UPDATE consents SET withdrawn_at='2026-09-20T00:00:00Z'", 'withdrawn'], ["INSERT INTO suppressions (email, reason, created_at) VALUES ('sam@example.test','complaint','2026-09-20T00:00:00Z')", 'suppressed_complaint']]) {
     const s = await ready(); s.db.run(patch);
@@ -377,7 +385,8 @@ await test('POST (also the RFC 8058 one-click call) unsubscribes: suppresses, wi
 });
 await test('unsubscribing also covers the same address on another lead, and leaves the confirmation system untouched', async () => {
   const s = await setup(); s.db.run("INSERT INTO leads (id, idempotency_key, created_at, name, email, phone, city, renovation_type, project_timing, source, status, customer_email_status, internal_email_status) VALUES ('L2','k2','2026-09-19T15:30:00Z','Sam Again','SAM@example.test','(416) 555-0199','Toronto','Deck','Just exploring','contact','new','sent','sent')");
-  const e1 = await enroll(s.db, 'L1'); const e2 = await enroll(s.db, 'L2'); const t = s.db.one('SELECT token FROM unsubscribe_tokens WHERE enrollment_id = ?', e1).token;
+  // The dashboard now allows one open sequence per person, so create the second open enrollment the way older data could have it: enrolled under another address, then the address changed to match.
+  const e1 = await enroll(s.db, 'L1'); const l1Email = s.db.one("SELECT email e FROM leads WHERE id='L1'").e; s.db.run("UPDATE leads SET email = 'temp-l2@example.test' WHERE id='L2'"); const e2 = await enroll(s.db, 'L2'); s.db.run('UPDATE leads SET email = ? WHERE id = ?', l1Email, 'L2'); const t = s.db.one('SELECT token FROM unsubscribe_tokens WHERE enrollment_id = ?', e1).token;
   await call(s.env, 'POST', `/u/${t}`);
   eq(s.db.rows('SELECT status FROM enrollments ORDER BY id').map((r) => r.status), ['stopped', 'stopped'], 'both enrollments'); eq(s.db.one("SELECT COUNT(*) n FROM email_jobs WHERE status='sent'").n, 2, 'confirmations untouched');
 });

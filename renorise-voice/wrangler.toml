@@ -1,0 +1,30 @@
+name = "renorise-voice"
+main = "src/index.js"
+compatibility_date = "2026-09-19"
+
+# One stable public URL for Twilio's webhooks (https://renorise-voice.<your-subdomain>.workers.dev).
+# Per-version preview URLs are off so there is exactly one endpoint to protect.
+workers_dev = true
+preview_urls = false
+
+# --- D1 -----------------------------------------------------------------
+# The SAME existing database as the forms Worker and the dashboard (no new database).
+# Schema changes live in ../renorise-forms/migrations, one ordered history.
+[[d1_databases]]
+binding = "DB"
+database_name = "renorise-leads"
+database_id = "debd2c89-e46b-4585-9693-0f83f35cb0de"
+migrations_dir = "../renorise-forms/migrations"
+
+# --- Non-secret configuration --------------------------------------------
+# BUSINESS_NUMBER is the public number already on the website. To test on a second Twilio number
+# first, list both, comma-separated (the number that was called is shown as caller ID on your phone).
+# RING_SECONDS is how long your phone rings before the caller is offered voicemail.
+#
+# SECRETS (never here, never in Git; set with `wrangler secret put`):
+#   TWILIO_ACCOUNT_SID   your Twilio Account SID (starts with AC)
+#   TWILIO_AUTH_TOKEN    your Twilio Auth Token (used ONLY to verify Twilio's signatures)
+#   FORWARD_TO_NUMBER    the cellphone to ring, in +1XXXXXXXXXX form (your personal number stays out of Git)
+[vars]
+BUSINESS_NUMBER = "+12895128112"
+RING_SECONDS = "25"
