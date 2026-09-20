@@ -12,8 +12,8 @@ const run = (file, args = []) => {
 
 run('pages/suite.js');
 run('pages/home.js');
-run('pages/basement.js');
 run('pages/cluster.js');
+run('pages/landing.js');
 run('pages/services-index.js');
 run('pages/misc.js');
 run('pages/posts.js');

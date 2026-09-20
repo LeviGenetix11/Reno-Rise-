@@ -7,6 +7,10 @@
 'use strict';
 
 const CLAIM_RULES = [
+  // URLs that moved to the keyword-map targets (see vercel.json redirects)
+  [/sump-pump-installation\//g, 'sump-pump/'],
+  [/backwater-valve-installation\//g, 'backwater-valve/'],
+
   // Brand
   [/Reno Rise Renovations/g, 'Reno Rise'],
   [/Licensed (?:&amp;|&) Insured\s*·\s*/g, ''],

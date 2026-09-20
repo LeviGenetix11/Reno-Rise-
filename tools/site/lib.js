@@ -42,7 +42,7 @@ const BASEMENT_MENU = [
   ['Egress Windows', 'services/egress-windows/'],
   ['Walkout & Separate Entrances', 'services/walkout-construction/'],
   ['Basement Soundproofing', 'services/basement-soundproofing/'],
-  ['Sump Pumps & Backwater Valves', 'services/sump-pump-installation/'],
+  ['Sump Pumps & Backwater Valves', 'services/sump-pump/'],
   ['Basement Renovation in Toronto', 'services/basement-renovation-toronto/'],
 ];
 
@@ -277,6 +277,38 @@ function diagramCard({ id = 'dg', caption = true } = {}) {
     </figure>`;
 }
 
+/** Photo card used in the split hero when a page has a relevant stock photo instead of the diagram. */
+function photoCard({ file, alt, credit }) {
+  return `<figure class="diagram-card photo-card" style="margin:0">
+      <img src="${'@UP@'}images/stock/${file}.webp" width="1200" height="800" alt="${alt}" fetchpriority="high">
+      <figcaption class="diagram-caption">${credit}. Stock photo, illustrative only. It is not a Reno Rise project.</figcaption>
+    </figure>`;
+}
+
+/** Homepage-style split hero for keyword landing pages. `visual` is the right-hand HTML (diagram or photo card). */
+function splitHero(depth, { eyebrow, h1, sub, primary, secondary, note, visual, crumbs = [] }) {
+  const trail = crumbs.map(([label, target], i) => (i === crumbs.length - 1 ? `<span aria-current="page">${label}</span>` : `<a href="${href(depth, target)}">${label}</a>`)).join(` ${ICON.crumb} `);
+  const v = visual.split('@UP@').join(up(depth));
+  return `<!-- ========== HERO ========== -->
+<section class="hero hero-basement">
+  <div class="container hero-split">
+    <div class="hero-copy">
+      ${crumbs.length ? `<div class="breadcrumb" aria-label="Breadcrumb">${trail}</div>` : ''}
+      <span class="eyebrow on-dark">${eyebrow}</span>
+      <h1>${h1}</h1>
+      <p>${sub}</p>
+      <div class="hero-actions">
+        <a href="${primary[1]}" class="btn btn-primary">${primary[0]} ${ICON.arrow}</a>
+        ${secondary ? `<a href="${secondary[1]}" class="btn btn-outline">${secondary[0]}</a>` : ''}
+      </div>
+      <p class="hero-note">${note || 'Reno Rise is an independent enquiry and matching service, not a contractor. You choose who to hire.'}</p>
+    </div>
+    ${v}
+  </div>
+</section>
+`;
+}
+
 // Comments supplied by the owner as real feedback from past customers (September 2026). They were not Google
 // reviews, so there is no Google badge, no star rating and no stock avatar: just the words, name and place.
 const CUSTOMER_QUOTES = {
@@ -323,5 +355,5 @@ const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace
 
 module.exports = {
   SITE, PHONE_DISPLAY, PHONE_TEL, EMAIL, DISCLOSURE, POSITIONING, P, BASEMENT_MENU, ICON,
-  up, href, header, footer, ctaBand, howItWorks, disclosure, diagramCard, customerQuotes, quoteFigure, CUSTOMER_QUOTES, escapeHtml,
+  up, href, header, footer, ctaBand, howItWorks, disclosure, diagramCard, customerQuotes, quoteFigure, photoCard, splitHero, CUSTOMER_QUOTES, escapeHtml,
 };

@@ -20,7 +20,7 @@ const SKIP_DIRS = new Set(['node_modules', 'SEO_brief', 'renorise-forms', 'renor
 const BASEMENT_SLUGS = new Set([
   'basement-renovation', 'legal-basement-apartment-toronto', 'basement-finishing', 'basement-soundproofing', 'basement-waterproofing',
   'basement-window-replacement', 'underpinning', 'bench-footing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair',
-  'egress-windows', 'window-well-installation', 'walkout-construction', 'sump-pump-installation', 'backwater-valve-installation',
+  'egress-windows', 'window-well-installation', 'walkout-construction', 'sump-pump', 'backwater-valve',
   'weeping-tile', 'french-drain', 'foundation-crack-repair', 'waterproofing-contractor', 'parging', 'crawl-space-conversion',
   'basement-renovation-toronto', 'basement-renovation-ajax', 'basement-renovation-oakville', 'basement-renovation-pickering',
   'basement-renovation-richmond-hill', 'basement-renovation-vaughan',
@@ -292,6 +292,7 @@ const GENERATED_SLUGS = new Set([
   'basement-waterproofing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair', 'walkout-construction',
   'basement-renovation-toronto', 'basement-renovation-ajax', 'basement-renovation-oakville', 'basement-renovation-pickering',
   'basement-renovation-richmond-hill', 'basement-renovation-vaughan', 'door-installation', 'garage-door-repair',
+  'sump-pump', 'backwater-valve', 'foundation-crack-repair', 'weeping-tile',
 ]);
 
 // ---------- main ----------

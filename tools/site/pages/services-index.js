@@ -33,7 +33,7 @@ const label = (s) => labelOf[s] || s.replace(/-/g, ' ').replace(/\b\w/g, (x) => 
 
 const GROUPS = [
   ['Structure, height & entrances', ['underpinning', 'bench-footing', 'walkout-construction', 'egress-windows', 'window-well-installation', 'basement-window-replacement', 'crawl-space-conversion']],
-  ['Waterproofing & moisture control', ['basement-waterproofing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair', 'foundation-crack-repair', 'weeping-tile', 'french-drain', 'sump-pump-installation', 'backwater-valve-installation', 'parging', 'waterproofing-contractor']],
+  ['Waterproofing & moisture control', ['basement-waterproofing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair', 'foundation-crack-repair', 'weeping-tile', 'french-drain', 'sump-pump', 'backwater-valve', 'parging', 'waterproofing-contractor']],
   ['Electrical & plumbing for basement projects', ['panel-upgrade', 'knob-and-tube-removal', 'aluminum-wiring-replacement', 'pot-light-installation', 'water-line-replacement']],
   ['Finishing, comfort & planning', ['basement-finishing', 'basement-soundproofing', 'design-planning', 'laundry-room-renovation']],
   ['Toronto & GTA basement pages', ['basement-renovation-toronto', 'basement-renovation-ajax', 'basement-renovation-oakville', 'basement-renovation-pickering', 'basement-renovation-richmond-hill', 'basement-renovation-vaughan']],

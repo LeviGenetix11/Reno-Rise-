@@ -1690,3 +1690,13 @@ body.nav-open { overflow: hidden; }
 .cq-who { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); line-height: 1.3; }
 .cq-who b { color: var(--text); font-size: 14.5px; }
 @media (max-width: 720px) { .quote-grid { grid-template-columns: 1fr; } }
+.photo-card { padding: 12px; }
+.photo-card img { display: block; width: 100%; height: auto; border-radius: 14px; }
+.photo-card .diagram-caption { padding: 4px 6px 2px; }
+.hero-copy .breadcrumb { display: flex; flex-wrap: wrap; margin-bottom: 16px; }
+/* Checklists on landing pages (outside .article-wrap) */
+.section-tight ul.check-list, .panel ul.check-list { list-style: none; margin: 0 0 20px; padding: 0; }
+.section-tight ul.check-list li, .panel ul.check-list li { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; color: var(--text); }
+.section-tight ul.check-list li svg, .panel ul.check-list li svg { width: 18px; height: 18px; color: var(--orange-a11y); flex-shrink: 0; margin-top: 2px; }
+.panel ul.check-list li:last-child { border-bottom: 0; }
+.section-tight ul.check-list li a, .panel p a, .lede a { color: var(--orange-a11y); text-decoration: underline; text-underline-offset: 2px; }
