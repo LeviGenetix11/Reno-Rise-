@@ -40,7 +40,7 @@ const main = `
 
     <div class="book-embed-wrap">
       <p class="book-status" id="book-status" role="status" aria-live="polite">Loading the booking calendar&hellip;</p>
-      <div class="book-embed" id="book-embed" role="region" aria-label="Choose a call time" data-cal-link="${esc(cfg.calLink)}" data-cal-origin="${esc(cfg.origin)}"></div>
+      <div class="book-embed" id="book-embed" role="region" aria-label="Choose a call time" data-cal-link="${esc(cfg.calLink)}" data-cal-namespace="${esc(cfg.namespace)}" data-cal-origin="${esc(cfg.origin)}"></div>
       <noscript><p class="book-noscript">The booking calendar needs JavaScript. <a href="${esc(cfg.hostedUrl)}" rel="noopener noreferrer">Open the booking page</a> instead, or call ${L.PHONE_DISPLAY}.</p></noscript>
     </div>
 

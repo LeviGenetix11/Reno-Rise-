@@ -16,9 +16,10 @@
 
   var calLink = el.getAttribute('data-cal-link');
   var origin = el.getAttribute('data-cal-origin') || 'https://app.cal.com';
+  var ns = el.getAttribute('data-cal-namespace') || '';
   var statusEl = document.getElementById('book-status');
   var fallbackEl = document.getElementById('book-fallback');
-  if (!calLink || !/^https:\/\/[A-Za-z0-9.-]+$/.test(origin)) return;
+  if (!calLink || !/^[A-Za-z0-9_-]{1,60}$/.test(ns) || !/^https:\/\/[A-Za-z0-9.-]+$/.test(origin)) return;
 
   var REF_RE = /^[A-Za-z0-9_-]{20,64}$/;
   var ref = null;
@@ -76,14 +77,17 @@
   })(window, origin + '/embed/embed.js', 'init');
 
   try {
-    var config = { layout: 'month_view' };
+    // Same options as the snippet Cal.com generates for this event. Deliberately NOT copied from it: `Cal.config.forwardQueryParams`,
+    // which would forward every query parameter on this page (including any contact details typed into the URL) to Cal.com.
+    var config = { layout: 'month_view', useSlotsViewOnSmallScreen: 'true' };
     if (ref) config['metadata[renorise_ref]'] = ref;
-    window.Cal('init', { origin: origin });
-    window.Cal('inline', { elementOrSelector: '#book-embed', calLink: calLink, config: config });
-    window.Cal('ui', { hideEventTypeDetails: false, layout: 'month_view' });
+    window.Cal('init', ns, { origin: origin });
+    var cal = window.Cal.ns[ns];
+    cal('inline', { elementOrSelector: '#book-embed', calLink: calLink, config: config });
+    cal('ui', { hideEventTypeDetails: false, layout: 'month_view' });
     // Event names are Cal.com's; if they change, the timer below still shows the fallback link.
-    window.Cal('on', { action: 'linkReady', callback: loaded });
-    window.Cal('on', { action: 'linkFailed', callback: failed });
+    cal('on', { action: 'linkReady', callback: loaded });
+    cal('on', { action: 'linkFailed', callback: failed });
   } catch (err) {
     failed();
   }

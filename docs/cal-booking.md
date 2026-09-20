@@ -43,7 +43,8 @@ Checked against Cal.com's official documentation while building this:
 | Where the booker's phone number appears in the payload | **Not documented precisely.** The receiver checks several places (any `responses` key containing "phone", the location response, `attendees[].phoneNumber`). Confirm with the test booking (section 7) |
 | Whether the phone field can be made required on the free plan | **Not confirmed.** Configure it as required and check in the test booking |
 | Manage link `https://app.cal.com/booking/<uid>` | Believed correct (Cal.com's own emails use it); **confirm on the test booking**. If it differs, change `manageUrlFor` in `renorise-dashboard/src/appt-db.js` |
-| The embed snippet | Written from Cal.com's standard loader. **Compare with the snippet in your Cal.com event's *Embed* dialog** and tell me about any difference |
+| The embed snippet | **Compared with the snippet from your event's *Embed* dialog** (namespace `free-renovation-consultation`, `calLink` `free-renovation-consultation`, origin `https://app.cal.com`, `useSlotsViewOnSmallScreen`). `js/book.js` uses the same calls. One deliberate difference: Cal.com's snippet sets `Cal.config.forwardQueryParams = true`, which forwards *every* query parameter of `/book/` to Cal.com; it is left out so only the validated opaque reference is passed |
+| Whether the event has seats turned on | **Check.** The event page showed "0 Going", which usually means *Offer seats* is on. Turn it off (event → Advanced): with seats one booking can hold several attendees and the receiver reads only the first |
 | Passing the reference in the *hosted* link (not the embed) | Not documented, so the hosted fallback link does not carry it. A booking made that way is matched by email only |
 
 **If webhooks turn out not to be on the free plan:** do not pay for anything yet. The fallback is fully supported:
@@ -96,14 +97,12 @@ then done by hand too. Tell me and we decide together whether a paid plan is wor
      ```
      (`clip` puts it on your clipboard instead of leaving it on screen. Never put it in Git, a file in the repo, or chat.)
    - If you cannot find the Webhooks page, or it says it needs a paid plan: **stop and use the fallback in section 2.**
-7. Get your **event link** (`your-username/free-renovation-consultation`) and the hosted booking URL for step 5 of section 6.
+7. Your event link is `https://cal.com/free-renovation-consultation` (already in the site config, section 5). Also check that *Offer seats* is off for the event (section 2).
 
 ## 5. Turning it on (after the backend is deployed and a test booking works)
 
-1. Edit `tools/site/booking-config.json`:
-   ```json
-   { "enabled": true, "calLink": "your-username/free-renovation-consultation", "hostedUrl": "https://cal.com/your-username/free-renovation-consultation", "origin": "https://app.cal.com" }
-   ```
+1. `tools/site/booking-config.json` already holds your link (`calLink` and `hostedUrl` for `https://cal.com/free-renovation-consultation`).
+   Change `"enabled": false` to `true`. A build with these real values was checked and works; it was then switched back.
 2. `node tools/site/build.js`. This creates `/book/`, adds the button to the thank-you page and the Cal.com line to the
    privacy page. It refuses to build with placeholder or malformed values. Deploy the site (your approval).
 3. Make a real test booking through the live `/book/` page. Confirm it appears in **Dashboard → Appointments**.

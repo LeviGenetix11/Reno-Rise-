@@ -15,12 +15,15 @@ const FILE = path.join(__dirname, 'booking-config.json');
 const DEV = process.env.RENORISE_BOOKING_DEV === '1';
 const PLACEHOLDER = 'dev-placeholder';
 
-const CAL_LINK_RE = /^[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)+$/; // "username/event-slug" (or "team/x/y")
+const CAL_LINK_RE = /^[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/; // as in the Cal.com embed snippet: "free-renovation-consultation" or "username/event-slug"
+
+// The embed snippet names its namespace after the event; any short safe identifier works.
+const namespaceOf = (calLink) => String(calLink).split('/').pop().replace(/[^A-Za-z0-9_-]/g, '-').slice(0, 60);
 const ORIGIN_RE = /^https:\/\/[A-Za-z0-9.-]+$/;
 
 function load() {
   if (DEV) {
-    return { enabled: true, dev: true, calLink: `${PLACEHOLDER}/free-renovation-consultation`, hostedUrl: `https://cal.com/${PLACEHOLDER}/free-renovation-consultation`, origin: 'https://app.cal.com' };
+    return { enabled: true, dev: true, namespace: PLACEHOLDER, calLink: `${PLACEHOLDER}/free-renovation-consultation`, hostedUrl: `https://cal.com/${PLACEHOLDER}/free-renovation-consultation`, origin: 'https://app.cal.com' };
   }
   let raw = {};
   try {
@@ -29,9 +32,10 @@ function load() {
     throw new Error(`booking-config.json is missing or not valid JSON: ${err.message}`);
   }
   const cfg = { enabled: raw.enabled === true, dev: false, calLink: String(raw.calLink || '').trim(), hostedUrl: String(raw.hostedUrl || '').trim(), origin: String(raw.origin || 'https://app.cal.com').trim() };
+  cfg.namespace = namespaceOf(cfg.calLink);
   if (!cfg.enabled) return cfg;
   const problems = [];
-  if (!CAL_LINK_RE.test(cfg.calLink)) problems.push('calLink must look like "your-username/free-renovation-consultation"');
+  if (!CAL_LINK_RE.test(cfg.calLink)) problems.push('calLink must be the link from the Cal.com embed snippet, e.g. "free-renovation-consultation" or "your-username/event-slug"');
   if (!/^https:\/\/[^\s"'<>]+$/.test(cfg.hostedUrl)) problems.push('hostedUrl must be the https:// address of the hosted Cal.com booking page');
   if (!ORIGIN_RE.test(cfg.origin)) problems.push('origin must be an https:// origin such as https://app.cal.com');
   if (cfg.calLink.includes(PLACEHOLDER) || cfg.hostedUrl.includes(PLACEHOLDER)) problems.push('placeholder values may not be published');
