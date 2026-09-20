@@ -20,6 +20,11 @@ for (const f of files) {
   pages.set(rel, { rel, html, ids, urlPath: urlPathOf(rel) });
 }
 
+// ---- booking: the development placeholder (RENORISE_BOOKING_DEV=1) must never be left in a page ----
+for (const { rel, html } of pages.values()) {
+  if (html.includes('dev-placeholder')) warn(rel, 'contains the booking development placeholder: rebuild without RENORISE_BOOKING_DEV');
+}
+
 // ---- resolve a link found on `fromRel` to a file (or null) ----
 function resolveTarget(fromRel, ref) {
   let [p, hash] = ref.split('#');

@@ -3,6 +3,7 @@
 const L = require('../lib');
 const PG = require('../page');
 const U = require('./util');
+const B = require('../booking');
 
 const form = (depth, { source, thank, type = '' }) =>
   `<div data-assessment-form-mount data-source="${source}"${type ? ` data-project-type="${type}"` : ''} data-thank-you-href="${thank}"></div>`;
@@ -45,6 +46,16 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
 (function thanks() {
   const depth = 1;
   const h = (t) => L.href(depth, t);
+  const booking = B.load();
+  // Optional consultation booking. Shown only when booking is enabled, and never an automatic redirect: the visitor chooses.
+  const bookBlock = booking.enabled
+    ? `<div class="ty-book" id="ty-book">
+        <h2>Prefer to talk sooner?</h2>
+        <p>You can choose a time for a free 15-minute phone call with Reno Rise. Booking is optional: if you would rather wait, you do not need to do anything, and Reno Rise will review your enquiry and may contact you.</p>
+        <a id="ty-book-link" href="${h('book/')}" class="btn btn-primary">Book Your Free Consultation ${L.ICON.arrow}</a>
+      </div>
+      `
+    : '';
   const main = `
 <section class="section" style="min-height:50vh; display:flex; align-items:center;">
   <div class="container" style="max-width:640px; text-align:center;">
@@ -61,7 +72,7 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
       </span>
       <p style="color:var(--muted); margin:14px 0 8px;">Reno Rise will review the details you shared. If there is a suitable fit, you may be contacted by phone or email about being introduced to an independent professional.</p>
       <p style="color:var(--muted); margin:0 0 8px;">This is an enquiry, not a booking. We cannot promise an appointment, a quote, a match with a professional, or that any work is permitted.</p>
-      <p style="color:var(--muted); font-size:14px; margin:0 0 26px;">In the meantime, the guides below cover what to confirm before you hire.</p>
+      ${bookBlock}<p style="color:var(--muted); font-size:14px; margin:0 0 26px;">In the meantime, the guides below cover what to confirm before you hire.</p>
       <div class="chip-row" style="justify-content:center; margin-bottom:26px;">
         <a class="city-chip" href="${h('services/legal-basement-apartment-toronto/')}">Legal secondary suite guide</a>
         <a class="city-chip" href="${h('blog/basement-renovation-permits-toronto.html')}">Permits in Toronto</a>
@@ -86,7 +97,12 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
       document.getElementById('ty-success').hidden = false;
       document.getElementById('ty-title').textContent = 'Thanks — we have your basement enquiry.';
       try { sessionStorage.removeItem(FLAG); } catch (err) { /* ignore */ }
-    }
+${booking.enabled ? `      // The booking link carries only an opaque reference (never contact details); it is a hint, not proof of identity.
+      var link = document.getElementById('ty-book-link');
+      var ref = null;
+      try { ref = sessionStorage.getItem('renoriseBookingRef'); sessionStorage.removeItem('renoriseBookingRef'); } catch (err) { ref = null; }
+      if (link && ref && /^[A-Za-z0-9_-]{20,64}$/.test(ref)) link.href = link.getAttribute('href') + '?r=' + ref;
+` : ''}    }
   })();
 </script>
 `;
@@ -183,6 +199,12 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
 })();
 
 // ---------------------------------------------------------------- privacy & terms
+// Scheduling-provider wording appears only while consultation booking is enabled (tools/site/booking-config.json).
+const BOOKING_ON = B.load().enabled;
+const BOOKING_PRIVACY_ITEM = BOOKING_ON
+  ? `        <li><strong>Booking a consultation.</strong> If you book a phone consultation, the details you enter (name, email, phone number and a short note) are processed by our scheduling provider, Cal.com, and by the calendar service connected to it, and are received by us so the call can take place. Booking does not by itself agree to marketing email.</li>
+`
+  : '';
 const legalPage = ({ path, title, description, h1, body }) => {
   const depth = 1;
   const main = `
@@ -213,7 +235,7 @@ legalPage({
       <h2>Information we collect</h2>
       <ul>
         <li><strong>What you submit.</strong> When you use our assessment or contact form we collect your name, email, phone number, Toronto neighbourhood or postal code, project type, basement condition, approximate size, timeframe, budget range, your project description, and your consent. Please do not include banking, payment card or other sensitive financial details.</li>
-        <li><strong>Calls and voicemail.</strong> Calls to our business number are handled by a telephone service provider. Call details (such as the caller&rsquo;s number, time and duration) and any voicemail you leave may be recorded and stored so we can respond.</li>
+${BOOKING_PRIVACY_ITEM}        <li><strong>Calls and voicemail.</strong> Calls to our business number are handled by a telephone service provider. Call details (such as the caller&rsquo;s number, time and duration) and any voicemail you leave may be recorded and stored so we can respond.</li>
         <li><strong>Technical data.</strong> Our website host and security providers process standard technical data such as IP address, browser type and pages requested, and our spam-protection check (Cloudflare Turnstile) analyzes signals from your browser to tell people from automated traffic.</li>
         <li><strong>Third-party content.</strong> Pages load fonts from Google Fonts, which may receive your IP address and other technical data under Google&rsquo;s own policies.</li>
       </ul>
@@ -229,7 +251,7 @@ legalPage({
       <h2>Who we share it with</h2>
       <ul>
         <li><strong>Independent professionals.</strong> With your consent, we may share your project details with a professional we think may be able to help. That professional is independent of Reno Rise and handles your information under their own practices.</li>
-        <li><strong>Service providers.</strong> Companies that host our website and store form data, send email, filter spam and handle phone calls on our behalf (currently including Vercel, Cloudflare, Resend and a telephone service provider).</li>
+        <li><strong>Service providers.</strong> Companies that host our website and store form data, send email, filter spam and handle phone calls on our behalf (currently including Vercel, Cloudflare, Resend${BOOKING_ON ? ', Cal.com and Google (scheduling and calendar)' : ''} and a telephone service provider).</li>
         <li><strong>Legal and safety.</strong> Where required by law or to protect rights and safety.</li>
       </ul>
       <p>Some of these providers may store or process information outside Canada.</p>
