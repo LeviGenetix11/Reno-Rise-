@@ -11,6 +11,7 @@
 // Nothing here sends a message.
 
 import { stopEnrollmentsForOpportunity } from '../../renorise-shared/followup-db.js';
+import { recomputeConsultationForOpportunity } from '../../renorise-shared/bookings-db.js';
 import { torontoToday, isValidDateString, torontoInputToUtcIso, formatDateTime } from './time.js';
 import {
   TASK_TYPES,
@@ -256,9 +257,11 @@ export async function callsFor(db, { opportunityId, contactId }) {
 
 // ---------------------------------------------------------------- appointments
 
+// Cal.com phone consultations are tracked in leads.consultation_at (bookings-db.js), not here, so an initial phone
+// call is never mistaken for an on-site assessment.
 const mirrorAssessmentStmt = (db, oppId) =>
   db
-    .prepare("UPDATE leads SET assessment_at = (SELECT MAX(starts_at) FROM appointments WHERE opportunity_id = ? AND status = 'scheduled'), updated_at = ? WHERE opportunity_id = ?")
+    .prepare("UPDATE leads SET assessment_at = (SELECT MAX(starts_at) FROM appointments WHERE opportunity_id = ? AND status = 'scheduled' AND source <> 'calcom'), updated_at = ? WHERE opportunity_id = ?")
     .bind(oppId, nowIso(), oppId);
 
 export async function addAppointment(db, oppId, input, actor) {
@@ -289,6 +292,7 @@ export async function addAppointment(db, oppId, input, actor) {
   ]);
   // A booked person is no longer an unbooked lead: the automatic follow-up emails for THIS project end.
   await stopEnrollmentsForOpportunity(db, opp.id, 'booked', actor);
+  await recomputeConsultationForOpportunity(db, opp.id);
   if (input.moveStage === true && !opp.archived_at && opp.stage && opp.stage !== 'on_hold' && !CLOSED_STAGES.includes(opp.stage) && STAGE_ORDER.indexOf(opp.stage) < STAGE_ORDER.indexOf('consultation_booked')) {
     await setStage(db, opp.id, { stage: 'consultation_booked', note: null }, actor);
   }
@@ -305,9 +309,12 @@ export async function setAppointmentStatus(db, apptId, status, actor) {
   if (!a) return { ok: false, code: 'not_found' };
   if (!['completed', 'cancelled', 'no_show'].includes(status)) return { ok: false, code: 'bad_request' };
   if (a.status !== 'scheduled') return { ok: true, code: 'no_change' };
+  // A Cal.com booking is cancelled in Cal.com (which frees the calendar slot and tells the customer); marking it here would
+  // leave the slot taken. Only the outcome of the call is recorded by hand.
+  if (status === 'cancelled' && a.source === 'calcom') return { ok: false, code: 'appointment_cancel_in_calcom' };
   const now = nowIso();
   const label = { completed: 'completed', cancelled: 'cancelled', no_show: 'marked as a no-show' }[status];
-  const res = await db.prepare("UPDATE appointments SET status = ?, updated_at = ? WHERE id = ? AND status = 'scheduled'").bind(status, now, a.id).run();
+  const res = await db.prepare("UPDATE appointments SET status = ?, status_source = 'staff', updated_at = ? WHERE id = ? AND status = 'scheduled'").bind(status, now, a.id).run();
   if (!res.meta || res.meta.changes === 0) return { ok: true, code: 'no_change' };
   await db.batch([
     mirrorAssessmentStmt(db, a.opportunity_id),
@@ -320,6 +327,7 @@ export async function setAppointmentStatus(db, apptId, status, actor) {
       actor,
     }),
   ]);
+  await recomputeConsultationForOpportunity(db, a.opportunity_id);
   return { ok: true, code: `appointment_${status}` };
 }
 
@@ -327,6 +335,7 @@ export async function rescheduleAppointment(db, apptId, startsLocal, actor) {
   const a = await getAppointment(db, apptId);
   if (!a) return { ok: false, code: 'not_found' };
   if (a.status !== 'scheduled') return { ok: false, code: 'appointment_not_scheduled' };
+  if (a.source === 'calcom') return { ok: false, code: 'appointment_move_in_calcom' }; // Cal.com and Google Calendar own the time
   const startsAt = torontoInputToUtcIso(String(startsLocal || ''));
   if (!startsAt) return { ok: false, code: 'bad_datetime' };
   if (startsAt === a.starts_at) return { ok: true, code: 'no_change' };

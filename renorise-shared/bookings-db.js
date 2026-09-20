@@ -128,6 +128,12 @@ export async function recomputeConsultationAt(db, leadId, now = new Date()) {
     .run();
 }
 
+/** Same, for the dashboard, which knows the project (opportunity) rather than the original submission. */
+export async function recomputeConsultationForOpportunity(db, opportunityId, now = new Date()) {
+  const row = await db.prepare('SELECT id FROM leads WHERE opportunity_id = ? LIMIT 1').bind(opportunityId).first();
+  if (row) await recomputeConsultationAt(db, row.id, now);
+}
+
 /** Sets a booking's match and copies the lead's CRM ids (which may still be null until the dashboard creates them). */
 async function saveMatch(db, bookingId, m, now) {
   const at = nowIsoOf(now);
@@ -255,7 +261,7 @@ export async function linkPendingBookings(db, now = new Date()) {
   const rows =
     (
       await db
-        .prepare("SELECT id, lead_id FROM bookings WHERE match_status IN ('matched', 'manual') AND lead_id IS NOT NULL AND status IN ('confirmed', 'cancelled', 'rejected') AND appointment_id IS NULL ORDER BY updated_at LIMIT 50")
+        .prepare("SELECT id, lead_id FROM bookings WHERE match_status IN ('matched', 'manual') AND lead_id IS NOT NULL AND status = 'confirmed' AND appointment_id IS NULL ORDER BY updated_at LIMIT 50")
         .all()
     ).results || [];
   let linked = 0;
@@ -452,6 +458,7 @@ export async function assignBookingToLead(db, bookingId, leadId, actor, now = ne
   const b = await db.prepare('SELECT * FROM bookings WHERE id = ?').bind(bookingId).first();
   const lead = await leadRow(db, 'id = ?', leadId);
   if (!b || !lead) return { ok: false, code: 'not_found' };
+  if (['matched', 'manual'].includes(b.match_status)) return { ok: false, code: 'booking_already_matched' }; // never silently re-link
   await saveMatch(db, bookingId, { lead, method: 'staff', manual: true }, now);
   const updated = await db.prepare('SELECT * FROM bookings WHERE id = ?').bind(bookingId).first();
   const at = nowIsoOf(now);

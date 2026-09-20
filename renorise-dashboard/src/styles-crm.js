@@ -88,6 +88,34 @@ fieldset.reasons legend{padding:0 6px;font-size:13.5px;font-weight:800;color:var
 .item-row button{min-height:40px;padding:6px 16px;font-size:14px}
 .late{color:var(--err);font-weight:800}
 
+/* ---------- appointments calendar ---------- */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.cal-title{margin:0;font-size:20px}
+.cal{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}
+.cal-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.cal-dow div{padding:8px 6px;background:var(--cream-2);color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.cal-day,.cal-pad{min-height:92px;padding:6px;border-top:1px solid var(--border);border-left:1px solid var(--border);font-size:13px}
+.cal-row>:first-child{border-left:0}
+.cal-pad{background:var(--cream-3)}
+.cal-n{display:block;font-weight:800;color:var(--muted);margin-bottom:4px}
+.cal-full{display:none}
+.cal-today .cal-n{color:var(--dark)}
+.cal-today{background:#fff8ef;box-shadow:inset 0 0 0 2px var(--edge)}
+.cal-appt{display:block;margin:0 0 4px;padding:3px 6px;border-radius:8px;background:var(--teal-light);color:#0b4f49;text-decoration:none;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.cal-appt:hover{text-decoration:underline}
+.cal-appt.st-cancelled{background:var(--err-bg);color:var(--err);text-decoration:line-through}
+.cal-appt.st-completed{background:var(--ok-bg);color:var(--ok)}
+.cal-appt.st-no_show{background:var(--warn-bg);color:var(--warn)}
+.cal-t{font-weight:800}
+.cal-s{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+@media(max-width:760px){
+  .cal-dow,.cal-pad,.cal-day.empty-day{display:none}
+  .cal-row{display:block}
+  .cal-day{min-height:0;border-left:0}
+  .cal-n{display:none}
+  .cal-full{display:block;font-weight:800;color:var(--dark);margin-bottom:4px}
+}
+
 @media(max-width:640px){
   .board{grid-auto-columns:minmax(240px,86%)}
   .view-switch .hint{margin-left:0;flex-basis:100%}

@@ -47,6 +47,17 @@ export const CRM_NOTICES = {
   call_needs_contact: ['error', 'Link this call to a contact first.'],
   call_already_linked: ['error', 'This call is already linked to a contact.'],
 
+  // --- Cal.com bookings
+  booking_matched: ['ok', 'Booking attached to the inquiry. The appointment is on the project and its automatic follow-up emails ended. No email was sent.'],
+  booking_dismissed: ['ok', 'Booking dismissed. Nothing was deleted or emailed.'],
+  booking_already_matched: ['error', 'That booking is already matched to an inquiry, so it was not changed.'],
+  booking_settings_saved: ['ok', 'Saved. Follow-up emails will not mention booking until an address is saved and marked as tested.'],
+  booking_settings_live: ['ok', 'Saved. Follow-up emails now include the booking button.'],
+  bad_booking_url: ['error', 'The booking address must be a full https:// address with no login details, query string or fragment.'],
+  booking_url_first: ['error', 'Enter the booking page address before marking it as tested.'],
+  appointment_cancel_in_calcom: ['error', 'This booking is cancelled in Cal.com, so the calendar slot is freed and the caller is told. It will update here by itself.'],
+  appointment_move_in_calcom: ['error', 'This booking is moved in Cal.com, so the calendar stays correct. It will update here by itself.'],
+
   // --- refused
   contact_name: ['error', 'A name is required.'],
   contact_email: ['error', 'That email address does not look valid.'],

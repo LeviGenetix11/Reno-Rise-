@@ -5,6 +5,7 @@ import { html, raw } from './html.js';
 import { formatDate, formatDateTime, torontoDateOf } from './time.js';
 import { STOP_LABELS } from '../../renorise-shared/eligibility.js';
 import { renderFollowup, TEMPLATE_KEYS } from '../../renorise-shared/templates.js';
+import { bookingPreviewUrl } from '../../renorise-shared/bookings-db.js';
 import { VERSIONS, CURRENT_VERSION, TEST_RECIPIENTS, SOURCE_KINDS, maxEmailsPerLead } from '../../renorise-shared/sequence.js';
 import { CONSENT_METHODS } from './seq-db.js';
 
@@ -113,11 +114,12 @@ ${items.length ? html`<div class="tablewrap"><table class="stack"><thead><tr><th
 // ------------------------------------------------------------------ preview
 
 export function previewPage({ settings, name, csrf }) {
-  const biz = { legalName: settings.business_legal_name, mailingAddress: settings.business_mailing_address, unsubscribeUrl: `${settings.unsubscribe_base_url}/u/<per-customer-token>`, preview: true };
+  const biz = { legalName: settings.business_legal_name, mailingAddress: settings.business_mailing_address, unsubscribeUrl: `${settings.unsubscribe_base_url}/u/<per-customer-token>`, preview: true, bookingUrl: bookingPreviewUrl(settings) };
+  const bookingLive = Boolean(biz.bookingUrl) && settings.booking_link_tested === '1';
   const missing = !biz.legalName.trim() || !biz.mailingAddress.trim();
   return html`
 <h1>Email previews</h1>
-<p class="hint">Exactly the copy that will be sent, with the greeting for “${name || '(blank name)'}”. Each email ends with the free-consultation invitation, then the RenoRise Team signature and the required footer. There is no booking link and no promise about response time.</p>
+<p class="hint">Exactly the copy that will be sent, with the greeting for “${name || '(blank name)'}”. Each email ends with the free-consultation invitation, then the RenoRise Team signature and the required footer. ${biz.bookingUrl ? (bookingLive ? 'The “Book Your Free Consultation” link shown is included in real emails (each real email carries a private reference so a booking can be matched to the inquiry). ' : 'A booking link is shown for preview only: real emails leave it out until the address is marked as tested on the Appointments screen. ') : 'There is no booking link yet. '}There is no promise about response time.</p>
 ${missing ? html`<div class="notice error" role="alert">The legal business name and/or mailing address are not recorded yet, so the footer below shows a clearly marked placeholder. Real emails will not send until both are entered in Settings.</div>` : ''}
 <form class="card" method="get" action="/sequence/preview"><div class="row"><div class="field"><label for="pn">Greeting name</label><input id="pn" name="name" value="${name}" maxlength="60" placeholder="Try: Jamie Lee — or leave blank to see the fallback"></div><div><button type="submit">Update</button></div></div></form>
 ${TEMPLATE_KEYS.map((k) => html`<section class="card" aria-labelledby="p-${k}"><h2 id="p-${k}">${TEMPLATE_TITLES[k]}</h2><div class="grid two">
