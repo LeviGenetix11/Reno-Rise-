@@ -346,7 +346,7 @@ for (const [w, label] of [[1440, 'two columns'], [1000, 'one column, video on'],
   const { ctx, page } = await open('/', w);
   await page.addStyleTag({ content: '.hero-video{display:none!important}.hero-has-video{background:#fff!important}' });
   const blocks = await page.$$eval('.hero-copy h1, .hero-copy > p, .hero-copy .btn-outline', (els) => els.map((e) => { const r = e.getBoundingClientRect(); const c = getComputedStyle(e).color.match(/[0-9.]+/g).map(Number); return { name: e.tagName + '.' + e.className, x: r.left, y: r.top + scrollY, w: r.width, h: r.height, rgb: c.slice(0, 3), a: c.length > 3 ? c[3] : 1 }; }));
-  await page.addStyleTag({ content: '.hero-copy *{color:transparent!important;background:transparent!important;border-color:transparent!important;text-shadow:none!important}' });
+  await page.addStyleTag({ content: '.hero-copy *{color:transparent!important;background:transparent!important;border-color:transparent!important;text-shadow:none!important;box-shadow:none!important}' });
   const results = [];
   for (const bk of blocks) {
     const png = await page.screenshot({ clip: { x: bk.x, y: bk.y, width: Math.max(1, bk.w), height: Math.max(1, bk.h) }, fullPage: true });
