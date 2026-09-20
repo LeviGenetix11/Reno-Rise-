@@ -54,8 +54,8 @@ then done by hand too. Tell me and we decide together whether a paid plan is wor
 
 ## 3. Decisions to confirm with you
 
-1. **Your real availability.** I have not set any. Tell me the days and hours you can take calls (I will not infer them from
-   the website's office hours). You set them in Cal.com; see step 4.
+1. **Your real availability (confirmed by you): Monday to Friday, 9:00 to 17:00 Toronto time.** Set it in Cal.com (step 4). It was not
+   taken from the website's office hours, and nothing in the repo stores availability.
 2. **The follow-up sequence has three emails (Day 1, 3, 7), version v2, not four (1, 4, 8, 14).** The link is added to all
    three. If you want the four-email schedule, that is a separate change to the approved copy and timing.
 3. **`/book/` is `noindex` and not in the sitemap**, because it is a thin scheduling page. Say if you want it indexed.
@@ -78,8 +78,9 @@ then done by hand too. Tell me and we decide together whether a paid plan is wor
    - Description: *A short phone call with RenoRise to discuss your renovation, answer initial questions, and talk through
      the next steps. We'll call the number you provide.*
    - *Limits*: **buffer after event 15 minutes**; **minimum notice 4 hours**
-   - *Availability*: schedule time zone **America/Toronto**; the days and hours you give me. Show times in the booker's
-     time zone (the default) so it is clear.
+   - *Availability*: a schedule named e.g. "Consultation calls": **Monday to Friday, 9:00 AM to 5:00 PM**, time zone **America/Toronto**,
+     assigned to this event. Check that the schedule's time zone really says Toronto: an earlier read of the page showed a 6:00 AM sample
+     slot, which suggests a different zone. Show times in the booker's time zone (the default) so it is clear.
    - *Booking questions*: name and email are required. Add **Phone number** (required) if the location field does not
      collect one, and **Brief project description** (required, short text). Keep the internal id of the description as
      `notes` (Cal.com's standard "Additional notes"), which is where the receiver looks.
