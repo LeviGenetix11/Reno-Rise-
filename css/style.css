@@ -1796,3 +1796,5 @@ nav.toc { margin: 8px 0 30px; }
 .back-to-top.visible { opacity: 1; visibility: visible; }
 .back-to-top:hover { background: var(--orange); color: var(--dark); }
 .article-wrap [id] { scroll-margin-top: 110px; } /* anchor jumps land below the sticky header */
+.how-steps.steps-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .how-steps.steps-3 { grid-template-columns: 1fr; } }

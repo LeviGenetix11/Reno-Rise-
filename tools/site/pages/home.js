@@ -89,8 +89,7 @@ const main = `
       steps: [
         ['Tell us about the project', 'Share your goals, your basement and your timeline using the enquiry form below.'],
         ['Reno Rise reviews the information', 'We look at what you have shared to understand the scope and what still needs to be confirmed.'],
-        ['You may be connected with a professional', 'Where there is a suitable fit, you may be introduced to an independent local renovation professional. A match is not guaranteed.'],
-        ['You review the options and decide', 'You choose who, if anyone, to hire. Estimates, contracts, warranties and the work itself come from the professional you select.'],
+        ['We find the right contractor', 'Reno Rise matches your project with the contractor best suited to the work, and they take it from there.'],
       ],
     })}
   </div>

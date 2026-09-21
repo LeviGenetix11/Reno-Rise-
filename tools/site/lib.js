@@ -224,7 +224,7 @@ function howItWorks({ heading = 'How Reno Rise Works', intro = '', steps = null 
   return `<div class="how-works">
     <h2>${heading}</h2>
     ${intro ? `<p class="how-works-intro">${intro}</p>` : ''}
-    <div class="how-steps">
+    <div class="how-steps${(steps || DEFAULT_STEPS).length === 3 ? ' steps-3' : ''}">
 ${(steps || DEFAULT_STEPS).map(([h, p], i) => step(i + 1, h, p)).join('\n')}
     </div>
   </div>`;

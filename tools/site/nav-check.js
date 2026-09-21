@@ -171,7 +171,7 @@ ok(order[order.length - 2] === 'Frequently Asked Questions' && order[order.lengt
 ok((main.match(/<h2>How Reno Rise Works<\/h2>/g) || []).length === 1, 'How Reno Rise Works appears more than once');
 ok(!/class="cta-band"/.test(main + home.slice(home.indexOf('</main>'), home.indexOf('</main>') + 200)), 'a CTA band follows the final form');
 const steps = [...main.matchAll(/<div class="process-step">[\s\S]*?<h3>([\s\S]*?)<\/h3>/g)].map((m) => decode(m[1]));
-ok(JSON.stringify(steps) === JSON.stringify(['Tell us about the project', 'Reno Rise reviews the information', 'You may be connected with a professional', 'You review the options and decide']), `how-it-works steps are ${JSON.stringify(steps)}`);
+ok(JSON.stringify(steps) === JSON.stringify(['Tell us about the project', 'Reno Rise reviews the information', 'We find the right contractor']), `how-it-works steps are ${JSON.stringify(steps)}`);
 ok(!/(guarantee[sd]? (a |an |your )?(match|quote|appointment|permit)|we will (match|connect) you|100%|\d+\+? (homeowners|contractors|projects|reviews)|\bstar\b|★|rated)/i.test(decode(main)), 'homepage contains a guarantee, statistic or rating claim');
 ok(!CLAIM_WORDS.test(decode(main)), `homepage describes professionals as qualified/vetted/licensed/insured/approved: ${(decode(main).match(CLAIM_WORDS) || [])[0]}`);
 ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|inspections?|assessments?)|reno rise (pulls?|applies for|submits?) permits?|code[- ]compliant\b/i.test(decode(main)), 'homepage claims Reno Rise performs construction, inspections, assessments or permit/code work');

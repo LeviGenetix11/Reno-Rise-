@@ -305,7 +305,11 @@ for (const w of [768, 390, 360, 900, 1023]) {
   const order = await page.$$eval('main > section', (ss) => ss.map((s) => (s.querySelector('h1, h2') || {}).textContent?.replace(/\s+/g, ' ').trim()));
   t('homepage sections are in the requested order', ['Basement Renovations & Legal Secondary Suites in Toronto', 'How Reno Rise Works', 'What Would You Like to Do With Your Basement?', 'Finished Basement or Legal Secondary Suite?', 'Cost, Permit & Planning Guides', 'Why Homeowners Use Reno Rise'].every((h, i) => order[i] === h) && order[order.length - 2] === 'Frequently Asked Questions' && order[order.length - 1] === 'Tell Us About Your Project', JSON.stringify(order));
   const steps = await page.$$eval('.how-steps h3', (hs) => hs.map((h) => h.textContent.trim()));
-  t('how it works: four steps as briefed', JSON.stringify(steps) === JSON.stringify(['Tell us about the project', 'Reno Rise reviews the information', 'You may be connected with a professional', 'You review the options and decide']), JSON.stringify(steps));
+  t('how it works: three steps as briefed', JSON.stringify(steps) === JSON.stringify(['Tell us about the project', 'Reno Rise reviews the information', 'We find the right contractor']), JSON.stringify(steps));
+  const cols = await page.$eval('.how-steps', (g) => getComputedStyle(g).gridTemplateColumns.split(' ').length);
+  t('how it works: laid out in three columns on desktop, no empty fourth column', cols === 3, String(cols));
+  const hiw = (await page.locator('#how-it-works').innerText()).replace(/\s+/g, ' ');
+  t('how it works: the hedging wording and the fourth step are gone', !/not guaranteed|suitable fit|review the options|who, if anyone|professional you select/i.test(hiw) && (await page.locator('#how-it-works .process-step').count()) === 3, hiw.slice(0, 200));
   t('form: still mounted on the homepage with all fields and consent', (await page.locator('#assessment-form .assessment-form input[name="consent"]').count()) === 1 && (await page.locator('#assessment-form .assessment-form input[name="email"]').count()) === 1);
   await page.locator('.hero-actions a.btn-primary').click();
   t('hero button scrolls to the form', (await page.evaluate(() => location.hash)) === '#assessment-form');
