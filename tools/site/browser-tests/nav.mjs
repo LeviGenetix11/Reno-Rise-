@@ -37,7 +37,7 @@ const results = [];
 const t = (name, ok, extra = '') => { results.push(ok); if (!PROBE || !ok) console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? '  ' + extra : ''}`); };
 
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL || 'msedge' });
-async function open(path, width, { touch = false, height = 900, reduced = false, init = null, fontDelay = 0, wait = 'load' } = {}) {
+async function open(path, width, { touch = false, height = 900, reduced = false, init = null, fontDelay = 0, wait = 'load', pre = null } = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: false, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const page = await ctx.newPage();
   const errs = [];
@@ -46,6 +46,7 @@ async function open(path, width, { touch = false, height = 900, reduced = false,
   if (init) await page.addInitScript(init);
   page.on('pageerror', (e) => errs.push(String(e)));
   await page.route(/^(?!http:\/\/127\.0\.0\.1).*/, (r) => (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.request().url()) ? r.continue() : r.abort()));
+  if (pre) await pre(page);
   if (fontDelay) await page.route('**/*.woff2', async (r) => { await new Promise((res) => setTimeout(res, fontDelay)); await r.continue(); });
   await page.goto(BASE + path, { waitUntil: wait });
   if (process.env.PROBE_FORCE === '1') await page.addStyleTag({ content: '.main-nav{display:flex!important}.nav-toggle{display:none!important}' });
@@ -551,6 +552,61 @@ const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) =
   t('blog filter (touch): tapping All Guides shows sixteen', (await visibleCards(page)).length === 16);
   t('blog @390px: no horizontal overflow', !(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)));
   await ctx.close();
+}
+
+// ---- consultation booking page (/book/) and the thank-you button
+{
+  const cfg = JSON.parse(readFileSync(join(process.cwd(), 'tools/site/booking-config.json'), 'utf8'));
+  if (cfg.enabled) {
+    const REF = 'Abcdefghij0123456789_-XYZ12';
+    const stub = async (page) => { await page.route('https://app.cal.com/embed/embed.js', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: 'window.__calStub = true;' })); };
+    const calls = (page) => page.evaluate(() => { const ns = document.getElementById('book-embed').getAttribute('data-cal-namespace'); const q = (window.Cal && window.Cal.ns && window.Cal.ns[ns] && window.Cal.ns[ns].q) || []; return { ns, q: q.map((a) => Array.from(a)), root: ((window.Cal && window.Cal.q) || []).map((a) => Array.from(a)) }; });
+    const inline = (c) => (c.q.find((a) => a[0] === 'inline') || [])[1] || {};
+    let ctx, page;
+    ({ ctx, page } = await open('/book/?r=' + REF + '&name=Jane%20Doe&email=jane%40example.com&phone=4165550100', 1440, { pre: stub }));
+    let c = await calls(page);
+    t('book: embeds the configured Cal.com event inline in #book-embed', inline(c).calLink === cfg.calLink && inline(c).elementOrSelector === '#book-embed', JSON.stringify(inline(c)));
+    t('book: only the validated opaque reference goes to Cal.com; no name, email or phone from the address bar', inline(c).config && inline(c).config['metadata[renorise_ref]'] === REF && !/Jane|jane|example\.com|4165550100/.test(JSON.stringify(c)) && Object.keys(inline(c).config).every((k) => ['layout', 'useSlotsViewOnSmallScreen', 'metadata[renorise_ref]'].includes(k)), JSON.stringify(inline(c).config));
+    t('book: Cal.com config does not forward every query parameter', !c.root.concat(c.q).some((a) => a[0] === 'config' && JSON.stringify(a).includes('forwardQueryParams')));
+    await ctx.close();
+    for (const bad of ['?r=<script>alert(1)</script>', '?r=short', '?r=' + 'a'.repeat(80), '']) {
+      ({ ctx, page } = await open('/book/' + bad, 1440, { pre: stub }));
+      c = await calls(page);
+      t('book: ' + (bad || 'no reference') + ' sends no booking reference', !!inline(c).calLink && !('metadata[renorise_ref]' in (inline(c).config || {})), JSON.stringify(inline(c).config));
+      await ctx.close();
+    }
+    for (const w of [1440, 768, 390, 360]) {
+      ({ ctx, page } = await open('/book/', w));
+      await page.waitForTimeout(400);
+      const st = await page.evaluate(() => ({ over: document.documentElement.scrollWidth > document.documentElement.clientWidth, status: document.getElementById('book-status').textContent, hidden: document.getElementById('book-status').hidden, failed: document.getElementById('book-fallback').classList.contains('is-failed') }));
+      t('book @' + w + 'px: no horizontal overflow', !st.over);
+      if (w === 1440 || w === 390) {
+        t('book @' + w + 'px: if Cal.com cannot load, the page says so and highlights the fallback link', !st.hidden && /did not load/.test(st.status) && st.failed, JSON.stringify(st));
+        const fb = await page.evaluate(() => { const a = document.querySelector('#book-fallback a[target=_blank]'); const tel = document.querySelector('#book-fallback a[href^="tel:"]'); return { href: a && a.href, rel: a && a.rel, tel: tel && tel.getAttribute('href') }; });
+        t('book @' + w + 'px: fallback opens the hosted page in a new tab with noopener, and offers the phone number', fb.href === cfg.hostedUrl && /noopener/.test(fb.rel) && fb.tel === 'tel:+12895128112', JSON.stringify(fb));
+        await page.evaluate(axeSource);
+        const v = await page.evaluate(async () => (await axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] })).violations.map((x) => x.id + '(' + x.nodes.length + ') ' + x.nodes[0].target.join(' ')));
+        t('axe: /book/ @' + w + 'px', v.length === 0, v.join(' ; '));
+      }
+      await ctx.close();
+    }
+    ({ ctx, page } = await open('/book/', 1440, { pre: async (p) => { await p.route('https://app.cal.com/embed/embed.js', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: 'window.__calStub = true;' })); } }));
+    t('book: the page title, noindex and single h1', (await page.title()).length >= 30 && (await page.locator('meta[name=robots]').getAttribute('content')) === 'noindex, follow' && (await page.locator('h1').count()) === 1);
+    await ctx.close();
+    // thank-you page button: carries the opaque reference only when there is one
+    ({ ctx, page } = await open('/assessment/thank-you.html', 1440, { init: "sessionStorage.setItem('renoriseAssessmentSubmitted', '1'); sessionStorage.setItem('renoriseBookingRef', 'Abcdefghij0123456789_-XYZ12');" }));
+    t('thank-you: the booking button carries only the opaque reference', (await page.locator('#ty-book-link').getAttribute('href')) === '../book/?r=Abcdefghij0123456789_-XYZ12');
+    await ctx.close();
+    ({ ctx, page } = await open('/assessment/thank-you.html', 1440, { init: "sessionStorage.setItem('renoriseAssessmentSubmitted', '1'); sessionStorage.setItem('renoriseBookingRef', '<b>bad</b>');" }));
+    t('thank-you: a malformed reference is ignored', (await page.locator('#ty-book-link').getAttribute('href')) === '../book/');
+    await ctx.close();
+    ({ ctx, page } = await open('/assessment/thank-you.html', 1440));
+    t('thank-you: someone who did not just submit an enquiry never sees the booking button', (await page.locator('#ty-book').isVisible()) === false && (await page.locator('#ty-success').isHidden()));
+    await ctx.close();
+    ({ ctx, page } = await open('/assessment/thank-you.html', 390, { init: "sessionStorage.setItem('renoriseAssessmentSubmitted', '1');" }));
+    t('thank-you: the booking button is a 44px+ touch target and says booking is optional', (await page.locator('#ty-book-link').boundingBox()).height >= 43.5 && /optional/.test(await page.locator('#ty-book').innerText()));
+    await ctx.close();
+  }
 }
 
 // ---- web font: self-hosted, no Google requests, and a late font does not shift the layout

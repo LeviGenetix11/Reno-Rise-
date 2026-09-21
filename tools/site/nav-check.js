@@ -180,6 +180,39 @@ ok(!/suitable fit|not guaranteed|who, if anyone|if anyone, to hire|professional 
 ok(!CLAIM_WORDS.test(decode(main)), `homepage describes professionals as qualified/vetted/licensed/insured/approved: ${(decode(main).match(CLAIM_WORDS) || [])[0]}`);
 ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|inspections?|assessments?)|reno rise (pulls?|applies for|submits?) permits?|code[- ]compliant\b/i.test(decode(main)), 'homepage claims Reno Rise performs construction, inspections, assessments or permit/code work');
 
+// consultation booking: when enabled, the page, the thank-you button and the privacy line exist and are safe; when not, nothing leaks
+{
+  const cfg = require('./booking').load();
+  const book = pages.get('book/index.html');
+  const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+  ok(!/\/book\//.test(sitemap), 'the booking page should not be in the sitemap');
+  if (cfg.enabled) {
+    ok(!!book, 'booking is enabled but book/index.html was not built');
+    if (book) {
+      const h = book.html;
+      ok(/<meta name="robots" content="noindex, follow">/.test(h), 'book/: must be noindex, follow');
+      ok((h.match(/<h1[\s>]/g) || []).length === 1, 'book/: exactly one h1');
+      ok(new RegExp('id="book-embed"[^>]*data-cal-link="' + cfg.calLink.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"').test(h), 'book/: the embed must point at the configured Cal.com link');
+      ok(/data-cal-origin="https:\/\/app\.cal\.com"/.test(h), 'book/: embed origin');
+      ok(h.includes('href="' + cfg.hostedUrl + '" target="_blank" rel="noopener noreferrer"'), 'book/: needs the hosted-page fallback link (new tab, noopener)');
+      ok(/<noscript>[^]*?href="[^"]*"[^]*?<\/noscript>/.test(h) && h.includes('tel:'), 'book/: needs the no-JavaScript fallback and a phone link');
+      ok(/role="region" aria-label="Choose a call time"/.test(h) && /role="status" aria-live="polite"/.test(h), 'book/: embed region and status must be labelled for assistive technology');
+      ok(/<script src="\.\.\/js\/book\.js"><\/script>/.test(h), 'book/: loads js/book.js');
+      ok(/Privacy Policy/.test(h) && /Cal\.com/.test(h), 'book/: needs the data-handling note that names Cal.com and links to the privacy policy');
+      ok(!/dev-placeholder/.test(h), 'book/: development placeholder left in the page');
+      ok(!/free-renovation-consultation"|"free-renovation-consultation\//.test(h.replace(cfg.calLink, '')), 'book/: an old event link is still present');
+    }
+    ok(/class="btn btn-primary">Book Your Free Consultation/.test(pages.get('assessment/thank-you.html').html), 'thank-you page: needs the optional booking button');
+    ok(/Cal\.com/.test(pages.get('privacy/index.html').html), 'privacy policy: must name Cal.com when booking is on');
+    ok(fs.existsSync(path.join(ROOT, 'js', 'book.js')), 'js/book.js is missing');
+    // the booking button/link must not be pushed on every page: only the thank-you page links to /book/
+    const linkers = [...pages.keys()].filter((r) => r !== 'book/index.html' && /href="(?:\.\.\/|\.\/|\/)?(?:\.\.\/)*book\/(?:\?[^"]*)?"/.test(pages.get(r).html));
+    ok(linkers.every((r) => r === 'assessment/thank-you.html'), 'unexpected pages link to /book/: ' + linkers.join(', '));
+  } else {
+    ok(!book && !pages.get('assessment/thank-you.html').html.includes('ty-book'), 'booking is disabled but a booking page or button is still published');
+  }
+}
+
 // web font: self-hosted and preloaded on every page, no Google Fonts requests, size-matched fallbacks in the stylesheet
 {
   const css = fs.readFileSync(path.join(ROOT, 'css', 'style.css'), 'utf8');

@@ -1,7 +1,15 @@
 # Consultation booking (Cal.com)
 
-Status: built on the `cal-booking` branch. **Nothing is deployed, merged or published.** The public site shows nothing
-about booking until you switch it on (section 5), so no broken link can ship.
+Status (2026-09-20): backend and dashboard are deployed; the public /book/ page, the thank-you button and the privacy line are
+built and tested on the `booking-page-live` branch (`booking-config.json` enabled). **Not published until it is merged and pushed.**
+
+Checked against the live Cal.com event on 2026-09-20 (real embed, browser tz America/Toronto):
+- The embed loads and renders correctly on desktop and phone.
+- **The event offered EVERY day, including Saturday and Sunday, from 8:00 am to about 8:00 pm.** That is not Monday to Friday
+  9 to 5. Fix it in Cal.com before publishing (Availability schedule: Mon-Fri 9:00-17:00, time zone America/Toronto, then assign that
+  schedule to the event under the event's *Availability* tab).
+- The webhook endpoint answers 503 (`CAL_WEBHOOK_SECRET` not set), so bookings will not reach the dashboard until step 6 is done
+  (or you record them by hand, see the fallback in section 2).
 
 A "consultation" here is a **15-minute phone call** with RenoRise. It is not an on-site assessment and not a confirmed
 contractor appointment. The database and dashboard keep it separate from on-site assessments (`leads.consultation_at` vs
