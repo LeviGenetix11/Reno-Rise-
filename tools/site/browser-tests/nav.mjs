@@ -373,6 +373,58 @@ for (const [w, label] of [[1440, 'two columns'], [1000, 'one column, video on'],
   await ctx.close();
 }
 
+// -------------------------------------------------------------------- landing pages: hero background video
+const LANDING = ['basement-renovation', 'basement-waterproofing', 'wet-basement-repair', 'interior-waterproofing', 'exterior-waterproofing', 'underpinning', 'egress-windows', 'sump-pump', 'backwater-valve', 'foundation-crack-repair', 'weeping-tile'].map((x) => '/services/' + x + '/');
+{
+  const { ctx, page } = await open(LANDING[0], 1440);
+  await page.waitForFunction(() => { const v = document.querySelector('[data-hero-video]'); return v && !v.paused && v.currentTime > 0; }, null, { timeout: 15000 }).catch(() => {});
+  t('landing page @1440px: the hero video plays on its own', await page.$eval('[data-hero-video]', (v) => !v.paused && v.currentTime > 0));
+  t('landing page: no grid lines, lighter overlay over the video, no video button', (await page.locator('.hero-video-toggle').count()) === 0 && /rgba\(15, 17, 22, 0\.64\)/.test(await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage)));
+  await ctx.close();
+}
+for (const path of LANDING) {
+  for (const w of [1440, 390]) {
+    const { ctx, page, reqs } = await open(path, w);
+    await page.waitForTimeout(w === 390 ? 700 : 200);
+    const over = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+    const phone = w === 390 ? await page.evaluate(() => { const v = document.querySelector('[data-hero-video]'); return { hidden: getComputedStyle(v).display === 'none', src: v.querySelectorAll('source').length, bg: getComputedStyle(document.querySelector('.hero-has-video')).backgroundImage }; }) : null;
+    t(path + ' @' + w + 'px: no horizontal overflow' + (w === 390 ? '; phone shows the poster and never downloads the video' : ''), !over && (!phone || (phone.hidden && phone.src === 0 && /hero-poster\.jpg/.test(phone.bg) && !reqs.some((u) => /hero-interior\.mp4/.test(u)))), JSON.stringify(phone));
+    await ctx.close();
+  }
+}
+{
+  const { ctx, page, reqs } = await open(LANDING[3], 1440, { reduced: true });
+  await page.waitForTimeout(800);
+  t('landing page (reduced motion): the video does not autoplay or download', await page.$eval('[data-hero-video]', (v) => v.paused && v.querySelectorAll('source').length === 0) && !reqs.some((u) => /hero-interior\.mp4/.test(u)));
+  await ctx.close();
+}
+for (const [path, w] of [[LANDING[0], 1440], [LANDING[4], 1000], [LANDING[7], 390]]) {
+  const { ctx, page } = await open(path, w);
+  await page.addStyleTag({ content: '.hero-video{display:none!important}.hero-has-video{background:#fff!important}' });
+  const blocks = await page.$$eval('.hero-copy h1, .hero-copy > p, .hero-copy .btn-outline, .hero-copy .breadcrumb a, .hero-copy .breadcrumb span[aria-current]', (els) => els.map((e) => { const r = e.getBoundingClientRect(); const c = getComputedStyle(e).color.match(/[0-9.]+/g).map(Number); return { name: e.tagName + '.' + (e.className || '') , x: r.left, y: r.top + scrollY, w: r.width, h: r.height, rgb: c.slice(0, 3), a: c.length > 3 ? c[3] : 1, op: Number(getComputedStyle(e).opacity) }; }));
+  await page.addStyleTag({ content: '.hero-copy *{color:transparent!important;background:transparent!important;border-color:transparent!important;text-shadow:none!important;box-shadow:none!important}' });
+  const results = [];
+  for (const bk of blocks) {
+    const png = await page.screenshot({ clip: { x: bk.x, y: bk.y, width: Math.max(1, bk.w), height: Math.max(1, bk.h) }, fullPage: true });
+    const lum = await page.evaluate(async (b64) => {
+      const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
+      const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+      const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data; let max = 0;
+      for (let i = 0; i < d.length; i += 4) { max = Math.max(max, 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]); }
+      return max;
+    }, png.toString('base64'));
+    const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    const a = bk.a * bk.op;
+    const text = bk.rgb.map((ch) => a * ch + (1 - a) * lum);
+    const Lt = 0.2126 * lin(text[0]) + 0.7152 * lin(text[1]) + 0.0722 * lin(text[2]);
+    results.push({ name: bk.name, ratio: (Lt + 0.05) / (Lb(lum) + 0.05), need: bk.name.startsWith('H1') ? 3 : 4.5 });
+    function Lb(v) { return lin(v); }
+  }
+  t('landing page ' + path + ' @' + w + 'px: hero text (heading, copy, buttons, breadcrumb) stays readable over even a white video frame', results.length >= 4 && results.every((r) => r.ratio >= r.need), results.map((r) => r.name.slice(0, 10) + ' ' + r.ratio.toFixed(1) + '(' + r.need + ')').join(', '));
+  await ctx.close();
+}
+
 {
   // Diagram legibility on phones.
   const { ctx, page } = await open('/', 360);

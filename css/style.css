@@ -1798,3 +1798,4 @@ nav.toc { margin: 8px 0 30px; }
 .article-wrap [id] { scroll-margin-top: 110px; } /* anchor jumps land below the sticky header */
 .how-steps.steps-3 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 760px) { .how-steps.steps-3 { grid-template-columns: 1fr; } }
+.hero.hero-has-video .hero-copy .hero-note, .hero.hero-has-video .hero-copy .breadcrumb, .hero.hero-has-video .hero-copy .breadcrumb a, .hero.hero-has-video .hero-copy .breadcrumb span { color: #fff; opacity: 1; }

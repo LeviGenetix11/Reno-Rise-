@@ -70,8 +70,8 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
       <span class="icon-circle" style="width:64px;height:64px;margin:0 auto 20px;">
         <svg viewBox="0 0 24 24" fill="none" style="width:28px;height:28px" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
-      <p style="color:var(--muted); margin:14px 0 8px;">Reno Rise will review the details you shared. If there is a suitable fit, you may be contacted by phone or email about being introduced to an independent professional.</p>
-      <p style="color:var(--muted); margin:0 0 8px;">This is an enquiry, not a booking. We cannot promise an appointment, a quote, a match with a professional, or that any work is permitted.</p>
+      <p style="color:var(--muted); margin:14px 0 8px;">Reno Rise will review the details you shared and match your project with the contractor best suited to the work. You may be contacted by phone or email about next steps.</p>
+      <p style="color:var(--muted); margin:0 0 8px;">This is an enquiry, not a booking. Reno Rise cannot promise an appointment, a quote or that any work is permitted.</p>
       ${bookBlock}<p style="color:var(--muted); font-size:14px; margin:0 0 26px;">In the meantime, the guides below cover what to confirm before you hire.</p>
       <div class="chip-row" style="justify-content:center; margin-bottom:26px;">
         <a class="city-chip" href="${h('services/legal-basement-apartment-toronto/')}">Legal secondary suite guide</a>
@@ -123,7 +123,7 @@ ${booking.enabled ? `      // The booking link carries only an opaque reference 
   <div class="container contact-grid">
     <div class="lead-form-wrap">
       <h2 style="font-size:20px; margin-bottom:6px;">Request a Basement Assessment</h2>
-      <p class="sub">Tell us about your basement project. Reno Rise reviews the details and, where there is a suitable fit, may connect you with an independent professional.</p>
+      <p class="sub">Tell us about your basement project. Reno Rise reviews the details and matches your project with the contractor best suited to the work.</p>
       ${form(depth, { source: 'contact', thank: 'assessment/thank-you.html' })}
     </div>
     <div>
@@ -169,20 +169,20 @@ ${booking.enabled ? `      // The booking link carries only an opaque reference 
     <div class="two-col" style="margin:28px 0;">
       <div class="panel accent">
         <h3>What Reno Rise does</h3>
-        ${U.checkList(['Publishes plain-language basement and secondary-suite planning guides.', 'Collects your project details through the assessment form.', 'Reviews requests and, where there is a suitable fit, connects homeowners with independent professionals.'])}
+        ${U.checkList(['Publishes plain-language basement and secondary-suite planning guides.', 'Collects your project details through the assessment form.', 'Reviews requests and matches each project with the contractor best suited to the work.'])}
       </div>
       <div class="panel">
         <h3>What Reno Rise does not do</h3>
-        ${U.checkList(['Perform renovation or construction work.', 'Issue permits, approvals or legal, engineering or code advice.', 'Provide estimates, contracts or warranties. The professional you choose does.'])}
+        ${U.checkList(['Perform renovation or construction work.', 'Issue permits, approvals or legal, engineering or code advice.', 'Provide estimates, contracts or warranties. The contractor doing the work does.'])}
       </div>
     </div>
     <h2>Our Approach</h2>
     <h3>Clarity Over Jargon</h3>
     <p>Guides explain what a project involves and what to confirm, in plain language, with links to the official sources.</p>
     <h3>Honest About Limits</h3>
-    <p>We do not tell you whether your basement is legal or eligible, and we do not promise a match, a price or an outcome. Those depend on your property and the professionals involved.</p>
-    <h3>You Stay in Control</h3>
-    <p>You choose who to hire. Before you do, confirm credentials, insurance, references and who is responsible for permits.</p>
+    <p>We do not tell you whether your basement is legal or eligible, and we do not promise a price or an outcome. Those depend on your property and the work involved.</p>
+    <h3>Clear Responsibilities</h3>
+    <p>Reno Rise chooses the contractor best suited to your project. Before work starts, confirm credentials, insurance, references and who is responsible for permits.</p>
     <h2>Service Area</h2>
     <p>Reno Rise is focused on Toronto homes. Enquiries from elsewhere in the Greater Toronto Area are welcome; see <a href="${h('locations/')}" style="text-decoration:underline;color:var(--orange-a11y)">areas served</a>.</p>
     ${U.internalLinks(depth, [['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Basement Renovations', 'services/basement-renovation/'], ['Planning Centre', 'blog/'], ['Contact', 'contact.html']])}

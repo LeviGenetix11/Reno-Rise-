@@ -44,11 +44,11 @@ const FAQ = [
   ['Is waterproof vinyl plank really waterproof?', `The label usually describes the plank itself. How the whole floor behaves depends on the seams and edges, the underlayment, moisture coming through the slab and the manufacturer's warranty terms for below-grade use. A waterproof floor covering does not stop water entering a basement, and it does not replace fixing the source.`],
   ['Do I need a building permit to replace basement flooring in Toronto?', `Toronto Building says finishing work that changes nothing structural, adds no new plumbing and creates no additional dwelling unit may not need a permit. Work around the floor might, for example structural changes, new plumbing or heating work, or creating a second unit. Check your exact scope with ${X(SRC.permit, 'Toronto Building')} and the professional doing the work.`],
   ['How much does basement flooring cost in Toronto?', `It depends on the material, the size of the area, how much slab preparation and levelling is needed, whether a subfloor system is used, any moisture work, removal of old flooring and trim. Reno Rise does not publish price ranges it cannot verify. Ask for itemized quotes that show preparation separately from materials and labour.`],
-  ['Does Reno Rise install basement flooring?', `No. Reno Rise is an independent project-enquiry and contractor-matching service. Installation, estimates, contracts and warranties are provided by the independent professional you choose. Where there is a suitable fit, Reno Rise may introduce you to one, but a match, an estimate or an appointment is not guaranteed.`],
+  ['Does Reno Rise install basement flooring?', `No. Reno Rise is an independent project-enquiry and contractor-matching service. Installation, estimates, contracts and warranties are provided by the independent contractor Reno Rise matches you with. Reno Rise reviews your project and matches it with the contractor best suited to the work.`],
 ];
 
 const body = `
-    ${U.notice(`<p><strong>General planning information.</strong> Reno Rise does not install flooring. It is an independent project-enquiry and contractor-matching service, so the choice of material, the installation and the warranty belong to the independent professional you hire. Nothing here confirms that a product suits your basement; the manufacturer's instructions and a professional's assessment do that.</p>`)}
+    ${U.notice(`<p><strong>General planning information.</strong> Reno Rise does not install flooring. It is an independent project-enquiry and contractor-matching service, so the choice of material, the installation and the warranty belong to the independent contractor doing the work. Nothing here confirms that a product suits your basement; the manufacturer's instructions and a professional's assessment do that.</p>`)}
 
     <p>Flooring a basement is a different job from flooring the main floor. The floor is usually a concrete slab in contact with the ground, and that changes what will last, what feels comfortable and what has to happen before a single plank or tile goes down. Get the order right and the floor tends to look after itself. Get it wrong and the prettiest material in the showroom can turn into a repair.</p>
     <p>This page compares the main options for Toronto basements, explains what to check first and lists questions worth asking. It is written for homeowners planning ${FINISH}, a wider ${RENO}, or a space that may later become a ${SUITE}.</p>
@@ -221,7 +221,7 @@ guidePage({
   faq: FAQ,
   formType: 'Basement flooring',
   formTitle: 'Tell Us About Your Basement Flooring Project',
-  formText: 'Tell Reno Rise about your basement and what you are planning for the floor. Reno Rise reviews the details and, where there is a suitable fit, may connect you with an independent professional. This does not confirm an appointment, a quote, product suitability or a match.',
+  formText: 'Tell Reno Rise about your basement and what you are planning for the floor. Reno Rise reviews the details and matches your project with the contractor best suited to the work. This does not confirm an appointment, a quote or product suitability.',
   updated: 'Last reviewed September 2026. General planning information, not engineering advice; confirm requirements for your property with Toronto Building and the professionals responsible for your project.',
   asideLinks: [
     ['Basement renovation planning', 'services/basement-renovation/'],

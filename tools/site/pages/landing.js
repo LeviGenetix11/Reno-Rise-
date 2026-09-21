@@ -42,6 +42,7 @@ function build(d) {
     primary: ['Request a Basement Assessment', '#assessment-form'],
     secondary: d.secondary ? [d.secondary[0], h(d.secondary[1])] : ['Explore Legal Suite Requirements', h('services/legal-basement-apartment-toronto/')],
     visual,
+    video: true,
   });
 
   const sections = (d.sections || []).map((s) => `<section class="section-tight${s.cream ? ' section-cream' : ''}">
@@ -132,7 +133,7 @@ ${U.faqItems(d.faq)}
     <div class="section-head left-stack" style="margin-bottom:28px;">
       <span class="eyebrow">Basement assessment</span>
       <h2>Request a Basement Assessment</h2>
-      <p class="lede">${d.formLede || 'Tell us about your basement and your goals. Reno Rise reviews the details and, where there is a suitable fit, may connect you with an independent professional.'}</p>
+      <p class="lede">${d.formLede || 'Tell us about your basement and your goals. Reno Rise reviews the details and matches your project with the contractor best suited to the work.'}</p>
     </div>
     <div class="lead-form-wrap">
       <div data-assessment-form-mount data-source="assessment" data-project-type="${d.formType}" data-thank-you-href="${h('assessment/thank-you.html')}"></div>

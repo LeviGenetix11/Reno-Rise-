@@ -46,7 +46,7 @@ const FAQ = [
   ['What is the difference between a finished basement and a legal secondary suite?', 'A finished basement is extra living space for the household. A secondary suite is a separate, self-contained home with its own kitchen and bathroom that must satisfy zoning, Building Code and Fire Code requirements for a second unit. Finishing a basement does not by itself make it a legal suite.'],
   ['What ceiling height does a basement apartment need?', 'Ontario’s second-unit guide describes a minimum basement ceiling height of about 1.95 metres (roughly 6 ft 5 in). Requirements can depend on the specific space and on current rules, so have a designer confirm the height that applies to your project.'],
   ['Does a basement apartment need a separate entrance?', 'Not always as a matter of principle, but exits matter a great deal. Ontario’s guide describes a separate exit as preferred and explains that shared exits may be possible with added fire separation. Zoning can also affect entrances. Ask a designer and Toronto Building what applies to your house.'],
-  ['Can Reno Rise tell me whether my basement is eligible?', 'No. Reno Rise is an independent project-enquiry and contractor-matching service. It does not determine legal eligibility, issue approvals or perform the work. A qualified designer, the contractor you choose, and Toronto Building are the right sources for eligibility.'],
+  ['Can Reno Rise tell me whether my basement is eligible?', 'No. Reno Rise is an independent project-enquiry and contractor-matching service. It does not determine legal eligibility, issue approvals or perform the work. A qualified designer, the contractor doing the work, and Toronto Building are the right sources for eligibility.'],
   ['How much does a legal basement apartment cost in Toronto?', 'It depends on scope: ceiling height work, waterproofing, layout, plumbing, electrical, fire separation, windows, entrances, finishes, drawings and permit fees can all move the total. Get itemized quotes from more than one professional, and treat any single number quoted without a site visit with caution.'],
   ['How long does the process take?', 'Timelines depend on design, permit review, structural or waterproofing work and the contractor’s schedule. Ontario’s guide refers to a 10-business-day decision timeframe for complete house permit applications, but real project timelines are usually much longer once design and construction are included.'],
 ];
@@ -195,7 +195,7 @@ ${TOC.map(([id, label], i) => `        <li><a href="#${id}"><span class="toc-num
 
     <section class="assess-band guide-form-wrap" id="assessment-form" aria-labelledby="assess-title">
       <h2 id="assess-title">Request a Basement Assessment</h2>
-      <p>Share a few details about your basement and your plans. Reno Rise reviews what you send and, where there is a suitable fit, may connect you with an independent professional. This does not confirm eligibility, an appointment, a quote or a match.</p>
+      <p>Share a few details about your basement and your plans. Reno Rise reviews what you send and matches your project with the contractor best suited to the work. This does not confirm eligibility, an appointment, a quote or an approval.</p>
       <div data-assessment-form-mount data-source="assessment" data-project-type="Legal secondary suite / basement apartment" data-thank-you-href="${h('assessment/thank-you.html')}"></div>
     </section>
 
@@ -277,7 +277,7 @@ const html = PG.renderPage({
   script: `<script src="${L.up(depth)}js/assessment-form.js"></script>
 `,
   main,
-  ctaOpts: { heading: 'Considering a Legal Secondary Suite?', text: 'Share your basement details. Reno Rise reviews your project and, where there is a suitable fit, may connect you with an independent professional.' },
+  ctaOpts: { heading: 'Considering a Legal Secondary Suite?', text: 'Share your basement details. Reno Rise reviews your project and matches your project with the contractor best suited to the work.' },
 });
 
 U.write(path + 'index.html', html);

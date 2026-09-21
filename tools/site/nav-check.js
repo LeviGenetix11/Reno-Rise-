@@ -177,6 +177,22 @@ ok(!/suitable fit|not guaranteed|who, if anyone|if anyone, to hire|professional 
 ok(!CLAIM_WORDS.test(decode(main)), `homepage describes professionals as qualified/vetted/licensed/insured/approved: ${(decode(main).match(CLAIM_WORDS) || [])[0]}`);
 ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|inspections?|assessments?)|reno rise (pulls?|applies for|submits?) permits?|code[- ]compliant\b/i.test(decode(main)), 'homepage claims Reno Rise performs construction, inspections, assessments or permit/code work');
 
+// hero video: homepage + the keyword landing pages only
+{
+  const { LANDINGS } = require('./pages/landing-data');
+  const want = new Set(['index.html', ...LANDINGS.map((l) => `services/${l.slug}/index.html`)]);
+  const have = [...pages.keys()].filter((rel) => /data-hero-video/.test(pages.get(rel).html));
+  ok(LANDINGS.length === 11, `expected 11 landing pages, found ${LANDINGS.length}`);
+  ok(have.length === want.size && have.every((r) => want.has(r)), `hero video should be on exactly the homepage and the landing pages; found on ${have.join(', ')}`);
+  for (const rel of want) {
+    const h = pages.get(rel).html;
+    const v = (h.match(/<video class="hero-video"[^>]*>/) || [''])[0];
+    ok(/ muted /.test(v) && / loop /.test(v) && /aria-hidden="true"/.test(v) && /preload="none"/.test(v) && /data-src="[^"]*videos\/hero-interior\.mp4"/.test(v) && /poster="[^"]*videos\/hero-poster\.jpg"/.test(v), `${rel}: hero video markup`);
+    ok(/<section class="hero hero-basement hero-has-video">/.test(h), `${rel}: hero needs the video class`);
+    ok(!/suitable fit|cannot guarantee a match|you choose who to hire|professional you choose/i.test(decode(between(h, '<main', '</main>'))), `${rel}: still has wording that says the homeowner chooses or that a match is uncertain`);
+  }
+}
+
 // structured data: preserved types, no unsupported schema
 ok(['Organization', 'WebSite', 'WebPage'].every((t) => types.includes(t)), `homepage structured data lost a type: ${types}`);
 ok(!/GeneralContractor|AggregateRating|"Review"|LocalBusiness/.test(home), 'unsupported structured data on the homepage');

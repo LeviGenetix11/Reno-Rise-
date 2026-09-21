@@ -153,7 +153,7 @@ const html = PG.renderPage({
   hero,
   main: `<section class="section-tight" style="padding-bottom:0;">
   <div class="container">
-    ${U.notice('<p><strong>How Reno Rise works.</strong> Reno Rise is an independent project-enquiry and contractor-matching service. Homeowners submit their project details, Reno Rise reviews them, and where there is a suitable fit the homeowner may be introduced to an independent professional. Estimates, contracts, credentials, warranties and construction are provided by that professional.</p>')}
+    ${U.notice('<p><strong>How Reno Rise works.</strong> Reno Rise is an independent project-enquiry and contractor-matching service. Homeowners submit their project details, Reno Rise reviews them and matches the project with the independent contractor best suited to the work. Estimates, contracts, warranties and construction are provided by that contractor.</p>')}
   </div>
 </section>
 ${primary}

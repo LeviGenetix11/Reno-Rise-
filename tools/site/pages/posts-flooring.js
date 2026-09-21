@@ -90,7 +90,7 @@ const FLOORING_POSTS = [
     <p>Picture a household that picks the floor first: a warm-toned plank they saw online, then a slab test that comes back high. The plank was fine. The order was the problem. The reverse order costs a phone call, and it keeps the choice in your hands.</p>
 
     <h2>Where flooring fits in a basement project</h2>
-    <p>Flooring usually comes near the end, after walls, wiring and plumbing. If you are planning the whole space, read ${RENO} and ${FINISH}. For the flooring-specific version of this guide, the ${FLOORING} covers options, subfloor considerations and questions to ask a professional. Reno Rise can review your details and, where there is a suitable fit, may connect you with an independent professional.</p>
+    <p>Flooring usually comes near the end, after walls, wiring and plumbing. If you are planning the whole space, read ${RENO} and ${FINISH}. For the flooring-specific version of this guide, the ${FLOORING} covers options, subfloor considerations and questions to ask a professional. Reno Rise can review your details and match your project with the contractor best suited to the work.</p>
 `,
     faq: [
       ['Is vinyl plank a good choice for a basement?', 'It is a common choice because the plank itself does not absorb water like wood. It still depends on a flat, dry-enough slab, well-sealed edges and the manufacturer&rsquo;s below-grade terms, and it does not stop water entering the basement.'],
@@ -221,7 +221,7 @@ const FLOORING_POSTS = [
       'Would an underlayment or insulated subfloor improve comfort, and how much height does it use?',
       'How easy is it to repair or replace a damaged area?',
     ])}
-    <p>The ${A('blog/basement-subfloor-finished-basement.html', 'guide to basement subfloors')} covers the height and comfort trade-offs. If you are planning the whole room, see ${FINISH}. Reno Rise can review your project details and, where there is a suitable fit, may connect you with an independent professional.</p>
+    <p>The ${A('blog/basement-subfloor-finished-basement.html', 'guide to basement subfloors')} covers the height and comfort trade-offs. If you are planning the whole room, see ${FINISH}. Reno Rise can review your project details and match your project with the contractor best suited to the work.</p>
 `,
     faq: [
       ['Which is warmer in a basement, vinyl plank or carpet?', 'Carpet feels warmer underfoot. Vinyl plank over an insulated subfloor or a suitable underlayment can narrow the gap, at the cost of some ceiling height.'],
@@ -276,7 +276,7 @@ const FLOORING_POSTS = [
       'How will humidity be kept in range, and what would void the warranty?',
       'What is the fallback if the moisture test fails?',
     ])}
-    <p>If you are planning a wider project, ${FINISH} and ${RENO} show where flooring fits, and Reno Rise may connect you with an independent professional where there is a suitable fit.</p>
+    <p>If you are planning a wider project, ${FINISH} and ${RENO} show where flooring fits, and Reno Rise can match your project with the contractor best suited to the work.</p>
 `,
     faq: [
       ['Can you install solid hardwood in a basement?', 'It is generally not recommended. The National Wood Flooring Association says solid wood floors should not be installed below grade unless the manufacturer recommends it, and most manufacturers do not.'],

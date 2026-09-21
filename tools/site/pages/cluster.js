@@ -152,7 +152,7 @@ const pages = [
       'Common causes include downspouts that discharge next to the foundation, soil sloping toward the house, cracks in the wall or floor, failed or clogged weeping tile, high groundwater and window wells that fill with water.',
     ],
     involves: ['Documenting where and when water appears (after rain, snowmelt, or all the time).', 'Checking eavestroughs, downspouts and grading.', 'Inspecting walls, floor-wall joints, penetrations and window wells.', 'Choosing the least invasive fix that addresses the cause: drainage, crack repair, sump system or exterior work.', 'Drying and, if needed, addressing mould before finishing.'],
-    permit: 'Toronto Building notes that installing a sump pump does not require a permit. Other repairs depend on the scope. Ask the professional you choose.',
+    permit: 'Toronto Building notes that installing a sump pump does not require a permit. Other repairs depend on the scope. Ask the contractor doing the work.',
     ask: ['What do you believe is causing the water and how did you confirm it?', 'Is there a lower-cost fix I should try first, such as downspout or grading work?', 'What is warranted, and what would void it?', 'How will you test that the repair worked?'],
     notFit: `If you are planning a renovation, resolve moisture first: read <a href="${h('blog/basement-waterproofing-before-renovation.html')}">Basement Waterproofing Before You Renovate</a>.`,
     faq: [['Why does my basement leak after heavy rain?', 'Common reasons are downspouts and grading that direct water toward the foundation, blocked weeping tile or wall cracks. A professional can help identify which applies.']],

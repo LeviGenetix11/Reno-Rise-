@@ -48,7 +48,7 @@ ${li}
 
 const formBand = (depth, { type, title = 'Request a Basement Assessment', text }) => `<section class="assess-band guide-form-wrap" id="assessment-form" aria-labelledby="assess-title">
       <h2 id="assess-title">${title}</h2>
-      <p>${text || 'Share a few details about your basement and your plans. Reno Rise reviews what you send and, where there is a suitable fit, may connect you with an independent professional. This does not confirm an appointment, a quote, an approval or a match.'}</p>
+      <p>${text || 'Share a few details about your basement and your plans. Reno Rise reviews what you send and matches your project with the contractor best suited to the work. This does not confirm an appointment, a quote or an approval.'}</p>
       <div data-assessment-form-mount data-source="assessment" data-project-type="${type}" data-thank-you-href="${L.href(depth, 'assessment/thank-you.html')}"></div>
     </section>`;
 

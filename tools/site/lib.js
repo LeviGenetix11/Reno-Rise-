@@ -289,12 +289,12 @@ function photoCard({ file, alt, credit }) {
 }
 
 /** Homepage-style split hero for keyword landing pages. `visual` is the right-hand HTML (diagram or photo card). */
-function splitHero(depth, { eyebrow, h1, sub, primary, secondary, note, visual, crumbs = [] }) {
+function splitHero(depth, { eyebrow, h1, sub, primary, secondary, note, visual, crumbs = [], video = false }) {
   const trail = crumbs.map(([label, target], i) => (i === crumbs.length - 1 ? `<span aria-current="page">${label}</span>` : `<a href="${href(depth, target)}">${label}</a>`)).join(` ${ICON.crumb} `);
   const v = visual.split('@UP@').join(up(depth));
   return `<!-- ========== HERO ========== -->
-<section class="hero hero-basement">
-  <div class="container hero-split">
+<section class="hero hero-basement${video ? ' hero-has-video' : ''}">
+${video ? `  <video class="hero-video" data-hero-video data-src="${up(depth)}videos/hero-interior.mp4" poster="${up(depth)}videos/hero-poster.jpg" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>\n` : ''}  <div class="container hero-split">
     <div class="hero-copy">
       ${crumbs.length ? `<div class="breadcrumb" aria-label="Breadcrumb">${trail}</div>` : ''}
       <span class="eyebrow on-dark">${eyebrow}</span>
@@ -304,7 +304,7 @@ function splitHero(depth, { eyebrow, h1, sub, primary, secondary, note, visual, 
         <a href="${primary[1]}" class="btn btn-primary">${primary[0]} ${ICON.arrow}</a>
         ${secondary ? `<a href="${secondary[1]}" class="btn btn-outline">${secondary[0]}</a>` : ''}
       </div>
-      <p class="hero-note">${note || 'Reno Rise is an independent enquiry and matching service, not a contractor. You choose who to hire.'}</p>
+      <p class="hero-note">${note || 'Reno Rise is an independent enquiry and matching service, not a contractor.'}</p>
     </div>
     ${v}
   </div>
