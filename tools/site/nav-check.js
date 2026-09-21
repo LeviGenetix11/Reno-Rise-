@@ -173,6 +173,7 @@ ok(!/class="cta-band"/.test(main + home.slice(home.indexOf('</main>'), home.inde
 const steps = [...main.matchAll(/<div class="process-step">[\s\S]*?<h3>([\s\S]*?)<\/h3>/g)].map((m) => decode(m[1]));
 ok(JSON.stringify(steps) === JSON.stringify(['Tell us about the project', 'Reno Rise reviews the information', 'We find the right contractor']), `how-it-works steps are ${JSON.stringify(steps)}`);
 ok(!/(guarantee[sd]? (a |an |your )?(match|quote|appointment|permit)|we will (match|connect) you|100%|\d+\+? (homeowners|contractors|projects|reviews)|\bstar\b|★|rated)/i.test(decode(main)), 'homepage contains a guarantee, statistic or rating claim');
+ok(!/suitable fit|not guaranteed|who, if anyone|if anyone, to hire|professional you (?:choose|select)|keeps the decision with you|you review the options/i.test(decode(main)), 'homepage still contains wording that contradicts "Reno Rise chooses the contractor"');
 ok(!CLAIM_WORDS.test(decode(main)), `homepage describes professionals as qualified/vetted/licensed/insured/approved: ${(decode(main).match(CLAIM_WORDS) || [])[0]}`);
 ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|inspections?|assessments?)|reno rise (pulls?|applies for|submits?) permits?|code[- ]compliant\b/i.test(decode(main)), 'homepage claims Reno Rise performs construction, inspections, assessments or permit/code work');
 

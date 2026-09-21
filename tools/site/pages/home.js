@@ -62,17 +62,17 @@ const hero = `<!-- ========== HERO ========== -->
 // ---------------------------------------------------------------- 6. why homeowners use Reno Rise (supportable benefits only)
 const WHY = [
   { icon: 'book', title: 'Plan before you commit', text: 'Guides on permits, costs, underpinning and legal secondary suites explain what a project involves before you speak to anyone.' },
-  { icon: 'send', title: 'Describe your project once', text: 'Share your goals, basement and timeline in one enquiry. Where there is a suitable fit, Reno Rise may introduce you to an independent professional.' },
-  { icon: 'choice', title: 'You stay in charge', text: 'You review the options and decide who, if anyone, to hire. Reno Rise does not choose for you or sign anything on your behalf.' },
-  { icon: 'scale', title: 'A clear line of responsibility', text: 'Reno Rise is not a contractor. Estimates, contracts, warranties and permit responsibilities belong to the professional you choose, so confirm them before you sign.' },
+  { icon: 'send', title: 'Describe your project once', text: 'Share your goals, basement and timeline in one enquiry. Reno Rise matches your project with the contractor best suited to the work.' },
+  { icon: 'choice', title: 'We do the choosing', text: 'Reno Rise reviews your project and selects the contractor best suited to it, so you do not have to search on your own.' },
+  { icon: 'scale', title: 'A clear line of responsibility', text: 'Reno Rise is not a contractor. Estimates, contracts, warranties and permit responsibilities belong to the contractor doing the work, so confirm them before you sign.' },
   { icon: 'pin', title: 'Focused on Toronto basements', text: 'The guides and requirements are written for Toronto homes and basement projects, and enquiries from across the Greater Toronto Area are welcome.' },
   { icon: 'info', title: 'Honest about limits', text: 'Reno Rise cannot say whether a specific basement is legal or eligible for a permit. It points you to Toronto Building and the professionals responsible for the work.' },
 ];
 
 // ---------------------------------------------------------------- 7. FAQ
 const FAQ = [
-  ['Is Reno Rise a contractor?', 'No. Reno Rise is an independent project-enquiry and contractor-matching service. It does not perform construction, inspections or permit applications. Estimates, contracts, warranties and the work itself come from the independent professional you choose.'],
-  ['Will I definitely be matched with a professional?', 'No. Reno Rise reviews the information you send and, where there is a suitable fit, you may be connected with an independent professional. A match, an estimate or an appointment is not guaranteed.'],
+  ['Is Reno Rise a contractor?', 'No. Reno Rise is an independent project-enquiry and contractor-matching service. It does not perform construction, inspections or permit applications. Estimates, contracts, warranties and the work itself come from the independent contractor Reno Rise matches you with.'],
+  ['How does Reno Rise choose the contractor?', 'Reno Rise reviews the details you send about your project, then matches it with the contractor best suited to the work. That contractor provides the estimate, the contract and the warranty for the job. Reno Rise itself does not perform construction, inspections or permit applications.'],
   ['What is the difference between a finished basement and a legal secondary suite?', 'A finished basement is extra living space for your own household. A legal secondary suite is a separate, self-contained home that must meet zoning, Building Code and Fire Code requirements and is created with a building permit. The <a href="' + h('blog/finished-basement-vs-legal-secondary-suite.html') + '">comparison guide</a> explains the differences.'],
   ['Do I need a permit for basement work in Toronto?', 'It depends on the work. Structural, plumbing, heating or layout changes usually involve a permit, while some cosmetic work does not. Confirm with Toronto Building and the professional doing the work. The <a href="' + h('blog/basement-renovation-permits-toronto.html') + '">permit guide</a> covers the basics.'],
   ['Can Reno Rise tell me whether my basement can be a legal suite?', 'No. Whether a particular basement qualifies depends on the property, zoning and current rules. Reno Rise can help you understand what is usually checked, but the decision rests with Toronto Building and the professionals responsible for your project.'],
@@ -83,15 +83,7 @@ const main = `
 <!-- ========== 2. HOW RENO RISE WORKS ========== -->
 <section class="section-tight section-cream" id="how-it-works">
   <div class="container">
-    ${L.howItWorks({
-      heading: 'How Reno Rise Works',
-      intro: L.POSITIONING,
-      steps: [
-        ['Tell us about the project', 'Share your goals, your basement and your timeline using the enquiry form below.'],
-        ['Reno Rise reviews the information', 'We look at what you have shared to understand the scope and what still needs to be confirmed.'],
-        ['We find the right contractor', 'Reno Rise matches your project with the contractor best suited to the work, and they take it from there.'],
-      ],
-    })}
+    ${L.howItWorks({ heading: 'How Reno Rise Works', intro: L.POSITIONING })}
   </div>
 </section>
 
@@ -185,7 +177,7 @@ ${card({ icon: 'foundation', title: 'Underpinning: When It Is Needed', text: 'Ce
     <div class="section-head left-stack">
       <span class="eyebrow">Why Reno Rise</span>
       <h2>Why Homeowners Use Reno Rise</h2>
-      <p class="lede">Planning a basement project involves a lot of unknowns. Reno Rise helps you understand the project first, then keeps the decision with you.</p>
+      <p class="lede">Planning a basement project involves a lot of unknowns. Reno Rise helps you understand the project first, then matches you with the right contractor.</p>
     </div>
     <div class="topic-grid">
 ${WHY.map(plainCard).join('\n')}
@@ -225,7 +217,7 @@ ${U.faqItems(FAQ)}
     <div class="section-head left-stack" style="margin-bottom:28px;">
       <span class="eyebrow">Project enquiry</span>
       <h2>Tell Us About Your Project</h2>
-      <p class="lede">Tell us about your basement and your goals. Reno Rise reviews the details and, where there is a suitable fit, may connect you with an independent professional.</p>
+      <p class="lede">Tell us about your basement and your goals. Reno Rise reviews the details and matches your project with the contractor best suited to the work.</p>
     </div>
     <div class="lead-form-wrap">
       <div data-assessment-form-mount data-source="homepage" data-thank-you-href="${h('assessment/thank-you.html')}"></div>

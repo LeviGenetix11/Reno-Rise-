@@ -19,7 +19,7 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
     <div class="section-head center">
       <span class="eyebrow">Basement assessment</span>
       <h2 style="font-size:32px;">Tell Us About Your Basement</h2>
-      <p style="color:var(--muted); max-width:620px; margin:14px auto 0; text-align:center;">Share your goals and a few basement details. Reno Rise reviews your request and, where there is a suitable fit, may connect you with an independent professional.</p>
+      <p style="color:var(--muted); max-width:620px; margin:14px auto 0; text-align:center;">Share your goals and a few basement details. Reno Rise reviews your request and matches your project with the contractor best suited to the work.</p>
     </div>
     <div class="lead-form-wrap" style="max-width:760px; margin-left:auto; margin-right:auto;">
       ${form(depth, { source: 'assessment', thank: 'thank-you.html' })}

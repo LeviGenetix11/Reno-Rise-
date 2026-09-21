@@ -208,10 +208,9 @@ function ctaBand(depth, { heading, text, tight = true } = {}) {
 }
 
 const DEFAULT_STEPS = [
-  ['You share your project', 'Tell us about your basement, your goals and your timeline using the assessment form.'],
-  ['Reno Rise reviews requirements', 'We look at what you have submitted to understand the scope and what needs to be confirmed.'],
-  ['You are connected with an independent professional', 'When there is a suitable fit, you are introduced to an appropriate professional. There is no guarantee of a match.'],
-  ['The professional takes it from there', 'Estimates, contracts, credentials, warranties and the construction itself are provided by the professional you select.'],
+  ['Tell us about the project', 'Share your goals, your basement and your timeline using the enquiry form.'],
+  ['Reno Rise reviews the information', 'We look at what you have shared to understand the scope and what still needs to be confirmed.'],
+  ['We find the right contractor', 'Reno Rise matches your project with the contractor best suited to the work, and they take it from there.'],
 ];
 
 /** Four-step "how it works" block: what Reno Rise does and what the professional does. */
