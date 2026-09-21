@@ -33,7 +33,7 @@ const main = `
       <ul class="check-list">
         <li>${L.ICON.check} <span><strong>Reno Rise will call the phone number you enter</strong> when you book. There is nothing to dial in to.</span></li>
         <li>${L.ICON.check} <span>It is a short phone call, not a site visit. It is not a quote, and it is not a commitment.</span></li>
-        <li>${L.ICON.check} <span>Times are shown in your own time zone. Reno Rise is in Toronto, on Eastern Time.</span></li>
+        <li>${L.ICON.check} <span>Reno Rise takes calls from ${L.HOURS_ET}. Times in the calendar are shown in your own time zone.</span></li>
         <li>${L.ICON.check} <span>Cal.com, the scheduling service we use, emails you a confirmation with links to reschedule or cancel.</span></li>
       </ul>
     </div>

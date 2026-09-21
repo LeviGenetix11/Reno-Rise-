@@ -7,6 +7,9 @@
 const SITE = 'https://www.renosrise.com';
 const PHONE_DISPLAY = '(289) 512-8112';
 const PHONE_TEL = '+12895128112';
+// Hours of operation. Owner decision 2026-09-21: the window offered in the Cal.com calendar is Reno Rise's hours. If either changes, change both.
+const HOURS = 'Every day: 8:00 AM \u2013 8:00 PM';
+const HOURS_ET = '8:00 AM to 8:00 PM Eastern Time (Toronto), every day';
 const EMAIL = 'hello@renosrise.com';
 
 const DISCLOSURE =
@@ -357,6 +360,7 @@ ${cards}
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 module.exports = {
+  HOURS, HOURS_ET,
   SITE, PHONE_DISPLAY, PHONE_TEL, EMAIL, DISCLOSURE, POSITIONING, P, SERVICES_MENU, ICON,
   up, href, header, footer, ctaBand, howItWorks, disclosure, diagramCard, customerQuotes, quoteFigure, photoCard, splitHero, CUSTOMER_QUOTES, escapeHtml,
 };

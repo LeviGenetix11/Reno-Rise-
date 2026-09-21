@@ -5,9 +5,9 @@ built and tested on the `booking-page-live` branch (`booking-config.json` enable
 
 Checked against the live Cal.com event on 2026-09-20 (real embed, browser tz America/Toronto):
 - The embed loads and renders correctly on desktop and phone.
-- **The event offered EVERY day, including Saturday and Sunday, from 8:00 am to about 8:00 pm.** That is not Monday to Friday
-  9 to 5. Fix it in Cal.com before publishing (Availability schedule: Mon-Fri 9:00-17:00, time zone America/Toronto, then assign that
-  schedule to the event under the event's *Availability* tab).
+- The event offers every day, including Saturday and Sunday, from 8:00 am to 8:00 pm (last call starts 7:45 pm). **Owner decision
+  2026-09-21: that window is Reno Rise's hours of operation.** The site states "Every day: 8:00 AM – 8:00 PM" (Contact page and
+  /book/, from `HOURS` in `tools/site/lib.js`). Leave the Cal.com schedule as it is; if you ever change it, change `HOURS` too.
 - The webhook endpoint answers 503 (`CAL_WEBHOOK_SECRET` not set), so bookings will not reach the dashboard until step 6 is done
   (or you record them by hand, see the fallback in section 2).
 
@@ -62,8 +62,8 @@ then done by hand too. Tell me and we decide together whether a paid plan is wor
 
 ## 3. Decisions to confirm with you
 
-1. **Your real availability (confirmed by you): Monday to Friday, 9:00 to 17:00 Toronto time.** Set it in Cal.com (step 4). It was not
-   taken from the website's office hours, and nothing in the repo stores availability.
+1. **Your hours of operation (decided by you 2026-09-21): every day, 8:00 AM to 8:00 PM Toronto time**, the same window the Cal.com
+   calendar offers. (You first said Monday to Friday 9 to 5; that is replaced.) Set in Cal.com; the site text comes from `HOURS` in `tools/site/lib.js`.
 2. **The follow-up sequence has three emails (Day 1, 3, 7), version v2, not four (1, 4, 8, 14).** The link is added to all
    three. If you want the four-email schedule, that is a separate change to the approved copy and timing.
 3. **`/book/` is `noindex` and not in the sitemap**, because it is a thin scheduling page. Say if you want it indexed.
@@ -86,9 +86,8 @@ then done by hand too. Tell me and we decide together whether a paid plan is wor
    - Description: *A short phone call with RenoRise to discuss your renovation, answer initial questions, and talk through
      the next steps. We'll call the number you provide.*
    - *Limits*: **buffer after event 15 minutes**; **minimum notice 4 hours**
-   - *Availability*: a schedule named e.g. "Consultation calls": **Monday to Friday, 9:00 AM to 5:00 PM**, time zone **America/Toronto**,
-     assigned to this event. Check that the schedule's time zone really says Toronto: an earlier read of the page showed a 6:00 AM sample
-     slot, which suggests a different zone. Show times in the booker's time zone (the default) so it is clear.
+   - *Availability*: a schedule named e.g. "Consultation calls": **every day, 8:00 AM to 8:00 PM**, time zone **America/Toronto**,
+     assigned to this event (checked 2026-09-21: from a Toronto browser the calendar shows 8:00 am to 7:45 pm starts). Show times in the booker's time zone (the default) so it is clear.
    - *Booking questions*: name and email are required. Add **Phone number** (required) if the location field does not
      collect one, and **Brief project description** (required, short text). Keep the internal id of the description as
      `notes` (Cal.com's standard "Additional notes"), which is where the receiver looks.

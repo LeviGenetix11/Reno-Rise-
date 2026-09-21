@@ -136,7 +136,7 @@ ${booking.enabled ? `      // The booking link carries only an opaque reference 
         </ul>
         <div style="border-top:1px solid rgba(255,255,255,0.12); margin-top:20px; padding-top:20px;">
           <p style="color:rgba(255,255,255,0.6); font-size:13px; margin:0 0 6px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Office &amp; Inquiry Hours</p>
-          <p style="color:rgba(255,255,255,0.85); font-size:14px; margin:0 0 10px;">Every day: 8:00 AM – 8:00 PM</p>
+          <p style="color:rgba(255,255,255,0.85); font-size:14px; margin:0 0 10px;">${L.HOURS}</p>
           <p style="color:rgba(255,255,255,0.6); font-size:12.5px; margin:0; line-height:1.5;">Submit an assessment request anytime. Inquiries received outside office hours will be reviewed the next business day.</p>
         </div>
       </div>

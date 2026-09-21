@@ -180,6 +180,20 @@ ok(!/suitable fit|not guaranteed|who, if anyone|if anyone, to hire|professional 
 ok(!CLAIM_WORDS.test(decode(main)), `homepage describes professionals as qualified/vetted/licensed/insured/approved: ${(decode(main).match(CLAIM_WORDS) || [])[0]}`);
 ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|inspections?|assessments?)|reno rise (pulls?|applies for|submits?) permits?|code[- ]compliant\b/i.test(decode(main)), 'homepage claims Reno Rise performs construction, inspections, assessments or permit/code work');
 
+// hours of operation: one statement, the same wherever it appears
+{
+  const L2 = require('./lib');
+  ok(decode(pages.get('contact.html').html).includes('Office & Inquiry Hours ' + L2.HOURS), 'contact page must state the hours of operation from lib.js');
+  const bk = pages.get('book/index.html');
+  if (bk) ok(decode(bk.html).includes(L2.HOURS_ET), 'book page must state the hours of operation from lib.js');
+  for (const [rel, { html }] of pages) {
+    const txt = decode(html);
+    ok(!/\b(?:Mon(?:day)?\s*(?:-|–|to)\s*Fri(?:day)?|weekdays only|Monday to Friday)\b/i.test(txt.replace(/business days?/gi, '')), rel + ': states weekday-only hours, which contradicts the every-day hours');
+    const times = [...txt.matchAll(/\b(\d{1,2}:\d{2}) ?(AM|PM)\b/gi)].map((m) => m[0]);
+    ok(times.every((x) => /^(8:00 ?AM|8:00 ?PM)$/i.test(x)) || rel.startsWith('blog/'), rel + ': mentions a time other than the 8:00 AM to 8:00 PM hours: ' + times.join(', '));
+  }
+}
+
 // consultation booking: when enabled, the page, the thank-you button and the privacy line exist and are safe; when not, nothing leaks
 {
   const cfg = require('./booking').load();
