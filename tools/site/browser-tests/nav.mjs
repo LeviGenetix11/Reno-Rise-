@@ -423,7 +423,7 @@ for (const [path, w] of [['/', 1440], ['/', 390], ['/services/legal-basement-apa
 }
 
 // ==================================================================== basement flooring cluster
-const FLOORING_PAGES = ['/services/basement-flooring/', '/blog/best-flooring-for-basement-toronto.html', '/blog/do-you-need-a-subfloor-in-a-finished-basement.html', '/blog/vinyl-plank-vs-carpet-basement.html', '/blog/hardwood-flooring-in-basement.html'];
+const FLOORING_PAGES = ['/services/basement-flooring/', '/blog/best-flooring-basement-toronto.html', '/blog/basement-subfloor-finished-basement.html', '/blog/vinyl-plank-vs-carpet-basement.html', '/blog/hardwood-flooring-basement.html'];
 const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) => !c.hidden && c.offsetParent !== null).map((c) => c.querySelector('a.readmore').getAttribute('href')));
 
 // ---- blog filter: mouse, keyboard, touch; existing categories intact; no duplicate cards
@@ -442,7 +442,7 @@ const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) =
   }
   await page.locator('.filter-bar button[data-filter="flooring"]').click();
   const fl = (await visibleCards(page)).map((h) => h.replace(/^\.\.\//, '')).sort();
-  t('blog filter "flooring": the four flooring guides and nothing else', JSON.stringify(fl) === JSON.stringify(['blog/best-flooring-for-basement-toronto.html', 'blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'blog/hardwood-flooring-in-basement.html', 'blog/vinyl-plank-vs-carpet-basement.html'].map((h) => h.replace('blog/', ''))) || fl.length === 4, JSON.stringify(fl));
+  t('blog filter "flooring": the four flooring guides and nothing else', JSON.stringify(fl) === JSON.stringify(['blog/best-flooring-basement-toronto.html', 'blog/basement-subfloor-finished-basement.html', 'blog/hardwood-flooring-basement.html', 'blog/vinyl-plank-vs-carpet-basement.html'].map((h) => h.replace('blog/', ''))) || fl.length === 4, JSON.stringify(fl));
   t('blog filter: the pressed button is announced (aria-pressed)', (await page.locator('.filter-bar button[data-filter="flooring"]').getAttribute('aria-pressed')) === 'true' && (await page.locator('.filter-bar button[data-filter="all"]').getAttribute('aria-pressed')) === 'false');
   // keyboard
   await page.locator('.filter-bar button[data-filter="all"]').focus(); await page.keyboard.press('Enter');
@@ -554,6 +554,32 @@ for (const path of FLOORING_PAGES) {
   const { ctx, page } = await open('/services/basement-flooring/', 1280);
   const active = await page.$eval('.nav-dropdown-toggle', (b) => b.classList.contains('active'));
   t('the Services menu shows as the current section on the flooring page', active);
+  await ctx.close();
+}
+
+// ---- long-form service page: table of contents, back-to-top, top CTA with click-to-call
+{
+  const { ctx, page } = await open('/services/basement-flooring/', 1440);
+  const ids = await page.$$eval('nav.toc a', (as) => as.map((a) => a.getAttribute('href').slice(1)));
+  t('flooring page: the table of contents links to nine sections that all exist', ids.length === 9 && (await page.evaluate((list) => list.every((id) => !!document.getElementById(id)), ids)));
+  await page.locator('nav.toc a[href="#questions"]').click();
+  await page.waitForTimeout(2000); // smooth scrolling over a long page
+  const top = await page.evaluate(() => Math.round(document.getElementById('questions').getBoundingClientRect().top));
+  t('flooring page: a table-of-contents link scrolls its section into view, below the sticky header (' + top + 'px)', (await page.evaluate(() => location.hash)) === '#questions' && top >= 0 && top < 400, String(top));
+  t('flooring page: the back-to-top control is hidden until you scroll, then appears', await (async () => {
+    await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(500);
+    const hidden = await page.$eval('.back-to-top', (b) => getComputedStyle(b).visibility === 'hidden');
+    await page.evaluate(() => window.scrollTo(0, 2500)); await page.waitForTimeout(500);
+    const shown = await page.$eval('.back-to-top', (b) => getComputedStyle(b).visibility === 'visible');
+    return hidden && shown;
+  })());
+  const btnBox = await page.locator('.back-to-top').boundingBox();
+  t('flooring page: back-to-top is a 48px touch target', btnBox.width >= 47.5 && btnBox.height >= 47.5, JSON.stringify(btnBox));
+  await page.locator('.back-to-top').click(); await page.waitForTimeout(1200);
+  t('flooring page: back-to-top returns to the top', (await page.evaluate(() => window.scrollY)) < 50);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  t('flooring page: a primary CTA button and a tel: link sit above the first section', await page.evaluate(() => { const first = document.querySelector('article h2').getBoundingClientRect().top; const cta = document.querySelector('.cta-row a.btn'); const tel = document.querySelector('.cta-row a[href^="tel:"]'); return !!cta && !!tel && cta.getBoundingClientRect().top < first && tel.getAttribute('href') === 'tel:+12895128112'; }));
+  t('flooring page @1440x900: the header CTA and the sidebar CTA are both in the first screen', await page.evaluate(() => { const a = document.querySelector('.header-cta .btn').getBoundingClientRect(); const b = document.querySelector('.aside-card .btn').getBoundingClientRect(); return a.bottom < innerHeight && b.bottom < innerHeight; }));
   await ctx.close();
 }
 

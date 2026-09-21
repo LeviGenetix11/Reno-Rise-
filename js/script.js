@@ -143,6 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
     sync();
   }
 
+  // ---------- Back-to-top button (long-form pages) ----------
+  const toTop = document.querySelector('.back-to-top');
+  if (toTop) {
+    const showTop = () => toTop.classList.toggle('visible', window.scrollY > 700);
+    window.addEventListener('scroll', showTop, { passive: true });
+    showTop();
+    toTop.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  }
+
   // ---------- Sticky header shadow on scroll ----------
   const header = document.querySelector('.site-header');
   if (header && header.classList.contains('solid')) {

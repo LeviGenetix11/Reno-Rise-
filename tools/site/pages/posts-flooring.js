@@ -46,7 +46,7 @@ const FLOORING_POSTS = [
   // ------------------------------------------------------------------ 1
   {
     ...common,
-    file: 'best-flooring-for-basement-toronto.html',
+    file: 'best-flooring-basement-toronto.html',
     title: 'Best Flooring for a Basement in Toronto',
     metaTitle: 'Best Flooring for a Basement in Toronto',
     short: 'Best Flooring for a Basement in Toronto',
@@ -77,7 +77,7 @@ const FLOORING_POSTS = [
         <tr><th scope="row">Rental-style suite that needs to be durable</th><td>Vinyl plank or tile</td><td>Confirm ceiling height and requirements for a suite</td></tr>
       </tbody>
     </table></div>
-    <p>Notice what is missing: nothing on the list is right for every slab. Carpet is the option most sensitive to moisture, and Health Canada&rsquo;s guide to moisture and mould suggests you advises to &ldquo;consider removing any carpets from the basement floor&rdquo;ldquo;consider removing any carpets from the basement flooradvises to &ldquo;consider removing any carpets from the basement floor&rdquo;rdquo; (${X(SRC.hcMould, 'Health Canada')}). Solid hardwood is generally not recommended below grade; see ${A('blog/hardwood-flooring-in-basement.html', 'Can You Install Hardwood Flooring in a Basement?')}</p>
+    <p>Notice what is missing: nothing on the list is right for every slab. Carpet is the option most sensitive to moisture, and Health Canada&rsquo;s guide to moisture and mould suggests you &ldquo;consider removing any carpets from the basement floor&rdquo; (${X(SRC.hcMould, 'Health Canada')}). Solid hardwood is generally not recommended below grade; see ${A('blog/hardwood-flooring-basement.html', 'Can You Install Hardwood Flooring in a Basement?')}</p>
 
     <h2>A short decision path</h2>
     <ol class="steps">
@@ -104,7 +104,7 @@ const FLOORING_POSTS = [
   // ------------------------------------------------------------------ 2
   {
     ...common,
-    file: 'do-you-need-a-subfloor-in-a-finished-basement.html',
+    file: 'basement-subfloor-finished-basement.html',
     title: 'Do You Need a Subfloor in a Finished Basement?',
     metaTitle: 'Do You Need a Subfloor in a Finished Basement?',
     short: 'Do You Need a Subfloor in a Finished Basement?',
@@ -126,10 +126,12 @@ const FLOORING_POSTS = [
     ])}
 
     <h2>When a subfloor is often used, and when it may not be needed</h2>
-    <p>People tend to reach for a subfloor when the slab is cold, uneven or has a history of dampness that has been fixed, or when the flooring is wood. Some floating and tile installations go directly on a prepared slab with an approved underlayment or membrane instead. What is required depends on the product. For wood over concrete, the National Wood Flooring Association strongly recommends a vapour-retarding membrane and says to follow the flooring and adhesive manufacturer on substrate preparation and moisture limits (${X(SRC.nwfaConcrete, 'NWFA guidance on concrete subfloors')}). The manufacturer&rsquo;s instructions are the deciding document.</p>
+    <p>People tend to reach for a subfloor when the slab is cold, uneven or has a history of dampness that has been fixed, or when the flooring is wood. Some floating and tile installations go directly on a prepared slab with an approved underlayment or membrane instead. What is required depends on the product.</p>
+    <p>For wood over concrete, the National Wood Flooring Association strongly recommends a vapour-retarding membrane and says to follow the flooring and adhesive manufacturer on substrate preparation and moisture limits (${X(SRC.nwfaConcrete, 'NWFA guidance on concrete subfloors')}). The manufacturer&rsquo;s instructions are the deciding document.</p>
 
     <h2>The ceiling-height trade-off</h2>
-    <p>Every layer comes out of the room. In a tall basement that is a minor detail. In an older, low basement it can decide what is possible. If a suite is possible in future, the height that applies to it is set out in Ontario&rsquo;s guide (${X(SRC.ontario, 'Ontario second-unit guide')}) and explained in the ${SUITE}. Measure finished floor to finished ceiling, ask each system for its stated thickness and confirm the number with Toronto Building before you commit.</p>
+    <p>Every layer comes out of the room. In a tall basement that is a minor detail. In an older, low basement it can decide what is possible.</p>
+    <p>If a suite is possible in future, the height that applies to it is set out in Ontario&rsquo;s guide (${X(SRC.ontario, 'Ontario second-unit guide')}) and explained in the ${SUITE}. Measure finished floor to finished ceiling, ask each system for its stated thickness and confirm the number with Toronto Building before you commit.</p>
 
     <h2>Common system types</h2>
     <div class="table-scroll" tabindex="0" role="region" aria-label="Basement subfloor system types"><table class="compare-table">
@@ -170,7 +172,7 @@ const FLOORING_POSTS = [
     ...common,
     file: 'vinyl-plank-vs-carpet-basement.html',
     title: 'Vinyl Plank vs. Carpet for a Basement',
-    metaTitle: 'Vinyl Plank vs. Carpet for a Basement',
+    metaTitle: 'Vinyl Plank vs. Carpet for a Basement Floor',
     short: 'Vinyl Plank vs. Carpet for a Basement',
     description: 'Vinyl plank vs carpet for a basement: compare comfort, moisture tolerance, sound, maintenance and replacement, and where each one tends to fit. Read the guide.',
     excerpt: 'Warm and quiet or tough and easy to clean. The answer depends on how dry your basement is more than on taste.',
@@ -178,7 +180,8 @@ const FLOORING_POSTS = [
     alt: 'Finished basement sitting room with a leather sofa and bright windows',
     body: () => `
     ${hero('finished-basement-sofa-room', 'Finished basement sitting room with a leather sofa and bright windows', 'Photo: Michael Gault Photos on Pexels')}
-    <p>Vinyl plank or carpet for a <strong>basement</strong>? It is a fair fight. Carpet wins on warmth and quiet. Vinyl plank wins on how it copes with the odd spill. But the deciding factor is usually not taste. It is whether the slab underneath stays dry.</p>
+    <p>Vinyl plank or carpet for a <strong>basement</strong>? It is a fair fight. Carpet wins on warmth and quiet. Vinyl plank wins on how it copes with the odd spill.</p>
+    <p>But the deciding factor is usually not taste. It is whether the slab underneath stays dry.</p>
     <p>This guide compares the two on the things homeowners actually ask about, then suggests where each tends to fit. For the wider field, including tile, laminate and engineered flooring, see the ${A('services/basement-flooring/', 'basement flooring page')}.</p>
     ${GENERAL}
 
@@ -198,7 +201,8 @@ const FLOORING_POSTS = [
     </table></div>
 
     <h2>The moisture question decides more than the rest</h2>
-    <p>Health Canada&rsquo;s guide to moisture and mould suggests you advises to &ldquo;consider removing any carpets from the basement floor&rdquo;ldquo;consider removing any carpets from the basement flooradvises to &ldquo;consider removing any carpets from the basement floor&rdquo;rdquo; (${X(SRC.hcMould, 'Health Canada')}). That is not a ban. It is a reminder that carpet is the option most affected if the basement gets damp, and basements are where dampness happens. Vinyl plank is a more forgiving material, but it is not a cure: seams and edges can still let water reach the slab, and &ldquo;waterproof&rdquo; usually describes the plank, not the whole floor. Read the manufacturer&rsquo;s below-grade terms.</p>
+    <p>Health Canada&rsquo;s guide to moisture and mould suggests you &ldquo;consider removing any carpets from the basement floor&rdquo; (${X(SRC.hcMould, 'Health Canada')}). That is not a ban. It is a reminder that carpet is the option most affected if the basement gets damp, and basements are where dampness happens.</p>
+    <p>Vinyl plank is a more forgiving material, but it is not a cure. Seams and edges can still let water reach the slab, and &ldquo;waterproof&rdquo; usually describes the plank, not the whole floor. Read the manufacturer&rsquo;s below-grade terms.</p>
     <p>Either way, the same first step applies: find out whether the basement is dry, and fix any source of water. ${WATERPROOF_FIRST.replace('why waterproofing comes before finishing', 'Why waterproofing comes before finishing')} explains the order.</p>
 
     <h2>Where each tends to fit</h2>
@@ -217,13 +221,13 @@ const FLOORING_POSTS = [
       'Would an underlayment or insulated subfloor improve comfort, and how much height does it use?',
       'How easy is it to repair or replace a damaged area?',
     ])}
-    <p>The ${A('blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'guide to basement subfloors')} covers the height and comfort trade-offs. If you are planning the whole room, see ${FINISH}. Reno Rise can review your project details and, where there is a suitable fit, may connect you with an independent professional.</p>
+    <p>The ${A('blog/basement-subfloor-finished-basement.html', 'guide to basement subfloors')} covers the height and comfort trade-offs. If you are planning the whole room, see ${FINISH}. Reno Rise can review your project details and, where there is a suitable fit, may connect you with an independent professional.</p>
 `,
     faq: [
       ['Which is warmer in a basement, vinyl plank or carpet?', 'Carpet feels warmer underfoot. Vinyl plank over an insulated subfloor or a suitable underlayment can narrow the gap, at the cost of some ceiling height.'],
       ['Which handles a spill or small leak better?', 'Vinyl plank is generally more forgiving of a spill, though water can still reach the slab through seams. Carpet and pad can hold moisture, so they need to dry quickly or be replaced.'],
       ['Can I use vinyl plank in one part of the basement and carpet in another?', 'Yes, it is common. Use a proper transition strip and match each material to how that area is used.'],
-      ['Do carpet tiles change the answer?', 'They make repairs easier because individual tiles can be replaced, but the backing can still trap moisture and they do not solve a damp slab.'],
+      ['Do carpet tiles change the answer?', 'They make repairs easier because individual tiles can be replaced. The backing can still trap moisture, though, and tiles do not solve a damp slab. Check the manufacturer&rsquo;s guidance for below-grade use before you choose them.'],
     ],
     related: [['Basement Flooring', 'services/basement-flooring/'], ['Basement Finishing', 'services/basement-finishing/'], ['Basement Waterproofing', 'services/basement-waterproofing/']],
   },
@@ -231,11 +235,11 @@ const FLOORING_POSTS = [
   // ------------------------------------------------------------------ 4
   {
     ...common,
-    file: 'hardwood-flooring-in-basement.html',
+    file: 'hardwood-flooring-basement.html',
     title: 'Can You Install Hardwood Flooring in a Basement?',
     metaTitle: 'Can You Install Hardwood Flooring in a Basement?',
     short: 'Can You Install Hardwood Flooring in a Basement?',
-    description: 'Can you install hardwood flooring in a basement? Solid vs engineered hardwood, moisture limits and manufacturer rules, without a simple yes or no. Read the guide.',
+    description: 'Can you install hardwood flooring in a basement? Solid vs engineered hardwood, moisture limits and manufacturer rules, with no simple yes or no. Read the guide.',
     excerpt: 'Solid hardwood, generally no. Engineered hardwood, sometimes, with conditions. Here is the difference and what decides it.',
     img: 'finished-basement-dining-living-area',
     alt: 'Finished basement dining and living area with small high windows',
@@ -256,7 +260,7 @@ const FLOORING_POSTS = [
     ${U.checkList([
       '<strong>The manufacturer.</strong> The product must be approved for below-grade installation, and its warranty must not exclude basements. Ask for the wording.',
       '<strong>The slab.</strong> Moisture test results within the product&rsquo;s limit, a flat surface and a properly prepared substrate.',
-      `<strong>The base.</strong> A vapour-retarding membrane and any subfloor the manufacturer specifies; see the ${A('blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'subfloor guide')}.`,
+      `<strong>The base.</strong> A vapour-retarding membrane and any subfloor the manufacturer specifies; see the ${A('blog/basement-subfloor-finished-basement.html', 'subfloor guide')}.`,
       '<strong>The room.</strong> Humidity controlled year-round, with no history of unresolved leaks.',
       '<strong>The professional.</strong> Someone who tests, documents and is willing to put conditions in writing.',
     ])}

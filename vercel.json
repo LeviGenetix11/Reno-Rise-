@@ -1,6 +1,9 @@
 {
   "trailingSlash": true,
   "redirects": [
+    { "source": "/blog/best-flooring-for-basement-toronto.html", "destination": "/blog/best-flooring-basement-toronto.html", "permanent": true },
+    { "source": "/blog/do-you-need-a-subfloor-in-a-finished-basement.html", "destination": "/blog/basement-subfloor-finished-basement.html", "permanent": true },
+    { "source": "/blog/hardwood-flooring-in-basement.html", "destination": "/blog/hardwood-flooring-basement.html", "permanent": true },
     { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/:path*/index.html", "destination": "/:path*/", "permanent": true },
     { "source": "/services/sump-pump-installation/", "destination": "/services/sump-pump/", "permanent": true },

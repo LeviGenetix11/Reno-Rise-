@@ -33,10 +33,10 @@ const INTERIOR = A('services/interior-waterproofing/', 'interior waterproofing')
 const WET = A('services/wet-basement-repair/', 'wet basement repair');
 const CRACK = A('services/foundation-crack-repair/', 'foundation crack repair');
 const SUITE = A('services/legal-basement-apartment-toronto/', 'legal secondary suite guide');
-const G_BEST = A('blog/best-flooring-for-basement-toronto.html', 'Best Flooring for a Basement in Toronto');
-const G_SUB = A('blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'Do You Need a Subfloor in a Finished Basement?');
+const G_BEST = A('blog/best-flooring-basement-toronto.html', 'Best Flooring for a Basement in Toronto');
+const G_SUB = A('blog/basement-subfloor-finished-basement.html', 'Do You Need a Subfloor in a Finished Basement?');
 const G_VINYL = A('blog/vinyl-plank-vs-carpet-basement.html', 'Vinyl Plank vs. Carpet for a Basement');
-const G_WOOD = A('blog/hardwood-flooring-in-basement.html', 'Can You Install Hardwood Flooring in a Basement?');
+const G_WOOD = A('blog/hardwood-flooring-basement.html', 'Can You Install Hardwood Flooring in a Basement?');
 
 const FAQ = [
   ['Does basement flooring need a subfloor?', `Often a subfloor system is used between the concrete slab and the finished floor, to add a moisture-separation layer, some warmth and a flatter base. Whether one is needed depends on the flooring product, the condition of the slab, how dry the basement is and how much ceiling height there is to spare. The manufacturer's installation instructions decide what is required. The guide ${G_SUB} goes through the common system types.`],
@@ -53,6 +53,23 @@ const body = `
     <p>Flooring a basement is a different job from flooring the main floor. The floor is usually a concrete slab in contact with the ground, and that changes what will last, what feels comfortable and what has to happen before a single plank or tile goes down. Get the order right and the floor tends to look after itself. Get it wrong and the prettiest material in the showroom can turn into a repair.</p>
     <p>This page compares the main options for Toronto basements, explains what to check first and lists questions worth asking. It is written for homeowners planning ${FINISH}, a wider ${RENO}, or a space that may later become a ${SUITE}.</p>
 
+    <p class="cta-row"><a href="#assessment-form" class="btn btn-primary">Tell Us About Your Project</a> <a class="cta-call" href="tel:${L.PHONE_TEL}">or call ${L.PHONE_DISPLAY}</a></p>
+
+    <nav class="toc" aria-label="On this page">
+      <div class="toc-title">On This Page</div>
+      <ol>
+        <li><a href="#why-different">Why basement flooring needs different planning</a></li>
+        <li><a href="#moisture">Check for moisture first</a></li>
+        <li><a href="#concrete">Concrete condition and floor levelling</a></li>
+        <li><a href="#subfloor">Subfloor and insulation</a></li>
+        <li><a href="#options">Flooring options</a></li>
+        <li><a href="#compare">Comparison table</a></li>
+        <li><a href="#process">How installation typically works</a></li>
+        <li><a href="#questions">Questions to ask a professional</a></li>
+        <li><a href="#faq">Frequently asked questions</a></li>
+      </ol>
+    </nav>
+
     <h2 id="why-different">Why Basement Flooring Needs Different Planning</h2>
     <p>A slab-on-ground floor is cooler than the rest of the house, can hold and pass moisture vapour, and is rarely perfectly flat. Ceiling height is also tight in many older Toronto basements, so every layer added on top of the slab comes out of the room's height.</p>
     ${U.checkList([
@@ -65,7 +82,8 @@ const body = `
     <p>That is why the sensible order is moisture first, then the slab, then any subfloor, then the finished floor. Flooring normally comes near the end of a basement project, after walls, electrical and plumbing rough-ins are done.</p>
 
     <h2 id="moisture">Check for Moisture Before Choosing a Floor</h2>
-    <p>The most useful first step is to find out whether the basement is dry and to deal with any source of water. A floor covering can hide a moisture problem for a while; it does not solve one. If water enters after heavy rain or snowmelt, start with ${WATERPROOF} or ${WET}. If a drainage system is being considered, see ${INTERIOR}. Read ${A('blog/basement-waterproofing-before-renovation.html', 'why waterproofing comes before renovation')} for the reasoning.</p>
+    <p>The most useful first step is to find out whether the basement is dry and to deal with any source of water. A floor covering can hide a moisture problem for a while; it does not solve one.</p>
+    <p>If water enters after heavy rain or snowmelt, start with ${WATERPROOF} or ${WET}. If a drainage system is being considered, see ${INTERIOR}. Read ${A('blog/basement-waterproofing-before-renovation.html', 'why waterproofing comes before renovation')} for the reasoning.</p>
     <p>Signs worth writing down before you talk to anyone:</p>
     ${U.checkList([
       'Damp or dark patches on the slab, especially after rain or in spring.',
@@ -103,7 +121,8 @@ const body = `
 
     <h3>Luxury vinyl plank</h3>
     <p>Luxury vinyl plank (LVP) is a layered synthetic plank, sold as click-together floating floors or as glue-down planks. Because the plank does not absorb water the way wood does, vinyl plank basement flooring is a common choice for family rooms, hallways and rental-style spaces. It is firm underfoot, so an underlayment or subfloor system is often used for comfort and sound.</p>
-    <p><strong>Watch for:</strong> it copies the slab's flatness problems, seams and edges can still let water reach the slab, and &ldquo;waterproof&rdquo; usually describes the plank, not the whole floor system. Some products and adhesives also have slab-moisture limits. Read the manufacturer's installation and warranty terms for below-grade use. See ${G_VINYL} for a comparison with carpet.</p>
+    <p><strong>Watch for:</strong> it copies the slab's flatness problems, seams and edges can still let water reach the slab, and &ldquo;waterproof&rdquo; usually describes the plank, not the whole floor system.</p>
+    <p>Some products and adhesives also have slab-moisture limits. Read the manufacturer's installation and warranty terms for below-grade use, and see ${G_VINYL} for a comparison with carpet.</p>
 
     <h3>Waterproof laminate</h3>
     <p>Laminate has a fibreboard-type core under a printed wear surface. &ldquo;Waterproof&rdquo; laminates use treated cores and sealed locking edges, but manufacturers describe their limits differently: some cover spills for a stated time only, and some exclude below-grade installation or standing water. It suits a dry, stable basement where a hard-surface look and moderate installation effort are wanted.</p>
@@ -118,7 +137,7 @@ const body = `
     <p><strong>Watch for:</strong> it is hard and cool underfoot, it needs a flat, stable slab, cracks in the concrete can telegraph through, grout needs sealing and cleaning, and a membrane or uncoupling layer may be specified. Preparation is often the larger part of the job.</p>
 
     <h3>Carpet</h3>
-    <p>Broadloom carpet with a pad is the warmest and quietest option underfoot and is popular for bedrooms and media rooms. Basement carpet installation also carries the highest moisture sensitivity of the options here: carpet and pad can hold water and support mould if they get damp. Health Canada's guide to moisture and mould suggests you advises to &ldquo;consider removing any carpets from the basement floor&rdquo;ldquo;consider removing any carpets from the basement flooradvises to &ldquo;consider removing any carpets from the basement floor&rdquo;rdquo; (${X(SRC.hcMould, 'Health Canada')}).</p>
+    <p>Broadloom carpet with a pad is the warmest and quietest option underfoot and is popular for bedrooms and media rooms. Basement carpet installation also carries the highest moisture sensitivity of the options here: carpet and pad can hold water and support mould if they get damp. Health Canada's guide to moisture and mould suggests you &ldquo;consider removing any carpets from the basement floor&rdquo; (${X(SRC.hcMould, 'Health Canada')}).</p>
     <p><strong>Watch for:</strong> carpet suits only a basement that has been shown to stay dry, with humidity kept in check. Follow the manufacturer's guidance on underlay and installation over concrete.</p>
 
     <h3>Carpet tiles</h3>
@@ -182,6 +201,9 @@ const body = `
       ['unfinished-basement-block-walls-joists', 'Unfinished basement with block walls and exposed floor joists', 'Photo: Curtis Adams on Pexels'],
     ], { heading: 'Basement Rooms for Reference', note: 'Illustrative stock photos from Pexels. They show basement spaces in general and are not Reno Rise projects; Reno Rise does not install flooring.' })}
 
+    <p>Reno Rise is focused on Toronto homes, and enquiries from across the Greater Toronto Area are welcome. See the ${A('locations/', 'areas served')}.</p>
+    <a href="#main-content" class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></a>
+
     <p class="sources-note"><strong>Sources:</strong> ${X(SRC.nwfa, 'NWFA wood flooring installation guidelines')}; ${X(SRC.nwfaConcrete, 'NWFA: solid and engineered wood over concrete subfloors')}; ${X(SRC.astm, 'ASTM F2170, in-slab relative humidity testing')}; ${X(SRC.hcMould, 'Health Canada: guide to addressing moisture and mould indoors')}; ${X(SRC.hcHumidity, 'Health Canada: reducing humidity, moisture and mould')}. Product and warranty terms vary; the manufacturer's instructions apply.</p>
     <p class="sources-note">Flooring for the rest of the house? The general ${A('services/flooring/', 'flooring information page')} covers other rooms; this page is only about below-grade floors.</p>
 `;
@@ -205,8 +227,8 @@ guidePage({
     ['Basement renovation planning', 'services/basement-renovation/'],
     ['Basement finishing', 'services/basement-finishing/'],
     ['Basement waterproofing', 'services/basement-waterproofing/'],
-    ['Do you need a subfloor?', 'blog/do-you-need-a-subfloor-in-a-finished-basement.html'],
-    ['Best flooring for a basement', 'blog/best-flooring-for-basement-toronto.html'],
+    ['Do you need a subfloor?', 'blog/basement-subfloor-finished-basement.html'],
+    ['Best flooring for a basement', 'blog/best-flooring-basement-toronto.html'],
   ],
   related: [
     ['Basement Renovation', 'services/basement-renovation/'],

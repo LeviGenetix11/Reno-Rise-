@@ -241,7 +241,7 @@ const POSTS = [
     <p>A familiar scenario: a homeowner notices one corner of the basement feels oddly cold and jokes that it is a portal. It is not a portal. It is missing insulation, and the fix is simple. Mystery is usually physics. Fix the physics, fix the mystery. Ceiling height works the same way: measure it before you assume the worst, and before anyone sells you a dig.</p>
 
     <h2>How do you measure ceiling height?</h2>
-    <p>Measure from the finished floor level to the underside of the ceiling finish. Then subtract what will change: a ${A('blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'subfloor and finished flooring')}, insulation and a fire-rated ceiling all cost you height. Beams and ducts can lower usable height in spots. Ask a designer which measurements apply to your project.</p>
+    <p>Measure from the finished floor level to the underside of the ceiling finish. Then subtract what will change: a ${A('blog/basement-subfloor-finished-basement.html', 'subfloor and finished flooring')}, insulation and a fire-rated ceiling all cost you height. Beams and ducts can lower usable height in spots. Ask a designer which measurements apply to your project.</p>
 
     <h2>What are the alternatives to underpinning?</h2>
     ${U.checkList([

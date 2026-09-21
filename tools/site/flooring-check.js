@@ -67,7 +67,7 @@ const forbid = [
   [/(?<!\bnot )(?<!\bcannot )(?<!\bno )\bguarantee[sd]?\b/i, 'a guarantee'], [/within \d+ (?:hours?|days?)|same[- ]day|free (?:quote|estimate)/i, 'a fixed-period or free-quote promise'],
   [/\bAggregateRating|"Review"|GeneralContractor|LocalBusiness\b/, 'unsupported schema'],
 ];
-const newRels = [SVC, 'blog/best-flooring-for-basement-toronto.html', 'blog/do-you-need-a-subfloor-in-a-finished-basement.html', 'blog/vinyl-plank-vs-carpet-basement.html', 'blog/hardwood-flooring-in-basement.html'];
+const newRels = [SVC, 'blog/best-flooring-basement-toronto.html', 'blog/basement-subfloor-finished-basement.html', 'blog/vinyl-plank-vs-carpet-basement.html', 'blog/hardwood-flooring-basement.html'];
 for (const rel of newRels) {
   const h = page(rel);
   const body = decode(articleOf(h)) + ' ' + h.match(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g).join(' ');
@@ -110,10 +110,10 @@ for (const rel of ['services/flooring/index.html', 'services/flooring-installati
 
 // ---------------------------------------------------------------- the four guides
 const GUIDES = {
-  'blog/best-flooring-for-basement-toronto.html': ['best flooring for basement', 'Best Flooring for a Basement in Toronto'],
-  'blog/do-you-need-a-subfloor-in-a-finished-basement.html': ['basement subfloor', 'Do You Need a Subfloor in a Finished Basement?'],
+  'blog/best-flooring-basement-toronto.html': ['best flooring for basement', 'Best Flooring for a Basement in Toronto'],
+  'blog/basement-subfloor-finished-basement.html': ['basement subfloor', 'Do You Need a Subfloor in a Finished Basement?'],
   'blog/vinyl-plank-vs-carpet-basement.html': ['vinyl plank vs carpet basement', 'Vinyl Plank vs. Carpet for a Basement'],
-  'blog/hardwood-flooring-in-basement.html': ['hardwood flooring in basement', 'Can You Install Hardwood Flooring in a Basement?'],
+  'blog/hardwood-flooring-basement.html': ['hardwood flooring in basement', 'Can You Install Hardwood Flooring in a Basement?'],
 };
 const flooringPosts = [...pages.keys()].filter((r) => /^blog\/.*\.html$/.test(r) && /class="post-hero"/.test(page(r)) && /Basement flooring/.test((page(r).match(/data-project-type="([^"]*)"/) || [])[1] || ''));
 ok(flooringPosts.length === 4, `expected exactly four flooring guides, found ${flooringPosts.length}`);
@@ -192,6 +192,60 @@ try {
 } catch (e) {
   console.log('(skipped location indexing comparison:', String(e.message).split('\n')[0], ')');
 }
+
+// ---------------------------------------------------------------- on-page SEO checklist (SEO_brief/on-page-seo.md)
+const sentences = (t) => t.replace(/\bvs\./gi, 'vs').split(/(?<=[.?])\s+(?=[A-Z"\u201c(])/).filter((x) => x.length > 3).length;
+for (const rel of newRels) {
+  const h = page(rel);
+  const t = titleOf(h), d = descOf(h);
+  ok(t.length >= 50 && t.length <= 60, `${rel}: title is ${t.length} chars (checklist 50-60)`);
+  ok(d.length >= 150 && d.length <= 160, `${rel}: meta description is ${d.length} chars (checklist 150-160)`);
+  ok((h.match(/<h1[\s>]/g) || []).length === 1, `${rel}: needs exactly one H1`);
+  const heads = [...h.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+  ok(heads.every((n, i) => i === 0 || n <= heads[i - 1] + 1), `${rel}: heading levels skip (${heads.join('')})`);
+  ok(/<html lang="en">/.test(h) && /<meta charset="UTF-8">/i.test(h) && /name="viewport"/.test(h) && /rel="icon"/.test(h) && /rel="apple-touch-icon"/.test(h), `${rel}: head basics (lang, charset, viewport, favicon, apple-touch-icon)`);
+  ok(/property="og:title"/.test(h) && /property="og:description"/.test(h) && /property="og:image"/.test(h) && /property="og:url"/.test(h) && /property="og:type"/.test(h) && /name="twitter:card" content="summary_large_image"/.test(h) && /name="twitter:image"/.test(h), `${rel}: Open Graph / Twitter tags`);
+  const art = articleOf(h);
+  const first100 = decode(art).split(' ').slice(0, 100).join(' ').toLowerCase();
+  ok(/basement/.test(first100), `${rel}: primary keyword (basement) must be in the first 100 words`);
+  const ext = [...art.matchAll(/<a\b[^>]*href="https?:[^"]*"[^>]*>/g)].map((m) => m[0]);
+  ok(ext.length >= 2 && ext.every((a) => /rel="noopener"/.test(a) && /target="_blank"/.test(a)), `${rel}: external links must be 2+ and open in a new tab with rel=noopener`);
+  ok(!/click here|read more/i.test(decode(art)), `${rel}: non-descriptive link text`);
+  ok(/href="[^"]*about\.html"/.test(art) || rel === SVC, `${rel}: author byline should link to the About page`);
+  ok(/Published [A-Z][a-z]+ \d+, \d{4}/.test(art) || /Last reviewed/.test(art), `${rel}: needs a visible published or reviewed date`);
+  // paragraphs: 1-4 sentences
+  const body = art.replace(/<table[\s\S]*?<\/table>/g, ' ').replace(/<div class="faq-item">[\s\S]*?<\/div>/g, ' ').replace(/<section class="assess-band[\s\S]*?<\/section>/g, ' ');
+  const long = [...body.matchAll(/<p(?=[\s>])([^>]*)>([\s\S]*?)<\/p>/g)].filter((m) => !/updated-line|sources-note|table-hint|disclosure|notice/.test(m[1])).map((m) => decode(m[2])).filter((x) => sentences(x) > 4);
+  ok(long.length === 0, `${rel}: paragraphs over four sentences: ${long.map((x) => x.slice(0, 50)).join(' | ')}`);
+  // FAQ answers: 2-4 sentences, 4-8 questions
+  const faq = [...art.matchAll(/<div class="faq-item">\s*<h3>[\s\S]*?<\/h3>\s*<p>([\s\S]*?)<\/p>/g)].map((m) => sentences(decode(m[1])));
+  ok(faq.length >= 4 && faq.length <= 8 && faq.every((n) => n >= 2 && n <= 4), `${rel}: FAQ needs 4-8 questions with 2-4 sentence answers (got ${JSON.stringify(faq)})`);
+  // images: hyphenated lowercase WebP files under 200 KB
+  for (const src of [...h.matchAll(/<img[^>]*src="([^"]*)"/g)].map((m) => m[1]).filter((x) => /stock/.test(x))) {
+    const file = path.join(ROOT, src.replace(/^(\.\.\/)+/, ''));
+    ok(/^[a-z0-9-]+\.webp$/.test(path.basename(src)) && fs.existsSync(file) && fs.statSync(file).size < 200 * 1024, `${rel}: image ${src} must be a lowercase hyphenated WebP under 200 KB`);
+  }
+}
+for (const rel of newRels) { // slugs: short, lowercase, hyphens, no stop words
+  const slug = path.basename(rel === SVC ? 'basement-flooring' : rel, '.html');
+  ok(slug.length < 60 && /^[a-z0-9-]+$/.test(slug) && !/(^|-)(the|a|an|of|for|in|do|you|is|to)(-|$)/.test(slug), `${rel}: slug "${slug}" should be short and free of stop words`);
+}
+// the three URLs renamed after first publication keep working through permanent redirects
+const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+for (const [from, to] of [['best-flooring-for-basement-toronto', 'best-flooring-basement-toronto'], ['do-you-need-a-subfloor-in-a-finished-basement', 'basement-subfloor-finished-basement'], ['hardwood-flooring-in-basement', 'hardwood-flooring-basement']]) {
+  ok(vercel.redirects.some((r) => r.source === `/blog/${from}.html` && r.destination === `/blog/${to}.html` && r.permanent === true), `missing permanent redirect for /blog/${from}.html`);
+  ok(!pages.has(`blog/${from}.html`) && pages.has(`blog/${to}.html`), `blog/${from}.html should be replaced by ${to}.html`);
+}
+// long-form service page (1500+ words): table of contents with working anchors, back-to-top, top CTA with click-to-call, areas
+const words = decode(articleOf(svc)).split(' ').length;
+ok(words >= 1500, `service page is ${words} words`);
+const toc = (articleOf(svc).match(/<nav class="toc"[\s\S]*?<\/nav>/) || [''])[0];
+const tocLinks = [...toc.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
+ok(tocLinks.length >= 8 && tocLinks.every((id) => new RegExp(`id="${id}"`).test(svc)), `service page needs a table of contents whose anchors all exist (${tocLinks.length} links)`);
+ok(/class="back-to-top"/.test(svc), 'service page needs a back-to-top control');
+const firstH2 = articleOf(svc).indexOf('<h2');
+ok(articleOf(svc).indexOf('class="cta-row"') > 0 && articleOf(svc).indexOf('class="cta-row"') < firstH2 && /class="cta-row"[^>]*>[\s\S]*?href="tel:\+1\d{10}"/.test(articleOf(svc)), 'service page needs a primary CTA and click-to-call before the first section');
+ok(links(SVC, svc, 'locations/'), 'service page should point to the areas served');
 
 console.log(`flooring-check: ${checks} checks`);
 if (failures.length) {

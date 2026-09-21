@@ -131,7 +131,7 @@ require('./seo-checks').seoChecks(pages, warn);
 try {
   const tracked = execFileSync('git', ['ls-tree', '-r', '--name-only', 'main'], { cwd: ROOT, encoding: 'utf8' }).split('\n');
   const missing = tracked.filter((t) => /^(services|locations|blog|assessment)\/.*\.html$|^(index|about|contact)\.html$/.test(t)).filter((t) => !fs.existsSync(path.join(ROOT, t)));
-  const redirected = new Set((JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')).redirects || []).map((r) => r.source.replace(/^\//, '') + 'index.html'));
+  const redirected = new Set((JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')).redirects || []).flatMap((r) => [r.source.replace(/^\//, ''), r.source.replace(/^\//, '') + 'index.html']));
   for (const m of missing) if (!redirected.has(m)) warn(m, 'existing page URL missing from working tree');
 } catch (e) {
   console.log('(skipped git URL-preservation check:', e.message.split('\n')[0], ')');

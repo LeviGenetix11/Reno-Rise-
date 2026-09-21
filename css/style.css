@@ -1771,15 +1771,15 @@ body.nav-open { overflow: hidden; }
 
 /* ---------- Basement flooring page ---------- */
 .compare-table caption { text-align: left; font-size: 13px; color: var(--muted); padding: 0 0 10px; caption-side: top; position: sticky; left: 0; max-width: calc(100vw - 48px); }
-.compare-table.compare-wide { min-width: 800px; font-size: 13.5px; }
+.compare-table.compare-wide { min-width: 760px; font-size: 14px; }
 .compare-table.compare-wide th, .compare-table.compare-wide td { padding: 10px 10px; }
-.table-hint { display: none; font-size: 13px; color: var(--muted); margin: -6px 0 8px; }
+.table-hint { display: none; font-size: 14px; color: var(--muted); margin: -6px 0 8px; }
 @media (max-width: 1279px) { .table-hint { display: block; } }
 .compare-table.compare-wide tbody th { width: 13%; }
 .table-scroll:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 .article-wrap ol.steps { margin: 0 0 24px; padding-left: 22px; }
 .article-wrap ol.steps li { padding: 8px 0; font-size: 15px; }
-.sources-note { font-size: 13.5px; color: var(--muted); }
+.sources-note { font-size: 14px; color: var(--muted); }
 .sources-note a { color: var(--orange-a11y); text-decoration: underline; }
 .directory-note { color: rgba(255,255,255,0.78); font-size: 14px; max-width: 720px; margin: 0 0 14px; }
 .directory-note a, .directory-note strong { color: #fff; }
@@ -1787,3 +1787,12 @@ body.nav-open { overflow: hidden; }
 .region-note { color: var(--muted); font-size: 14px; max-width: 720px; margin: 0 0 14px; }
 .region-note a { color: var(--orange-a11y); text-decoration: underline; }
 .post-hero img { aspect-ratio: 3 / 2; object-fit: cover; } /* reserve the box so any photo shape loads without shifting the page */
+.article-wrap .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 22px 0 26px; }
+.article-wrap .cta-row a.btn { color: var(--dark); text-decoration: none; }
+.article-wrap .cta-call { font-weight: 700; color: var(--orange-a11y); text-decoration: underline; }
+nav.toc { margin: 8px 0 30px; }
+.back-to-top { position: fixed; right: 18px; bottom: 18px; width: 48px; height: 48px; border-radius: 50%; background: var(--dark); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); z-index: 90; opacity: 0; visibility: hidden; transition: opacity 0.2s ease; }
+.back-to-top svg { width: 22px; height: 22px; }
+.back-to-top.visible { opacity: 1; visibility: visible; }
+.back-to-top:hover { background: var(--orange); color: var(--dark); }
+.article-wrap [id] { scroll-margin-top: 110px; } /* anchor jumps land below the sticky header */
