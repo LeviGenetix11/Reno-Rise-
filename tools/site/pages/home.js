@@ -44,6 +44,7 @@ const plainCard = ({ icon, title, text }) => `      <article class="topic-card p
 const hero = `<!-- ========== HERO ========== -->
 <section class="hero hero-basement hero-has-video">
   <video class="hero-video" data-hero-video data-src="${h('videos/hero-interior.mp4')}" poster="${h('videos/hero-poster.jpg')}" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+  <button type="button" class="hero-video-toggle" data-hero-video-toggle hidden>Pause background video</button>
   <div class="container hero-split">
     <div class="hero-copy">
       <span class="eyebrow on-dark">Toronto basement renovations &amp; secondary suites</span>
@@ -121,10 +122,10 @@ ${card({ icon: 'plan', title: 'Permit &amp; Design Planning', text: 'Which basem
     </div>
     <div class="inspiration">
     ${U.stockGallery(depth, [
-      ['finished-basement-dining-living-area', 'Finished basement dining and living area with small high windows', 'Photo: Elias Storm on Pexels'],
-      ['finished-basement-living-room', 'Finished basement living room with a large television and sectional sofa', 'Photo: Curtis Adams on Pexels'],
-      ['basement-family-room-fireplace', 'Basement family room with wood paneling and a fireplace', 'Photo: Peter Vang on Pexels'],
-    ])}
+      ['finished-basement-dining-living-area', 'Finished basement dining and living area with small high windows'],
+      ['finished-basement-living-room', 'Finished basement living room with a large television and sectional sofa'],
+      ['basement-family-room-fireplace', 'Basement family room with wood paneling and a fireplace'],
+    ], { tag: '' })}
     </div>
   </div>
 </section>

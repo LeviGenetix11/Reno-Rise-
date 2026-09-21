@@ -264,6 +264,19 @@ function ensureIcons(h, depth) {
   return h;
 }
 
+/** Every page: drop the Google Fonts links and preload the self-hosted font instead (idempotent). */
+const FONT_FILE = 'fonts/plus-jakarta-sans-v12-latin.woff2';
+function selfHostFonts(h) {
+  h = h.replace(/<link rel="preconnect" href="https:\/\/fonts\.(?:googleapis|gstatic)\.com"[^>]*>\n?/g, '');
+  h = h.replace(/<link rel="preload" as="style" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
+  h = h.replace(/<noscript><link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*><\/noscript>\n?/g, '');
+  h = h.replace(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
+  if (!h.includes(FONT_FILE)) {
+    h = h.replace(/(<link rel="stylesheet" href="([^"]*)css\/style\.css">)/, (m, link, prefix) => `<link rel="preload" href="${prefix}${FONT_FILE}" as="font" type="font/woff2" crossorigin>\n${link}`);
+  }
+  return h;
+}
+
 function ensureAccessibility(h) {
   if (!h.includes('class="skip-link"')) h = h.replace(/<body([^>]*)>\s*/, (m, a) => `<body${a}>\n<a href="#main-content" class="skip-link">Skip to content</a>\n\n`);
   h = h.replace(/<main>/, '<main id="main-content">');
@@ -339,6 +352,7 @@ function transform(file, html, stats) {
   h = ensureSocialMeta(h, urlPath);
   h = ensureIcons(h, depth);
   h = ensureAccessibility(h);
+  h = selfHostFonts(h);
   h = h.replace(/\n{3,}/g, '\n\n');
   // 404.html is served at any missing URL, so every reference must be root-absolute.
   if (rel === '404.html') h = h.replace(/(href|src)="\.\//g, '$1="/');

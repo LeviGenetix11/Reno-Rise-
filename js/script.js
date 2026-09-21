@@ -119,14 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------- Homepage hero background video ----------
   // Muted, looping and decorative. The file is only fetched on wider screens (phones and tablets keep the still poster) and it
   // never starts for visitors who prefer reduced motion or have Data Saver on.
+  // A pause / play button exists for keyboard and screen-reader visitors: it is visually hidden until it receives focus.
   const heroVideo = document.querySelector('[data-hero-video]');
+  const videoBtn = document.querySelector('[data-hero-video-toggle]');
   if (heroVideo) {
     const wide = window.matchMedia('(min-width: 861px)');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const saveData = !!(navigator.connection && navigator.connection.saveData);
     let attached = false;
+    let userPaused = false;
+    const label = () => { if (videoBtn) videoBtn.textContent = heroVideo.paused ? 'Play background video' : 'Pause background video'; };
     const sync = () => {
-      if (!wide.matches || reduced.matches || saveData) { heroVideo.pause(); return; }
+      const allowed = wide.matches && !reduced.matches && !saveData;
+      if (videoBtn) videoBtn.hidden = !allowed;
+      if (!allowed) { heroVideo.pause(); return; }
       if (!attached) {
         attached = true;
         const src = document.createElement('source');
@@ -135,9 +141,16 @@ document.addEventListener('DOMContentLoaded', () => {
         heroVideo.appendChild(src);
         heroVideo.load();
       }
+      if (userPaused) { heroVideo.pause(); return; }
       const p = heroVideo.play();
       if (p && p.catch) p.catch(() => {}); // blocked autoplay just leaves the poster showing
     };
+    heroVideo.addEventListener('play', label);
+    heroVideo.addEventListener('pause', label);
+    if (videoBtn) videoBtn.addEventListener('click', () => {
+      userPaused = !heroVideo.paused;
+      if (userPaused) heroVideo.pause(); else { const p = heroVideo.play(); if (p && p.catch) p.catch(() => {}); }
+    });
     wide.addEventListener('change', sync);
     reduced.addEventListener('change', sync);
     sync();

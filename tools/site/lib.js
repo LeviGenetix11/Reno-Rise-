@@ -294,7 +294,7 @@ function splitHero(depth, { eyebrow, h1, sub, primary, secondary, note, visual, 
   const v = visual.split('@UP@').join(up(depth));
   return `<!-- ========== HERO ========== -->
 <section class="hero hero-basement${video ? ' hero-has-video' : ''}">
-${video ? `  <video class="hero-video" data-hero-video data-src="${up(depth)}videos/hero-interior.mp4" poster="${up(depth)}videos/hero-poster.jpg" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>\n` : ''}  <div class="container hero-split">
+${video ? `  <video class="hero-video" data-hero-video data-src="${up(depth)}videos/hero-interior.mp4" poster="${up(depth)}videos/hero-poster.jpg" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>\n  <button type="button" class="hero-video-toggle" data-hero-video-toggle hidden>Pause background video</button>\n` : ''}  <div class="container hero-split">
     <div class="hero-copy">
       ${crumbs.length ? `<div class="breadcrumb" aria-label="Breadcrumb">${trail}</div>` : ''}
       <span class="eyebrow on-dark">${eyebrow}</span>
@@ -317,7 +317,7 @@ ${video ? `  <video class="hero-video" data-hero-video data-src="${up(depth)}vid
 const CUSTOMER_QUOTES = {
   kaylyn: { name: 'Kaylyn Beatty', where: 'Homeowner', initials: 'KB', text: '&ldquo;Saved my a$!. Butt lot outstanding service, affordable, and not to mention very quick to get &lsquo;er done!!! They offer all sorts of services, mine was plumbing and they truly saved the day. My heroes. 10/10 would recommend.&rdquo;' },
   reliance: { name: 'Reliance Janitorial', where: 'Commercial client', initials: 'RJ', text: '&ldquo;Amazing work and an outstanding crew. Very professional, energetic, and a pleasure to work with from start to finish. They communicate openly throughout the entire project, show up reliably, and get the job done right.&rdquo;' },
-  marco: { name: 'Marco DiFranco', where: 'Oakville, ON', initials: 'MD', text: '&ldquo;We needed underpinning done before finishing the basement and most contractors wouldn&rsquo;t even quote it properly. Reno Rise walked us through the whole process and pulled every permit themselves.&rdquo;' },
+  marco: { name: 'Marco DiFranco', where: 'Oakville, ON', initials: 'MD', text: '&ldquo;We needed underpinning done before finishing the basement and most contractors wouldn&rsquo;t even quote it properly. Reno Rise walked us through the whole process.&rdquo;' },
   priya: { name: 'Priya Nandakumar', where: 'Markham, ON', initials: 'PN', text: '&ldquo;Got a quote within a day and the crew showed up when they said they would, every single time. Our kitchen went from 1998 to something we actually want to cook in.&rdquo;' },
 };
 

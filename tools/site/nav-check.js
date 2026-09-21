@@ -160,7 +160,10 @@ ok((main.match(/class="dg-num"/g) || []).length === 5, 'diagram numbered topics 
 ok(/id="assessment-form"[\s\S]*data-assessment-form-mount data-source="homepage"/.test(main), 'homepage enquiry form mount is missing');
 const heroVideo = (main.match(/<video class="hero-video"[^>]*>/) || [''])[0];
 ok(/data-src="\.\/videos\/hero-interior\.mp4"/.test(heroVideo) && /poster="\.\/videos\/hero-poster\.jpg"/.test(heroVideo) && / muted /.test(heroVideo) && / loop /.test(heroVideo) && /aria-hidden="true"/.test(heroVideo) && /preload="none"/.test(heroVideo), `hero background video markup is wrong: ${heroVideo}`);
-ok(!/hero-video-toggle/.test(main), 'the hero pause button was asked to be removed');
+ok(!/<figcaption>[^<]*(?:Pexels|Photo)/i.test(main), 'homepage photo captions (Pexels / Photo by) were asked to be removed');
+ok(!/stock-tag|Stock photography/i.test(decode(between(main, 'class="inspiration"', '</section>'))), 'homepage gallery: the "Stock photography" tag was asked to be removed');
+ok(/not Reno Rise projects/.test(decode(main)), 'homepage gallery still says the photos are not Reno Rise projects');
+ok(/<button type="button" class="hero-video-toggle" data-hero-video-toggle hidden>Pause background video<\/button>/.test(main), 'homepage needs the visually hidden pause button');
 ok(fs.existsSync(path.join(ROOT, 'videos', 'hero-interior.mp4')) && fs.existsSync(path.join(ROOT, 'videos', 'hero-poster.jpg')), 'hero video files are missing from /videos');
 ok(!/<video/.test(pages.get('services/legal-basement-apartment-toronto/index.html').html), 'only the homepage hero should carry the video');
 
@@ -177,6 +180,23 @@ ok(!/suitable fit|not guaranteed|who, if anyone|if anyone, to hire|professional 
 ok(!CLAIM_WORDS.test(decode(main)), `homepage describes professionals as qualified/vetted/licensed/insured/approved: ${(decode(main).match(CLAIM_WORDS) || [])[0]}`);
 ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|inspections?|assessments?)|reno rise (pulls?|applies for|submits?) permits?|code[- ]compliant\b/i.test(decode(main)), 'homepage claims Reno Rise performs construction, inspections, assessments or permit/code work');
 
+// web font: self-hosted and preloaded on every page, no Google Fonts requests, size-matched fallbacks in the stylesheet
+{
+  const css = fs.readFileSync(path.join(ROOT, 'css', 'style.css'), 'utf8');
+  for (const f of ['plus-jakarta-sans-v12-latin.woff2', 'plus-jakarta-sans-v12-latin-ext.woff2', 'OFL.txt']) ok(fs.existsSync(path.join(ROOT, 'fonts', f)), `fonts/${f} is missing`);
+  ok(/@font-face\s*\{[^}]*font-family: 'Plus Jakarta Sans';[^}]*font-display: swap;[^}]*plus-jakarta-sans-v12-latin\.woff2/.test(css), 'stylesheet must declare the self-hosted Plus Jakarta Sans with font-display: swap');
+  ok((css.match(/font-family: 'Plus Jakarta Sans Fallback';/g) || []).length === 2 && (css.match(/size-adjust:/g) || []).length === 2, 'stylesheet needs the two size-matched fallback faces (regular and bold)');
+  ok(/font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback'/.test(css), 'body and headings must list the fallback face');
+  ok(/googleapis|gstatic/.test(css) === false, 'stylesheet still refers to Google Fonts');
+  const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  ok((vercel.headers || []).some((h) => h.source === '/fonts/(.*)' && h.headers.some((x) => x.key === 'Cache-Control' && /max-age=31536000/.test(x.value))), 'vercel.json should cache /fonts/ for a year');
+  for (const [rel, { html }] of pages) {
+    ok(!/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(html), `${rel}: still loads Google Fonts`);
+    ok(/<link rel="preload" href="[^"]*fonts\/plus-jakarta-sans-v12-latin\.woff2" as="font" type="font\/woff2" crossorigin>/.test(html), `${rel}: needs the preload for the self-hosted font (with crossorigin)`);
+    ok(html.indexOf('rel="preload"') < html.indexOf('css/style.css'), `${rel}: the font preload should come before the stylesheet`);
+  }
+}
+
 // hero video: homepage + the keyword landing pages only
 {
   const { LANDINGS } = require('./pages/landing-data');
@@ -188,7 +208,8 @@ ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|ins
     const h = pages.get(rel).html;
     const v = (h.match(/<video class="hero-video"[^>]*>/) || [''])[0];
     ok(/ muted /.test(v) && / loop /.test(v) && /aria-hidden="true"/.test(v) && /preload="none"/.test(v) && /data-src="[^"]*videos\/hero-interior\.mp4"/.test(v) && /poster="[^"]*videos\/hero-poster\.jpg"/.test(v), `${rel}: hero video markup`);
-    ok(/<section class="hero hero-basement hero-has-video">/.test(h), `${rel}: hero needs the video class`);
+    ok(/<section class="hero hero-basement hero-has-video">/.test(h) || rel === 'index.html', `${rel}: hero needs the video class`);
+    ok(/class="hero-video-toggle" data-hero-video-toggle hidden>Pause background video<\/button>/.test(h), `${rel}: needs the visually hidden pause button`);
     ok(!/suitable fit|cannot guarantee a match|you choose who to hire|professional you choose/i.test(decode(between(h, '<main', '</main>'))), `${rel}: still has wording that says the homeowner chooses or that a match is uncertain`);
   }
 }

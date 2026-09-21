@@ -37,7 +37,7 @@ const results = [];
 const t = (name, ok, extra = '') => { results.push(ok); if (!PROBE || !ok) console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? '  ' + extra : ''}`); };
 
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL || 'msedge' });
-async function open(path, width, { touch = false, height = 900, reduced = false, init = null } = {}) {
+async function open(path, width, { touch = false, height = 900, reduced = false, init = null, fontDelay = 0, wait = 'load' } = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: false, reducedMotion: reduced ? 'reduce' : 'no-preference' });
   const page = await ctx.newPage();
   const errs = [];
@@ -46,7 +46,8 @@ async function open(path, width, { touch = false, height = 900, reduced = false,
   if (init) await page.addInitScript(init);
   page.on('pageerror', (e) => errs.push(String(e)));
   await page.route(/^(?!http:\/\/127\.0\.0\.1).*/, (r) => (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.request().url()) ? r.continue() : r.abort()));
-  await page.goto(BASE + path, { waitUntil: 'load' });
+  if (fontDelay) await page.route('**/*.woff2', async (r) => { await new Promise((res) => setTimeout(res, fontDelay)); await r.continue(); });
+  await page.goto(BASE + path, { waitUntil: wait });
   if (process.env.PROBE_FORCE === '1') await page.addStyleTag({ content: '.main-nav{display:flex!important}.nav-toggle{display:none!important}' });
   // Trigger and wait for the real web font so widths are the real ones (the page loads it asynchronously).
   await page.evaluate(() => document.fonts.load('600 14px "Plus Jakarta Sans"').then(() => document.fonts.ready)).catch(() => {});
@@ -300,7 +301,7 @@ for (const w of [768, 390, 360, 900, 1023]) {
   t('hero: new supporting copy', (await txt('.hero-copy > p')).replace(/’/g, "'") === "Whether you're finishing your basement, creating more living space or exploring a legal secondary suite, Reno Rise helps you understand the project and connect with independent local renovation professionals.");
   const btns = await page.$$eval('.hero-actions a', (as) => as.map((a) => { const h = a.getAttribute('href'); return [a.textContent.trim(), h.startsWith('./') ? h.slice(2) : h]; }));
   t('hero: primary "Tell Us About Your Project" -> the enquiry form; secondary -> legal suite page', JSON.stringify(btns) === JSON.stringify([['Tell Us About Your Project', '#assessment-form'], ['Explore Legal Suite Requirements', 'services/legal-basement-apartment-toronto/']]), JSON.stringify(btns));
-  t('hero: no disclosure line above/below the buttons, no grid lines, no video button', (await page.locator('.hero .hero-note').count()) === 0 && (await page.locator('.hero-video-toggle').count()) === 0 && (await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage.includes('linear-gradient(rgba(255, 255, 255') === false)));
+  t('hero: no disclosure line above/below the buttons, no grid lines, no video button', (await page.locator('.hero .hero-note').count()) === 0 && (await page.$eval('.hero-video-toggle', (b) => { const r = b.getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })) && (await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage.includes('linear-gradient(rgba(255, 255, 255') === false)));
   t('diagram: new fine print, numbered key kept', (await txt('.diagram-caption')) === 'Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.' && (await page.locator('.diagram-legend li').count()) === 5);
   const order = await page.$$eval('main > section', (ss) => ss.map((s) => (s.querySelector('h1, h2') || {}).textContent?.replace(/\s+/g, ' ').trim()));
   t('homepage sections are in the requested order', ['Basement Renovations & Legal Secondary Suites in Toronto', 'How Reno Rise Works', 'What Would You Like to Do With Your Basement?', 'Finished Basement or Legal Secondary Suite?', 'Cost, Permit & Planning Guides', 'Why Homeowners Use Reno Rise'].every((h, i) => order[i] === h) && order[order.length - 2] === 'Frequently Asked Questions' && order[order.length - 1] === 'Tell Us About Your Project', JSON.stringify(order));
@@ -373,13 +374,44 @@ for (const [w, label] of [[1440, 'two columns'], [1000, 'one column, video on'],
   await ctx.close();
 }
 
+// -------------------------------------------------------------------- hero pause button: hidden until keyboard focus
+for (const path of ['/', '/services/basement-renovation/']) {
+  const { ctx, page } = await open(path, 1440);
+  await page.waitForFunction(() => { const v = document.querySelector('[data-hero-video]'); return v && !v.paused && v.currentTime > 0; }, null, { timeout: 15000 }).catch(() => {});
+  const btn = page.locator('.hero-video-toggle');
+  t(path + ' pause button: present for assistive tech, but takes no visible space', (await btn.count()) === 1 && (await btn.getAttribute('hidden')) === null && (await btn.evaluate((b) => { const r = b.getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })));
+  t(path + ' pause button: has an accessible name', (await btn.innerText()).trim() === 'Pause background video' || (await btn.textContent()).trim() === 'Pause background video');
+  await btn.focus();
+  const box = await btn.boundingBox();
+  t(path + ' pause button: becomes visible and at least 44px tall when focused', box && box.height >= 43.5 && box.width > 100 && box.x >= 0 && box.y + box.height <= 900, JSON.stringify(box));
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(300);
+  t(path + ' pause button: Enter pauses the video and the label becomes Play', await page.$eval('[data-hero-video]', (v) => v.paused) && /Play background video/.test(await btn.textContent()));
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(400);
+  t(path + ' pause button: Space plays it again', await page.$eval('[data-hero-video]', (v) => !v.paused));
+  await btn.evaluate((b) => b.blur());
+  t(path + ' pause button: invisible again once focus leaves', (await btn.evaluate((b) => { const r = b.getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })));
+  await ctx.close();
+}
+{
+  const { ctx, page } = await open('/', 390);
+  t('pause button: not offered on phones, where the video never runs', await page.$eval('.hero-video-toggle', (b) => b.hidden));
+  await ctx.close();
+}
+{
+  const { ctx, page } = await open('/', 1440, { reduced: true });
+  t('pause button: not offered with reduced motion, where the video never runs', await page.$eval('.hero-video-toggle', (b) => b.hidden));
+  await ctx.close();
+}
+
 // -------------------------------------------------------------------- landing pages: hero background video
 const LANDING = ['basement-renovation', 'basement-waterproofing', 'wet-basement-repair', 'interior-waterproofing', 'exterior-waterproofing', 'underpinning', 'egress-windows', 'sump-pump', 'backwater-valve', 'foundation-crack-repair', 'weeping-tile'].map((x) => '/services/' + x + '/');
 {
   const { ctx, page } = await open(LANDING[0], 1440);
   await page.waitForFunction(() => { const v = document.querySelector('[data-hero-video]'); return v && !v.paused && v.currentTime > 0; }, null, { timeout: 15000 }).catch(() => {});
   t('landing page @1440px: the hero video plays on its own', await page.$eval('[data-hero-video]', (v) => !v.paused && v.currentTime > 0));
-  t('landing page: no grid lines, lighter overlay over the video, no video button', (await page.locator('.hero-video-toggle').count()) === 0 && /rgba\(15, 17, 22, 0\.64\)/.test(await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage)));
+  t('landing page: no grid lines, lighter overlay over the video, pause button not visible', (await page.$eval('.hero-video-toggle', (b) => { const r = b.getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })) && /rgba\(15, 17, 22, 0\.64\)/.test(await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage)));
   await ctx.close();
 }
 for (const path of LANDING) {
@@ -518,6 +550,21 @@ const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) =
   await page.locator('.filter-bar button[data-filter="all"]').tap();
   t('blog filter (touch): tapping All Guides shows sixteen', (await visibleCards(page)).length === 16);
   t('blog @390px: no horizontal overflow', !(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)));
+  await ctx.close();
+}
+
+// ---- web font: self-hosted, no Google requests, and a late font does not shift the layout
+{
+  const { ctx, page, reqs } = await open('/', 1440);
+  t('font: nothing is requested from Google Fonts', !reqs.some((u) => /fonts\.(googleapis|gstatic)\.com/.test(u)));
+  t('font: the self-hosted file is used and Plus Jakarta Sans is loaded', reqs.some((u) => /fonts\/plus-jakarta-sans-v12-latin\.woff2/.test(u)) && (await page.evaluate(() => document.fonts.check('600 16px "Plus Jakarta Sans"'))));
+  await ctx.close();
+}
+for (const [path, w] of [['/services/basement-flooring/', 390], ['/services/basement-flooring/', 1440], ['/', 390], ['/', 1440], ['/services/basement-renovation/', 390]]) {
+  const { ctx, page } = await open(path, w, { fontDelay: 1500, wait: 'commit', init: "window.__cls = 0; new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });" });
+  await page.waitForTimeout(3200);
+  const r = await page.evaluate(() => ({ cls: window.__cls, loaded: document.fonts.check('600 16px "Plus Jakarta Sans"') }));
+  t('font arriving 1.5s late @' + w + 'px ' + path + ': layout shift stays under 0.02 (' + r.cls.toFixed(4) + ') and the font does arrive', r.loaded && r.cls < 0.02, JSON.stringify(r));
   await ctx.close();
 }
 
