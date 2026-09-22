@@ -145,7 +145,7 @@ ok(new Set(cards.map((c) => c.href)).size === cards.length, 'blog index has dupl
 ok(/data-filter="flooring">Flooring<\/button>/.test(blog), 'blog index is missing the Flooring filter');
 ok(cards.filter((c) => c.cats.includes('flooring')).length === 4, 'exactly four cards should be in the Flooring category');
 ok(['planning', 'suites', 'costs', 'permits', 'waterproofing', 'underpinning', 'general'].every((k) => new RegExp(`data-filter="${k}"`).test(blog)) && cards.filter((c) => c.cats.includes('permits')).length >= 2, 'existing blog categories must be intact');
-ok(cards.length === 22, `blog index should have 15 original + 4 flooring + 3 new planning cards (22), has ${cards.length}`);
+ok(cards.length === 23, `blog index should have 16 original + 4 flooring + 3 new planning cards (23), has ${cards.length}`);
 
 const dir = page('services/index.html');
 const basementPart = dir.slice(dir.indexOf('id="basement-renovations-secondary-suites"'), dir.indexOf('id="other-home-improvement-services"'));

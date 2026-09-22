@@ -11,7 +11,8 @@ Tracks primary keywords already targeted by a published blog post, sourced from 
 | basement staircase | basement stair, basement staircase ideas, basement stair railing ideas, railing ideas for basement stairs, basement stair rail ideas | [blog/basement-staircase-ideas.html](blog/basement-staircase-ideas.html) | 2026-09-22 |
 | basement office renovation | office space in the basement, home office in basement, small basement office, basement office space | [blog/basement-office-renovation.html](blog/basement-office-renovation.html) | 2026-09-22 |
 | insulating basement walls with rigid foam | insulating basement walls canada, basement wall framing, framing a basement wall, framing basement | [blog/insulating-basement-walls-with-rigid-foam.html](blog/insulating-basement-walls-with-rigid-foam.html) | 2026-09-22 |
+| basement design build | design build renovation*, design bid build*, design build contractor*, basement renovation delivery method* | [blog/basement-design-build.html](blog/basement-design-build.html) | 2026-09-22 |
 
 \* made up (not in the CSV) — a natural secondary, no exact-match row existed.
 
-Source for this batch and the one above it: `basement-reno-blog2_list_2026-09-22.csv` (~600 raw, ungrouped keywords, seed "basement renovation"). All seven primaries above were checked against this table before use and are new.
+Source for the first seven rows above: `basement-reno-blog2_list_2026-09-22.csv` (~600 raw, ungrouped keywords, seed "basement renovation"). "basement design build" is sourced differently — it came from the owner's pasted service list (2026-09-22), not this CSV; it was cross-checked against this table and against `reno-rise-service-keywords.csv` before use and is new to both. All eight primaries above are new.

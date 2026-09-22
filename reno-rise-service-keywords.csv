@@ -78632,3 +78632,38 @@
 3,787,micro-location,wychwood window replacement,service+micro,Commercial,window-replacement,Window Replacement,Windows,yes,Wychwood,wychwood,micro,Toronto,Toronto,target on parent city page,/locations/toronto/toronto/,,,,no
 3,787,micro-location,yonge and eglinton window replacement,service+micro,Commercial,window-replacement,Window Replacement,Windows,yes,Yonge and Eglinton,yonge-and-eglinton,micro,Toronto,Toronto,target on parent city page,/locations/toronto/toronto/,,,,no
 3,787,micro-location,yorkville window replacement,service+micro,Commercial,window-replacement,Window Replacement,Windows,yes,Yorkville,yorkville,micro,Toronto,Toronto,target on parent city page,/locations/toronto/toronto/,,,,no
+1,788,head,basement renovation,head,Commercial,basement-renovation,Basement Renovation,Basement,yes,,,,,,service page (existing),/services/basement-renovation/,,,,no
+1,788,head,legal secondary suite construction,head,Commercial,legal-basement-apartment-toronto,Legal Secondary Suite Construction,Basement,yes,,,,,,service page (existing),/services/legal-basement-apartment-toronto/,,,,no
+1,788,head,basement finishing,head,Commercial,basement-finishing,Basement Finishing,Basement,yes,,,,,,service page (existing),/services/basement-finishing/,,,,no
+1,788,head,underpinning and ceiling height raising,head,Commercial,underpinning,Underpinning & Ceiling Height Raising,Basement,yes,,,,,,service page (existing),/services/underpinning/,,,,no
+1,788,head,basement waterproofing,head,Commercial,basement-waterproofing,Basement Waterproofing,Basement,yes,,,,,,service page (existing),/services/basement-waterproofing/,,,,no
+1,788,head,egress windows,head,Commercial,egress-windows,Egress Windows & Separate Entrances,Basement,yes,,,,,,service page (existing),/services/egress-windows/,,,,no
+1,788,head,separate basement entrance,head,Commercial,walkout-construction,Egress Windows & Separate Entrances,Basement,yes,,,,,,service page (existing),/services/walkout-construction/,,,,no
+1,788,head,basement soundproofing,head,Commercial,basement-soundproofing,Basement Soundproofing,Basement,yes,,,,,,service page (existing),/services/basement-soundproofing/,,,,no
+1,788,head,basement flooring installation,head,Commercial,basement-flooring,Basement Flooring Installation,Basement,yes,,,,,,service page (existing),/services/basement-flooring/,,,,no
+1,788,head,permit and design planning,head,Commercial,design-planning,Permit & Design Planning,Basement,yes,,,,,,service page (existing),/services/design-planning/,,,,no
+1,788,head,bench footing,head,Commercial,bench-footing,Bench Footing,Basement,yes,,,,,,service page (existing),/services/bench-footing/,,,,no
+1,788,head,walkout basement construction,head,Commercial,walkout-construction,Walkout Basement Construction,Basement,yes,,,,,,service page (existing),/services/walkout-construction/,,,,no
+1,788,head,window well installation,head,Commercial,window-well-installation,Window Well Installation,Basement,yes,,,,,,service page (existing),/services/window-well-installation/,,,,no
+1,788,head,basement window replacement,head,Commercial,basement-window-replacement,Basement Window Replacement,Basement,yes,,,,,,service page (existing),/services/basement-window-replacement/,,,,no
+1,788,head,crawl space conversion,head,Commercial,crawl-space-conversion,Crawl Space Conversion,Basement,yes,,,,,,service page (existing),/services/crawl-space-conversion/,,,,no
+1,788,head,interior waterproofing,head,Commercial,interior-waterproofing,Interior Waterproofing,Basement,yes,,,,,,service page (existing),/services/interior-waterproofing/,,,,no
+1,788,head,exterior waterproofing,head,Commercial,exterior-waterproofing,Exterior Waterproofing,Basement,yes,,,,,,service page (existing),/services/exterior-waterproofing/,,,,no
+1,788,head,wet basement repair,head,Commercial,wet-basement-repair,Wet Basement Repair,Basement,yes,,,,,,service page (existing),/services/wet-basement-repair/,,,,no
+1,788,head,foundation crack repair,head,Commercial,foundation-crack-repair,Foundation Crack Repair,Basement,yes,,,,,,service page (existing),/services/foundation-crack-repair/,,,,no
+1,788,head,weeping tile installation,head,Commercial,weeping-tile,Weeping Tile & French Drain Installation,Basement,yes,,,,,,service page (existing),/services/weeping-tile/,,,,no
+1,788,head,french drain installation,head,Commercial,french-drain,Weeping Tile & French Drain Installation,Basement,yes,,,,,,service page (existing),/services/french-drain/,,,,no
+1,788,head,sump pump installation,head,Commercial,sump-pump,Sump Pump Installation,Basement,yes,,,,,,service page (existing),/services/sump-pump/,,,,no
+1,788,head,backwater valve installation,head,Commercial,backwater-valve,Backwater Valve Installation,Basement,yes,,,,,,service page (existing),/services/backwater-valve/,,,,no
+1,788,head,parging,head,Commercial,parging,Parging,Basement,yes,,,,,,service page (existing),/services/parging/,,,,no
+1,788,head,electrical panel upgrades,head,Commercial,panel-upgrade,Electrical Panel Upgrades,Basement,yes,,,,,,service page (existing),/services/panel-upgrade/,,,,no
+1,788,head,knob and tube wiring replacement,head,Commercial,knob-and-tube-removal,Knob-and-Tube & Aluminum Wiring Replacement,Basement,yes,,,,,,service page (existing),/services/knob-and-tube-removal/,,,,no
+1,788,head,aluminum wiring replacement,head,Commercial,aluminum-wiring-replacement,Knob-and-Tube & Aluminum Wiring Replacement,Basement,yes,,,,,,service page (existing),/services/aluminum-wiring-replacement/,,,,no
+1,788,head,pot light installation,head,Commercial,pot-light-installation,Pot Light Installation,Basement,yes,,,,,,service page (existing),/services/pot-light-installation/,,,,no
+1,788,head,water line replacement,head,Commercial,water-line-replacement,Water Line Replacement,Basement,yes,,,,,,service page (existing),/services/water-line-replacement/,,,,no
+1,788,head,laundry room renovation,head,Commercial,laundry-room-renovation,Laundry Room Renovation,Basement,yes,,,,,,service page (existing),/services/laundry-room-renovation/,,,,no
+1,788,head,basement renovation cost estimates,head,Commercial,basement-renovation,Basement Renovation Cost Estimates,Basement,yes,,,,,,"blog post (existing, covers this)",/blog/basement-renovation-cost-toronto.html,,,,no
+1,788,head,basement design build,head,Commercial,basement-renovation,Basement Design-Build,Basement,yes,,,,,,"blog post (new, 2026-09-22 batch)",/blog/basement-design-build-vs-hiring-separately.html,,,,no
+1,788,head,basement renovation permits toronto and gta,head,Commercial,design-planning,Basement Renovation Permits (Toronto & GTA),Basement,yes,,,,,,service page + blog post (existing),/services/design-planning/,,,,no
+1,788,head,second basement opinion and quote review,head,Commercial,,Second Basement Opinion & Quote Review,Basement,deferred,,,,,,"deferred - business model conflict, owner decision 2026-09-22",,,,,no
+1,788,head,basement renovation project management,head,Commercial,,Basement Renovation Project Management,Basement,deferred,,,,,,"deferred - business model conflict, owner decision 2026-09-22",,,,,no

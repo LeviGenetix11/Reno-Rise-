@@ -27,6 +27,8 @@ const SRC = {
   subsidy: 'https://www.toronto.ca/services-payments/water-environment/managing-rain-melted-snow/basement-flooding/basement-flooding-protection-subsidy-program/',
   humidity: 'https://www.canada.ca/en/health-canada/services/publications/healthy-living/addressing-moisture-mould-your-home.html',
   nrcan: 'https://natural-resources.canada.ca/energy-efficiency/home-energy-efficiency/keeping-heat-section-6-basement-insulation-floors-walls-crawl-spaces',
+  dbia: 'https://dbia.org/what-is-design-build/',
+  chba: 'https://www.chba.ca/chba-renovators-manual/',
 };
 
 const hero = (file, alt, credit) => `<figure class="post-hero">
@@ -913,6 +915,68 @@ const POSTS = [
       ['Do I need a permit to insulate a basement wall in Toronto?', 'Insulating a wall is usually part of a larger finishing project, and Toronto Building requires a permit once the scope includes structural or material changes. Confirm the exact scope with the City or a designer.'],
     ],
     related: [['Basement Renovation Steps', 'blog/basement-renovation-steps.html'], ['Basement Finishing', 'services/basement-finishing/'], ['Basement Waterproofing', 'services/basement-waterproofing/'], ['Basement Renovation', 'services/basement-renovation/']],
+  },
+
+  // ------------------------------------------------------------------ 13
+  {
+    file: 'basement-design-build.html',
+    cats: 'planning',
+    tag: 'Basement Planning',
+    title: 'Basement Design-Build vs. Hiring Separately: How to Choose',
+    metaTitle: 'Basement Design-Build vs. Hiring Separately',
+    short: 'Basement Design-Build vs. Hiring Separately',
+    description: 'Basement design-build versus hiring a designer and contractor separately: how each works, the real trade-offs, and which one fits your basement project.',
+    excerpt: 'One team for design and construction, or two separate ones. Here is what actually changes between the options.',
+    img: 'couple-reviewing-renovation-plans',
+    alt: 'Couple sitting on a floor reviewing renovation plans',
+    formType: 'General basement renovation',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('couple-reviewing-renovation-plans', 'Couple sitting on a floor reviewing renovation plans', 'Photo: A. Darmel on Pexels')}
+    <p><strong>Basement design-build</strong> means one company handles the design and the construction, with the same team responsible for the plan and for building it. The alternative, sometimes called design-bid-build, means hiring a designer for the plans and a separate contractor to build them, often after getting more than one bid on the same drawings. Neither one is universally better. Each solves a different problem, and a basement is usually a small enough project that the choice actually matters.</p>
+
+    <h2>What Design-Build Actually Means</h2>
+    <p>In a design-build setup, the same company draws the plan and builds it, so the person designing the space already knows what it costs to build, because they are the ones building it. The ${X(SRC.dbia, 'Design-Build Institute of America')} defines the approach by its contract structure: one single contract covers both design and construction, instead of the separate contracts every other delivery method uses. There is no handoff between a designer who is finished once the drawings are stamped and a contractor who inherits someone else&rsquo;s assumptions. Changes get resolved in one conversation instead of a round trip between two companies.</p>
+
+    <h2>What Hiring Separately (Design-Bid-Build) Means</h2>
+    <p>Here, a designer or architect creates the plans first, independent of any contractor, and those finished drawings then go out for bids from more than one contractor. The appeal is comparability: everyone is pricing the same fixed plan, so quotes are easier to line up side by side. The trade-off is that the design was created without construction input, so a contractor can come back with cost or feasibility concerns after the plan is already done, which can mean a redesign nobody budgeted time for.</p>
+
+    <h2>The Real Trade-offs</h2>
+    ${U.checkList([
+      '<strong>Timeline.</strong> Design-build tends to move faster, since design and construction planning happen together instead of one waiting on the other to finish.',
+      '<strong>Cost comparability.</strong> Design-bid-build makes it easier to compare multiple contractors against the exact same fixed drawings. Design-build gives up some of that direct comparability in exchange for a plan that was priced realistically from the start.',
+      '<strong>Accountability.</strong> One company to call with design-build. Two separate relationships to manage with design-bid-build, which can mean a designer and a contractor pointing at each other if something goes wrong.',
+      '<strong>Independence of the design.</strong> A separate designer, with no construction contract riding on the outcome, has less incentive to shape a plan around what is easiest to build versus what the homeowner actually wants.',
+    ])}
+    <p>None of these are dealbreakers on their own. They are the actual questions worth answering before picking a direction, instead of picking one because it is the word a friend used for their kitchen.</p>
+
+    <h2>Which One Fits a Basement Project?</h2>
+    <p>A basement renovation is usually more contained than a full-home project, which changes the calculus a little. A straightforward finish, adding walls, flooring and lighting to a dry, tall-enough basement, rarely needs the coordination overhead that makes design-build worth it; a good contractor can usually handle layout decisions directly. A more structural project, one that involves ${A('services/underpinning/', 'underpinning')}, a ${A('services/walkout-construction/', 'walkout entrance')}, or a full ${SUITE}, has more moving parts where design and construction assumptions need to match from day one, which is exactly where design-build tends to earn its keep.</p>
+
+    <h2>How This Works Through Reno Rise</h2>
+    <p>Reno Rise does not design or build anything itself. It reviews the project details submitted through the form and matches the project with the independent professional best suited to the work, which can be a design-build company or a standalone contractor, depending on scope. Mentioning which direction is preferred, or that it is still undecided, helps that match happen faster.</p>
+
+    <p>Whichever route is chosen, the same underlying idea applies: a renovation works best when it is treated as one system, not a pile of separate components. The Canadian Home Builders&rsquo; Association makes a similar point in its ${X(SRC.chba, "Renovators&rsquo; Manual")}, which frames a renovation around how the parts of a house interact rather than treating each trade as its own island. That is true whether one company or two is doing the coordinating.</p>
+
+    <h2>Questions to Ask Before You Choose</h2>
+    ${U.checkList([
+      'Is this basement project structural enough that design and construction assumptions need to match from the start?',
+      'Does comparing itemized quotes from more than one contractor matter enough to be worth a slower process?',
+      'Who is accountable if something the drawings assumed turns out not to be true once the walls are open?',
+      'Has each option been asked directly what their process looks like, not just what they call it?',
+    ])}
+    <p>Get this decision right early and the rest of the project has one less thing working against it. See ${A('blog/basement-renovation-steps.html', 'basement renovation steps in order')} for what happens next either way.</p>
+    ${TB_NOTE}
+`,
+    faq: [
+      ['What is the difference between design-build and hiring a designer and contractor separately?', 'Design-build uses one company for both the design and the construction. Hiring separately, sometimes called design-bid-build, means a designer creates the plans first and a separate contractor is then hired, often after bidding, to build them.'],
+      ['Is design-build faster than design-bid-build?', 'Usually, because design and construction planning happen together instead of the construction phase waiting for a finished, independently created plan.'],
+      ['Is it harder to compare quotes with design-build?', 'Yes, since design-build does not produce one fixed plan that multiple contractors bid on the same way. Design-bid-build makes direct quote comparison easier, at the cost of a slower process.'],
+      ['Do I need design-build for a basement renovation?', 'It depends on scope. A straightforward finish rarely needs it. More structural projects, such as underpinning, a walkout entrance, or a legal secondary suite, often benefit from design and construction being coordinated from the start.'],
+      ['Does Reno Rise offer design-build services?', 'No. Reno Rise is a project-enquiry and contractor-matching service. It reviews submitted project details and matches the project with an independent professional, which may be a design-build company or a standalone contractor depending on the project.'],
+    ],
+    related: [['Basement Renovation Steps', 'blog/basement-renovation-steps.html'], ['Basement Renovation', 'services/basement-renovation/'], ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Underpinning', 'services/underpinning/']],
   },
 ];
 
