@@ -12,6 +12,7 @@ const run = (file, args = []) => {
 
 run('minify-css.js');
 run('pages/suite.js');
+run('pages/city-service.js');
 run('pages/home.js');
 run('pages/cluster.js');
 run('pages/flooring.js');

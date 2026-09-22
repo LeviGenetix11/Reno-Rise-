@@ -280,13 +280,15 @@ ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|ins
   ok(min.length < src.length, 'css/style.min.css should be smaller than the source stylesheet');
 }
 
-// hero video: homepage + the keyword landing pages only
+// hero video: homepage + the keyword landing pages + the city+service landing pages only
 {
   const { LANDINGS } = require('./pages/landing-data');
-  const want = new Set(['index.html', ...LANDINGS.map((l) => `services/${l.slug}/index.html`)]);
+  const { PAGES: CITY_SERVICE } = require('./pages/city-service');
+  const want = new Set(['index.html', ...LANDINGS.map((l) => `services/${l.slug}/index.html`), ...CITY_SERVICE.map((p) => `services/${p.slug}/index.html`)]);
   const have = [...pages.keys()].filter((rel) => /data-hero-video/.test(pages.get(rel).html));
   ok(LANDINGS.length === 11, `expected 11 landing pages, found ${LANDINGS.length}`);
-  ok(have.length === want.size && have.every((r) => want.has(r)), `hero video should be on exactly the homepage and the landing pages; found on ${have.join(', ')}`);
+  ok(CITY_SERVICE.length === 11, `expected 11 city+service landing pages, found ${CITY_SERVICE.length}`);
+  ok(have.length === want.size && have.every((r) => want.has(r)), `hero video should be on exactly the homepage, the landing pages and the city+service pages; found on ${have.join(', ')}`);
   for (const rel of want) {
     const h = pages.get(rel).html;
     const v = (h.match(/<video class="hero-video"[^>]*>/) || [''])[0];

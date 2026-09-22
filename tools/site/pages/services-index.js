@@ -36,7 +36,7 @@ const GROUPS = [
   ['Waterproofing & moisture control', ['basement-waterproofing', 'interior-waterproofing', 'exterior-waterproofing', 'wet-basement-repair', 'foundation-crack-repair', 'weeping-tile', 'french-drain', 'sump-pump', 'backwater-valve', 'parging', 'waterproofing-contractor']],
   ['Electrical & plumbing for basement projects', ['panel-upgrade', 'knob-and-tube-removal', 'aluminum-wiring-replacement', 'pot-light-installation', 'water-line-replacement']],
   ['Finishing, comfort & planning', ['basement-finishing', 'basement-flooring', 'basement-soundproofing', 'design-planning', 'laundry-room-renovation']],
-  ['Toronto & GTA basement pages', ['basement-renovation-toronto', 'basement-renovation-ajax', 'basement-renovation-oakville', 'basement-renovation-pickering', 'basement-renovation-richmond-hill', 'basement-renovation-vaughan']],
+  ['Toronto & GTA basement pages', ['basement-renovation-toronto', 'basement-renovation-ajax', 'basement-renovation-oakville', 'basement-renovation-pickering', 'basement-renovation-richmond-hill', 'basement-renovation-vaughan', 'basement-renovation-markham', 'basement-renovation-aurora', 'basement-renovation-newmarket', 'basement-renovation-oshawa', 'basement-renovation-brampton', 'basement-renovation-whitby', 'basement-renovation-etobicoke', 'basement-waterproofing-brampton', 'basement-waterproofing-north-york', 'basement-waterproofing-markham', 'basement-waterproofing-ajax']],
 ];
 const CORE = new Set(['basement-renovation', 'legal-basement-apartment-toronto']);
 const usedInBasement = new Set([...CORE]);
