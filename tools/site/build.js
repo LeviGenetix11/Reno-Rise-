@@ -10,6 +10,7 @@ const run = (file, args = []) => {
   execFileSync(process.execPath, [path.join(here, file), ...args], { stdio: 'inherit' });
 };
 
+run('minify-css.js');
 run('pages/suite.js');
 run('pages/home.js');
 run('pages/cluster.js');

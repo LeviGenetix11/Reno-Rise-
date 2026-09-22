@@ -99,10 +99,10 @@ const main = `
     <div class="topic-grid">
 ${card({ icon: 'home', title: 'Basement Renovations', text: 'A family room, guest room, office or gym. Plan the scope, the order of work and the questions to ask.', href: 'services/basement-renovation/', primary: true, cta: 'Plan a renovation' })}
 ${card({ icon: 'suite', title: 'Legal Secondary Suites', text: 'What makes a basement apartment legal, how it differs from a finished basement, and what to confirm with Toronto Building.', href: 'services/legal-basement-apartment-toronto/', primary: true, cta: 'Read the suite guide' })}
-${card({ icon: 'foundation', title: 'Basement Underpinning', text: 'Lowering a floor to gain ceiling height is structural work. Learn when it comes up and how it is approached.', href: 'services/underpinning/' })}
-${card({ icon: 'water', title: 'Waterproofing &amp; Moisture Control', text: 'Diagnose the cause of damp or leaks before finishing. Interior, exterior and drainage options explained.', href: 'services/interior-waterproofing/' })}
-${card({ icon: 'window', title: 'Egress Windows &amp; Separate Entrances', text: 'Safe exits, natural light and a private entrance are central to a suite. See what is involved.', href: 'services/egress-windows/' })}
-${card({ icon: 'plan', title: 'Permit &amp; Design Planning', text: 'Which basement work needs a permit in Toronto, and how drawings, engineers and inspections fit in.', href: 'blog/basement-renovation-permits-toronto.html' })}
+${card({ icon: 'foundation', title: 'Basement Underpinning', text: 'Lowering a floor to gain ceiling height is structural work. Learn when it comes up and how it is approached.', href: 'services/underpinning/', cta: 'Explore underpinning' })}
+${card({ icon: 'water', title: 'Waterproofing &amp; Moisture Control', text: 'Diagnose the cause of damp or leaks before finishing. Interior, exterior and drainage options explained.', href: 'services/interior-waterproofing/', cta: 'Explore waterproofing' })}
+${card({ icon: 'window', title: 'Egress Windows &amp; Separate Entrances', text: 'Safe exits, natural light and a private entrance are central to a suite. See what is involved.', href: 'services/egress-windows/', cta: 'Explore egress windows' })}
+${card({ icon: 'plan', title: 'Permit &amp; Design Planning', text: 'Which basement work needs a permit in Toronto, and how drawings, engineers and inspections fit in.', href: 'blog/basement-renovation-permits-toronto.html', cta: 'Explore permits &amp; design' })}
     </div>
     <p class="section-more"><a href="${h('services/#basement-renovations-secondary-suites')}" class="btn btn-dark">View all basement services ${L.ICON.arrow}</a></p>
     <div class="other-resources" id="other-resources">

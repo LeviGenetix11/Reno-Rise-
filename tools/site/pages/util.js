@@ -9,7 +9,19 @@ const ROOT = path.resolve(__dirname, '..', '..', '..');
 function write(rel, html) {
   const file = path.join(ROOT, rel);
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, html.split('\r\n').join('\n'));
+  const body = html.split('\r\n').join('\n');
+  // OneDrive (this repo lives in an OneDrive-synced folder) sometimes holds a file locked
+  // for a moment while it syncs; retry a few times before giving up.
+  for (let attempt = 1; ; attempt++) {
+    try {
+      fs.writeFileSync(file, body);
+      break;
+    } catch (err) {
+      if (attempt >= 5 || err.code !== 'UNKNOWN') throw err;
+      const until = Date.now() + 200 * attempt;
+      while (Date.now() < until) { /* brief busy-wait: no async in these sync build scripts */ }
+    }
+  }
   console.log('wrote', rel);
 }
 

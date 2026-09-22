@@ -240,8 +240,44 @@ ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|ins
   for (const [rel, { html }] of pages) {
     ok(!/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(html), `${rel}: still loads Google Fonts`);
     ok(/<link rel="preload" href="[^"]*fonts\/plus-jakarta-sans-v12-latin\.woff2" as="font" type="font\/woff2" crossorigin>/.test(html), `${rel}: needs the preload for the self-hosted font (with crossorigin)`);
-    ok(html.indexOf('rel="preload"') < html.indexOf('css/style.css'), `${rel}: the font preload should come before the stylesheet`);
+    ok(html.indexOf('rel="preload"') < html.indexOf('css/style.min.css'), `${rel}: the font preload should come before the stylesheet`);
+    ok(!/css\/style\.css"/.test(html), `${rel}: should link the minified stylesheet, not css/style.css`);
   }
+}
+
+// security headers: HSTS, COOP and a CSP that is at least restricted to the origins the site actually uses
+{
+  const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  const site = (vercel.headers || []).find((h) => h.source === '/(.*)');
+  ok(!!site, 'vercel.json needs a header rule matching every page');
+  const val = (key) => (site.headers.find((x) => x.key === key) || {}).value || '';
+  ok(/max-age=\d{7,}/.test(val('Strict-Transport-Security')), 'HSTS max-age missing or too short');
+  ok(val('Cross-Origin-Opener-Policy') === 'same-origin', 'COOP should be same-origin');
+  const csp = val('Content-Security-Policy');
+  ok(!!csp, 'Content-Security-Policy header is missing');
+  ok(/object-src 'none'/.test(csp), "CSP: object-src 'none' is missing");
+  ok(/base-uri 'self'/.test(csp), "CSP: base-uri 'self' is missing");
+  ok(/frame-ancestors 'self'/.test(csp), "CSP: frame-ancestors 'self' is missing");
+  ok(/form-action 'self'/.test(csp), "CSP: form-action 'self' is missing");
+  ok(!/script-src[^;]*'unsafe-inline'/.test(csp), 'CSP: script-src must not allow unsafe-inline (the site has no inline scripts left to justify it)');
+  ok(/script-src[^;]*https:\/\/challenges\.cloudflare\.com/.test(csp) && /script-src[^;]*https:\/\/app\.cal\.com/.test(csp), 'CSP: script-src is missing Turnstile or Cal.com');
+  ok(/frame-src[^;]*https:\/\/challenges\.cloudflare\.com/.test(csp) && /frame-src[^;]*https:\/\/app\.cal\.com/.test(csp), 'CSP: frame-src is missing Turnstile or Cal.com');
+  ok(/connect-src[^;]*https:\/\/renorise-forms\.levi-gene-ous\.workers\.dev/.test(csp), 'CSP: connect-src is missing the leads API');
+  ok(!/fonts\.googleapis|fonts\.gstatic/.test(csp), 'CSP still allow-lists Google Fonts, which the site no longer uses');
+  // the one remaining inline construct on every page is JSON-LD, which browsers never execute as script regardless of CSP
+  for (const [rel, { html }] of pages) {
+    const inlineScripts = [...html.matchAll(/<script(\b[^>]*)>([\s\S]*?)<\/script>/g)].filter(([, attrs]) => !/\bsrc=/.test(attrs) && !/type="application\/ld\+json"/.test(attrs));
+    ok(inlineScripts.length === 0, `${rel}: has an inline <script> that a strict script-src (no 'unsafe-inline') would block: ${inlineScripts.map((m) => m[0].slice(0, 60)).join(' | ')}`);
+  }
+}
+
+// css/style.min.css (the file every page actually links to) must be freshly built from css/style.css
+{
+  const { minifyCss } = require('./minify-css.js');
+  const src = fs.readFileSync(path.join(ROOT, 'css', 'style.css'), 'utf8');
+  const min = fs.readFileSync(path.join(ROOT, 'css', 'style.min.css'), 'utf8');
+  ok(min === minifyCss(src), 'css/style.min.css is stale: run node tools/site/minify-css.js (part of build.js) after editing css/style.css');
+  ok(min.length < src.length, 'css/style.min.css should be smaller than the source stylesheet');
 }
 
 // hero video: homepage + the keyword landing pages only

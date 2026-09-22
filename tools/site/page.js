@@ -81,7 +81,7 @@ function head({ depth, path, title, description, ogImage, ldGraph = [], robots =
 <meta name="description" content="${d}">
 ${robots ? `<meta name="robots" content="${robots}">\n` : ''}<link rel="canonical" href="${url}">
 <link rel="preload" href="${up(depth)}fonts/plus-jakarta-sans-v12-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="${up(depth)}css/style.css">
+<link rel="stylesheet" href="${up(depth)}css/style.min.css">
 <link rel="icon" type="image/png" href="${up(depth)}images/favicon.png">
 <link rel="apple-touch-icon" href="${up(depth)}images/apple-touch-icon.png">
 

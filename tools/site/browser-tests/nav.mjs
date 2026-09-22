@@ -18,6 +18,18 @@ const PROBE = process.argv.includes('--probe');
 const PORT = 8871;
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.mp4': 'video/mp4' };
 
+// Apply the same response headers vercel.json configures, so the tests exercise the real
+// Content-Security-Policy (a broken CSP would otherwise only be discovered in production).
+const VERCEL_CONFIG = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
+// This repo's only "source" pattern shape is a literal path followed by the Vercel wildcard "(.*)".
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const vercelSourceToRegExp = (source) => new RegExp('^' + source.split('(.*)').map(escapeRe).join('.*') + '$');
+const HEADER_RULES = (VERCEL_CONFIG.headers || []).map((r) => ({ re: vercelSourceToRegExp(r.source), headers: r.headers }));
+function vercelHeadersFor(pathname) {
+  const out = {};
+  for (const rule of HEADER_RULES) if (rule.re.test(pathname)) for (const { key, value } of rule.headers) out[key] = value;
+  return out;
+}
 const server = createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
   const p = decodeURIComponent(url.pathname);
@@ -26,8 +38,9 @@ const server = createServer((req, res) => {
     if (!p.endsWith('/')) { res.writeHead(308, { Location: p + '/' + url.search }); return res.end(); }
     f = join(f, 'index.html');
   }
-  if (!existsSync(f)) { res.writeHead(404, { 'Content-Type': 'text/html' }); return res.end('not found'); }
-  res.writeHead(200, { 'Content-Type': MIME[extname(f)] || 'application/octet-stream' });
+  const extraHeaders = vercelHeadersFor(p);
+  if (!existsSync(f)) { res.writeHead(404, { 'Content-Type': 'text/html', ...extraHeaders }); return res.end('not found'); }
+  res.writeHead(200, { 'Content-Type': MIME[extname(f)] || 'application/octet-stream', ...extraHeaders });
   res.end(readFileSync(f));
 });
 await new Promise((r) => server.listen(PORT, '127.0.0.1', r));
@@ -357,7 +370,7 @@ for (const [w, label] of [[1440, 'two columns'], [1000, 'one column, video on'],
   for (const bk of blocks) {
     const png = await page.screenshot({ clip: { x: bk.x, y: bk.y, width: Math.max(1, bk.w), height: Math.max(1, bk.h) }, fullPage: true });
     const lum = await page.evaluate(async (b64) => {
-      const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
+      const bin = atob(b64); const bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); const img = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
       const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
       const g = c.getContext('2d'); g.drawImage(img, 0, 0);
       const d = g.getImageData(0, 0, c.width, c.height).data; let max = 0;
@@ -440,7 +453,7 @@ for (const [path, w] of [[LANDING[0], 1440], [LANDING[4], 1000], [LANDING[7], 39
   for (const bk of blocks) {
     const png = await page.screenshot({ clip: { x: bk.x, y: bk.y, width: Math.max(1, bk.w), height: Math.max(1, bk.h) }, fullPage: true });
     const lum = await page.evaluate(async (b64) => {
-      const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + b64)).blob());
+      const bin = atob(b64); const bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); const img = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
       const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
       const g = c.getContext('2d'); g.drawImage(img, 0, 0);
       const d = g.getImageData(0, 0, c.width, c.height).data; let max = 0;

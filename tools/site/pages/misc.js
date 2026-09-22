@@ -83,29 +83,7 @@ const formScript = (depth) => `<script src="${L.up(depth)}js/assessment-form.js"
   </div>
 </section>
 `;
-  const script = `<script>
-  // Only show the personalized success message to a browser that just
-  // completed a real submission (flagged by assessment-form.js right
-  // before it redirected here). Everyone else, including anyone who
-  // bookmarks or shares this URL, sees the fallback above.
-  (function () {
-    var FLAG = 'renoriseAssessmentSubmitted';
-    var justSubmitted = false;
-    try { justSubmitted = sessionStorage.getItem(FLAG) === '1'; } catch (err) { justSubmitted = false; }
-    if (justSubmitted) {
-      document.getElementById('ty-fallback').hidden = true;
-      document.getElementById('ty-success').hidden = false;
-      document.getElementById('ty-title').textContent = 'Thanks — we have your basement enquiry.';
-      try { sessionStorage.removeItem(FLAG); } catch (err) { /* ignore */ }
-${booking.enabled ? `      // The booking link carries only an opaque reference (never contact details); it is a hint, not proof of identity.
-      var link = document.getElementById('ty-book-link');
-      var ref = null;
-      try { ref = sessionStorage.getItem('renoriseBookingRef'); sessionStorage.removeItem('renoriseBookingRef'); } catch (err) { ref = null; }
-      if (link && ref && /^[A-Za-z0-9_-]{20,64}$/.test(ref)) link.href = link.getAttribute('href') + '?r=' + ref;
-` : ''}    }
-  })();
-</script>
-`;
+  const script = `<script src="${L.up(depth)}js/thank-you.js"></script>\n`;
   U.write('assessment/thank-you.html', PG.renderPage({
     depth, path: 'assessment/thank-you.html',
     title: 'Thank You | Reno Rise',

@@ -10,6 +10,21 @@ const path = require('path');
 const L = require('./lib');
 const PG = require('./page');
 const { CLAIM_RULES, META_RULES } = require('./claims');
+
+// OneDrive (this repo lives in an OneDrive-synced folder) sometimes holds a file locked for
+// a moment while it syncs; retry a few times before giving up.
+function writeRetrying(file, body) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      fs.writeFileSync(file, body);
+      return;
+    } catch (err) {
+      if (attempt >= 5 || err.code !== 'UNKNOWN') throw err;
+      const until = Date.now() + 200 * attempt;
+      while (Date.now() < until) { /* brief busy-wait: no async in these sync build scripts */ }
+    }
+  }
+}
 const { transformSecondaryService } = require('./secondary');
 
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -271,8 +286,10 @@ function selfHostFonts(h) {
   h = h.replace(/<link rel="preload" as="style" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
   h = h.replace(/<noscript><link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*><\/noscript>\n?/g, '');
   h = h.replace(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
+  // Every page links to the minified stylesheet (tools/site/minify-css.js), not the hand-authored source.
+  h = h.replace(/(<link rel="stylesheet" href="[^"]*)css\/style\.css(">)/, '$1css/style.min.css$2');
   if (!h.includes(FONT_FILE)) {
-    h = h.replace(/(<link rel="stylesheet" href="([^"]*)css\/style\.css">)/, (m, link, prefix) => `<link rel="preload" href="${prefix}${FONT_FILE}" as="font" type="font/woff2" crossorigin>\n${link}`);
+    h = h.replace(/(<link rel="stylesheet" href="([^"]*)css\/style\.min\.css">)/, (m, link, prefix) => `<link rel="preload" href="${prefix}${FONT_FILE}" as="font" type="font/woff2" crossorigin>\n${link}`);
   }
   return h;
 }
@@ -369,7 +386,7 @@ function main() {
     const out = transform(f, html, stats);
     if (out !== null) {
       stats.changed++;
-      if (!CHECK) fs.writeFileSync(f, out);
+      if (!CHECK) writeRetrying(f, out);
     }
   }
   console.log(`${CHECK ? '[check] ' : ''}pages: ${files.length}, changed: ${stats.changed}`);
