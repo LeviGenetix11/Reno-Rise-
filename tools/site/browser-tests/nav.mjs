@@ -303,7 +303,7 @@ for (const w of [768, 390, 360, 900, 1023]) {
   const btns = await page.$$eval('.hero-actions a', (as) => as.map((a) => { const h = a.getAttribute('href'); return [a.textContent.trim(), h.startsWith('./') ? h.slice(2) : h]; }));
   t('hero: primary "Tell Us About Your Project" -> the enquiry form; secondary -> legal suite page', JSON.stringify(btns) === JSON.stringify([['Tell Us About Your Project', '#assessment-form'], ['Explore Legal Suite Requirements', 'services/legal-basement-apartment-toronto/']]), JSON.stringify(btns));
   t('hero: no disclosure line above/below the buttons, no grid lines, no video button', (await page.locator('.hero .hero-note').count()) === 0 && (await page.$eval('.hero-video-toggle', (b) => { const r = b.getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })) && (await page.$eval('.hero-has-video', (h) => getComputedStyle(h, '::before').backgroundImage.includes('linear-gradient(rgba(255, 255, 255') === false)));
-  t('diagram: new fine print, numbered key kept', (await txt('.diagram-caption')) === 'Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.' && (await page.locator('.diagram-legend li').count()) === 5);
+  t('diagram: fine print removed from the hero, numbered key kept', (await page.locator('.hero .diagram-caption').count()) === 0 && (await page.locator('.diagram-legend li').count()) === 5);
   const order = await page.$$eval('main > section', (ss) => ss.map((s) => (s.querySelector('h1, h2') || {}).textContent?.replace(/\s+/g, ' ').trim()));
   t('homepage sections are in the requested order', ['Basement Renovations & Legal Secondary Suites in Toronto', 'How Reno Rise Works', 'What Would You Like to Do With Your Basement?', 'Finished Basement or Legal Secondary Suite?', 'Cost, Permit & Planning Guides', 'Why Homeowners Use Reno Rise'].every((h, i) => order[i] === h) && order[order.length - 2] === 'Frequently Asked Questions' && order[order.length - 1] === 'Tell Us About Your Project', JSON.stringify(order));
   const steps = await page.$$eval('.how-steps h3', (hs) => hs.map((h) => h.textContent.trim()));
@@ -464,8 +464,7 @@ for (const [path, w] of [[LANDING[0], 1440], [LANDING[4], 1000], [LANDING[7], 39
   const box = await page.locator('.diagram-card').boundingBox();
   const key = await page.locator('.diagram-legend li').first().evaluate((li) => parseFloat(getComputedStyle(li).fontSize));
   t('diagram @360px: fits the screen and the key text is at least 13px', box.x >= 0 && box.x + box.width <= 360 && key >= 13, `${Math.round(box.width)}px wide, key ${key}px`);
-  const cap = await page.locator('.diagram-caption').evaluate((c) => parseFloat(getComputedStyle(c).fontSize));
-  t('diagram @360px: fine print at least 12px', cap >= 12, `${cap}px`);
+  t('diagram @360px: no fine print under the hero diagram', (await page.locator('.diagram-caption').count()) === 0);
   await ctx.close();
 }
 

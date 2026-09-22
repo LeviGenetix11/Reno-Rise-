@@ -155,7 +155,7 @@ const heroActions = links(between(main, '<div class="hero-actions">', '</div>'))
 ok(heroActions[0] && heroActions[0].text === 'Tell Us About Your Project' && heroActions[0].href === '#assessment-form', 'hero primary button should be "Tell Us About Your Project" -> #assessment-form');
 ok(heroActions[1] && heroActions[1].text === 'Explore Legal Suite Requirements' && resolve('index.html', heroActions[1].href).url === `${SITE}/services/legal-basement-apartment-toronto/`, 'hero secondary button changed');
 ok(!/class="hero-note"/.test(between(main, '<section class="hero', '</section>')), 'the hero disclosure line above the button was asked to be removed');
-ok(decode((main.match(/<figcaption class="diagram-caption">([\s\S]*?)<\/figcaption>/) || [])[1] || '') === 'Planning illustration only. Property requirements vary. Confirm applicable requirements with Toronto Building and the professionals responsible for your project.', 'diagram fine print is not the requested text');
+ok(!/<figcaption class="diagram-caption">Planning illustration only\./.test(main), 'the homepage hero diagram caption was asked to be removed');
 ok((main.match(/class="dg-num"/g) || []).length === 5, 'diagram numbered topics changed');
 ok(/id="assessment-form"[\s\S]*data-assessment-form-mount data-source="homepage"/.test(main), 'homepage enquiry form mount is missing');
 const heroVideo = (main.match(/<video class="hero-video"[^>]*>/) || [''])[0];

@@ -55,7 +55,7 @@ const hero = `<!-- ========== HERO ========== -->
         <a href="${h('services/legal-basement-apartment-toronto/')}" class="btn btn-outline">Explore Legal Suite Requirements</a>
       </div>
     </div>
-    ${L.diagramCard({ id: 'dgh' })}
+    ${L.diagramCard({ id: 'dgh', caption: false })}
   </div>
 </section>
 `;

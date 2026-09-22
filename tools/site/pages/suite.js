@@ -258,7 +258,7 @@ const heroWithActions = L.splitHero(depth, {
   sub: 'Plan a code-compliant secondary suite: what it involves, what to confirm with the City, and how to connect with qualified Toronto professionals.',
   primary: ['Request a Basement Assessment', '#assessment-form'],
   secondary: ['Explore Legal Suite Requirements', '#what-makes-legal'],
-  visual: L.diagramCard({ id: 'dgh' }),
+  visual: L.diagramCard({ id: 'dgh', caption: false }),
 });
 
 const title = 'Legal Basement Apartment Toronto | Secondary Suite Guide & Quotes';

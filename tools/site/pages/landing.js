@@ -33,7 +33,7 @@ function build(d) {
   const path = `services/${d.slug}/`;
   const visual = d.photo
     ? L.photoCard({ file: d.photo[0], alt: d.photo[1], credit: d.photo[2] })
-    : L.diagramCard({ id: 'dgl' });
+    : L.diagramCard({ id: 'dgl', caption: false });
   const hero = L.splitHero(depth, {
     crumbs: [['Home', ''], ['Services', 'services/'], [d.crumb, '']],
     eyebrow: d.eyebrow,
