@@ -1,5 +1,9 @@
 SEO_brief/
 
+# Local secrets (e.g. PEXELS_API_KEY) — never commit.
+.env
+.env.local
+
 # Cloudflare Worker (renorise-forms) local/dev artifacts — never commit
 # secrets or local state.
 renorise-forms/node_modules/

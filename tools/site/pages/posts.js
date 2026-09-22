@@ -381,6 +381,291 @@ const POSTS = [
     ],
     related: [['Basement Waterproofing', 'services/basement-waterproofing/'], ['Interior Waterproofing', 'services/interior-waterproofing/'], ['Wet Basement Repair', 'services/wet-basement-repair/'], ['Basement Renovation', 'services/basement-renovation/']],
   },
+
+  // ------------------------------------------------------------------ 7
+  {
+    file: 'basement-renovation-steps.html',
+    cats: 'planning permits waterproofing',
+    tag: 'Basement Planning',
+    title: 'Basement Renovation Steps in Toronto: The Order That Actually Works',
+    metaTitle: 'Basement Renovation Steps in Toronto, In Order',
+    short: 'Basement Renovation Steps',
+    description: 'Basement renovation steps in the right order: moisture first, permits, framing, electrical, plumbing, windows and finishes. The Toronto sequence, explained.',
+    excerpt: 'Nine steps, in the order that actually works, and the two most people skip until it costs them.',
+    img: 'room-under-renovation',
+    alt: 'Room under renovation with a ladder and drywall',
+    formType: 'General basement renovation',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('room-under-renovation', 'Room under renovation with a ladder and drywall', 'Photo: Valentin Ivantsov on Pexels')}
+    <p>The short answer: a <strong>basement renovation</strong> generally follows nine steps, in this order &mdash; fix moisture and drainage, confirm permits, frame and insulate, run electrical, run plumbing, handle windows and entrances, close up walls and ceiling, lay flooring, then paint and finish. Do them out of order and you usually redo one of them. Twice, if you are unlucky.</p>
+    <p>None of this is a secret. It is just easy to skip when a basement has sat unfinished for years and you finally want to see drywall go up this weekend. Slow down for nine steps and the rest of the project gets a lot calmer.</p>
+
+    ${U.toc([
+      ['step-1-scope', 'Step 1: Decide the scope'],
+      ['step-2-permits', 'Step 2: Confirm what needs a permit'],
+      ['step-3-moisture', 'Step 3: Deal with moisture first'],
+      ['step-4-framing', 'Step 4: Frame and insulate'],
+      ['step-5-electrical', 'Step 5: Electrical rough-in'],
+      ['step-6-plumbing', 'Step 6: Plumbing rough-in'],
+      ['step-7-windows', 'Step 7: Windows and entrances'],
+      ['step-8-close-up', 'Step 8: Close up walls, ceiling and floor'],
+      ['step-9-finish', 'Step 9: Paint, lighting and finishing touches'],
+      ['timeline', 'How long each step typically takes'],
+      ['which-step-pro', 'Which steps need a licensed professional'],
+      ['faq', 'Frequently asked questions'],
+    ])}
+
+    <h2 id="step-1-scope">Step 1: Decide the Scope</h2>
+    <p>Before anyone measures a stud wall, decide what the room is for: a family room, a home gym, an office, or a future ${SUITE}. That answer changes ceiling height requirements, plumbing, and whether you need an egress window. Homeowners do not want a menu of twelve options here. They want a plan, so pick one and write it down.</p>
+
+    <h2 id="step-2-permits">Step 2: Confirm What Needs a Permit</h2>
+    <p>Toronto Building says structural changes, new plumbing or heating, underpinning, a new basement entrance and a second dwelling unit all need a ${X(SRC.permit, 'building permit')}. Paint and flooring on a safe existing layout generally do not. Confirm your exact scope before step 3, not after step 6, because "it's just finishing" is how a permit conversation turns into a stop-work order.</p>
+    <p>This step also takes longer than people expect. Drawings, applications and review are measured in weeks, not days, so it is the first thing to start, not the thing you squeeze in once the framing is already up.</p>
+
+    <h2 id="step-3-moisture">Step 3: Deal With Moisture First</h2>
+    <p>A familiar scenario: a basement feels &ldquo;warm, kind of cozy&rdquo; all winter. It is not cozy. It is humid enough to fog the windows from the inside, which is mould&rsquo;s favourite vacation spot. Comfort can be a disguise, and warmth is not always safety.</p>
+    <p>Any history of dampness gets diagnosed and fixed before framing starts, not after. See ${A('blog/basement-waterproofing-before-renovation.html', 'basement waterproofing before renovation')} for the full breakdown of causes and fixes. Finishing over a wet basement does not solve it. It just buys the mould some drywall to hide behind.</p>
+    <p>This is also the step where ceiling height gets a real measurement, not a guess from standing in the doorway. If the number is close to Ontario&rsquo;s roughly 1.95 metre basement minimum, that changes what steps 4 and 8 can achieve, and it is far cheaper to know that now than after the framing is already up.</p>
+
+    <h2 id="step-4-framing">Step 4: Frame and Insulate</h2>
+    <p>Once the space is dry, stud walls go up against the foundation with proper insulation behind them, and ceiling height gets checked against what the finished floor, insulation and ceiling assembly will actually take away. If height is tight, that is a conversation for an ${A('blog/basement-underpinning-cost-and-when-needed.html', 'underpinning or bench footing')} decision, not a surprise at drywall stage.</p>
+
+    <h2 id="step-5-electrical">Step 5: Electrical Rough-In</h2>
+    <p>Wiring, outlets, lighting circuits and panel capacity get run and inspected before the walls close up, because nobody wants to cut open a finished ceiling to add one more pot light. Ask who pulls the electrical permit and books the inspection, and get the answer in writing.</p>
+
+    <h2 id="step-6-plumbing">Step 6: Plumbing Rough-In</h2>
+    <p>If the plan includes a bathroom, a kitchenette or a laundry hookup, drains, supply lines and venting are run at this stage, sometimes with a sewage ejector pump if gravity will not cooperate with the existing line. This is also the step that most changes a suite budget, so confirm it before you fall in love with a tile pattern.</p>
+
+    <h2 id="step-7-windows">Step 7: Windows and Entrances</h2>
+    ${U.sectionImage(depth, { file: 'basement-staircase-brick-wall', alt: 'Staircase down to a basement beside an exposed brick wall', credit: 'Photo: Curtis Adams on Pexels' })}
+    <p>A basement bedroom or a secondary suite generally needs a safe way out, which is what an ${A('blog/egress-windows-toronto-basements.html', 'egress window')} is for. A separate below-grade entrance, if the plan calls for one, is its own structural project; see ${A('services/walkout-construction/', 'walkout construction')}. Both get planned around the framing that is already up, not cut into it as an afterthought.</p>
+
+    <h2 id="step-8-close-up">Step 8: Close Up Walls, Ceiling and Floor</h2>
+    <p>With inspections passed on the rough-ins, drywall, a fire-rated ceiling assembly where one is required, and subfloor and flooring suited to a below-grade slab go in. A below-grade floor has its own moisture and height questions; see ${A('services/basement-flooring/', 'basement flooring for a below-grade slab')} before choosing a material.</p>
+
+    <h2 id="step-9-finish">Step 9: Paint, Lighting and Finishing Touches</h2>
+    ${U.sectionImage(depth, { file: 'finished-basement-living-room', alt: 'Finished basement living room with a large television and sectional sofa', credit: 'Photo: Curtis Adams on Pexels' })}
+    <p>Paint, trim, light fixtures and furniture are the fun part, and they are supposed to be. This is also the step people try to rush toward from step one, which is exactly backwards. Get here in order and it stays fun. Get here early and you are just decorating a problem.</p>
+
+    <h2 id="timeline">How Long Each Step Typically Takes</h2>
+    <p>Timelines vary by scope, but this is the rough shape of a straightforward finish, once permits are approved:</p>
+    ${U.checkList([
+      '<strong>Permits and drawings:</strong> two to six weeks, depending on scope and how busy the City is.',
+      '<strong>Moisture fixes, if needed:</strong> a few days for minor grading and downspout work; longer for excavation-based waterproofing.',
+      '<strong>Framing, electrical and plumbing rough-ins:</strong> one to three weeks, plus inspection wait times between each.',
+      '<strong>Windows, entrances, drywall and flooring:</strong> two to four weeks.',
+      '<strong>Paint and finishing touches:</strong> a few days to a week.',
+    ])}
+    <p>Add it up and a straightforward basement finish often runs six to twelve weeks of actual construction, not counting the permit wait beforehand. A suite conversion, underpinning or a walkout entrance extends that considerably, because the structural steps above take longer and often happen in sequence rather than side by side.</p>
+
+    <h2 id="which-step-pro">Which Steps Need a Licensed Professional</h2>
+    <p>Most pros overcomplicate this to sound essential for everything. They are not. A confident homeowner can often prime and paint, assemble furniture, and choose finishes. Electrical, plumbing, structural framing, underpinning and anything touching a permit are a different conversation, because a mistake there is not cosmetic. It is the kind of problem that introduces itself later, usually at an inspection or a sale.</p>
+    ${U.checkList([
+      'Ask each professional what part of the sequence they handle, and what they do not.',
+      'Confirm who pulls permits and books inspections for their portion of the work.',
+      'Get the order of trades in writing, so nobody drywalls over another trade&rsquo;s unfinished rough-in.',
+      'Keep a folder of permits, inspection records and warranties as you go, not after the fact.',
+    ])}
+    <p>&ldquo;Cash is cheaper&rdquo; is a sentence with a lot of company: Statistics Canada estimated that residential construction accounted for 32.7% of underground economic activity in 2023, the largest share of any industry (${X(SRC.statcan, 'Statistics Canada, March 2025')}). Skipping the licence and the permit on the steps above is how that statistic grows. It is also how a basement renovation becomes a story you tell your insurance adjuster.</p>
+    <p>If you would rather hand the whole sequence to someone else and just answer questions as they come up, that is what the form below is for. Share your basement and your goals, and Reno Rise matches your project with the contractor best suited to the work.</p>
+    ${TB_NOTE}
+    ${U.backToTop()}
+`,
+    faq: [
+      ['What is the correct order for a basement renovation?', 'Moisture and drainage first, then permits, framing and insulation, electrical, plumbing, windows and entrances, closing up the walls and ceiling, flooring, and finally paint and finishing touches. Working out of order usually means redoing a step.'],
+      ['What should I do first when renovating a basement?', 'Confirm the scope and check for any history of dampness before anything else. Finishing over an unresolved moisture problem is the single most common step people skip, and the most expensive one to skip.'],
+      ['How long does a basement renovation take?', 'It depends on scope, but a typical finish runs from several weeks to a few months once permits are in hand, longer if underpinning, a suite conversion or a walkout entrance is involved.'],
+      ['Do I need a permit for every step of a basement renovation in Toronto?', 'No. Toronto Building lists specific triggers, including structural changes, new plumbing or heating, underpinning, a new entrance and a second unit. Paint and flooring on a safe existing layout generally do not need one.'],
+      ['Can I do some basement renovation steps myself?', 'Often yes for painting, trim and furnishing. Electrical, plumbing, structural work and anything requiring a permit are usually best left to a licensed professional, both for safety and for inspection sign-off.'],
+      ['Which basement renovation step needs a professional the most?', 'Anything electrical, plumbing, structural or permit-triggering. Mistakes there are not cosmetic, and they tend to surface later at an inspection, a sale or an insurance claim.'],
+    ],
+    related: [['Basement Renovation', 'services/basement-renovation/'], ['Basement Waterproofing', 'blog/basement-waterproofing-before-renovation.html'], ['Permits in Toronto', 'blog/basement-renovation-permits-toronto.html'], ['Walkout Construction', 'services/walkout-construction/']],
+  },
+
+  // ------------------------------------------------------------------ 8
+  {
+    file: 'basement-renovation-before-and-after.html',
+    cats: 'planning suites',
+    tag: 'Basement Planning',
+    title: 'Basement Renovation Before and After: What Actually Changes',
+    metaTitle: 'Basement Renovation Before and After: 5 Changes',
+    short: 'Basement Renovation Before and After',
+    description: 'Basement renovation before and after: what really changes in a transformation, five common storylines, and the one shortcut that ruins the after photo.',
+    excerpt: 'Five common basement transformations, what changes in each one, and the shortcut that undoes all of it.',
+    img: 'finished-basement-living-room',
+    alt: 'Finished basement living room with a large television and sectional sofa',
+    formType: 'General basement renovation',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('finished-basement-living-room', 'Finished basement living room with a large television and sectional sofa', 'Photo: Curtis Adams on Pexels')}
+    <p>A <strong>basement renovation before and after</strong> almost always changes the same five things: light, moisture control, layout, ceiling finish and flooring. What differs is which room the space becomes. Below are the five transformations homeowners ask about most, what genuinely changes in each, and why chasing the after photo before fixing the before problem is how a nice basement becomes a repeat renovation.</p>
+    <p>A quick note before the pictures: these are common storylines, not one specific project. Every basement is a different &ldquo;before,&rdquo; and Reno Rise does not perform the renovation work itself; it matches your project with the contractor best suited to it. Think of the five below as a way to figure out which &ldquo;after&rdquo; you are actually picturing before you start asking contractors for one. If you want the full build sequence rather than the highlights, see ${A('blog/basement-renovation-steps.html', 'basement renovation steps in order')}.</p>
+
+    ${U.toc([
+      ['unfinished-to-family-room', 'Unfinished storage to family room'],
+      ['damp-to-dry', 'Damp and musty to dry and finished'],
+      ['low-light-to-office', 'Low light to home office'],
+      ['unused-to-suite', 'Unused space to legal secondary suite'],
+      ['storage-to-gym', 'Storage room to home gym'],
+      ['dated-to-modern', 'Dated finishes to a modern space'],
+      ['shortcut', 'The shortcut that ruins the after photo'],
+      ['what-it-costs', 'What a real transformation costs'],
+      ['faq', 'Frequently asked questions'],
+    ])}
+
+    <h2 id="unfinished-to-family-room">1. Unfinished Storage to Family Room</h2>
+    ${U.sectionImage(depth, { file: 'unfinished-basement-block-walls-joists', alt: 'Unfinished basement with block walls and exposed floor joists', credit: 'Photo: Curtis Adams on Pexels' })}
+    <p>This is the classic &ldquo;before&rdquo;: bare block walls, exposed joists, a bare bulb, and boxes nobody has opened since the move. The &ldquo;after&rdquo; adds framed and insulated walls, a proper ceiling, lighting on more than one switch, and flooring suited to a slab. Nothing structural usually changes here, which is why it is the most common transformation and often the most affordable one. See ${RENO} for how to scope it.</p>
+
+    <h2 id="damp-to-dry">2. Damp and Musty to Dry and Finished</h2>
+    ${U.sectionImage(depth, { file: 'water-on-basement-floor-near-stairs', alt: 'Standing water on a floor beside a staircase', credit: 'Photo: pppsdavid on Pexels' })}
+    <p>Your basement did not just start smelling weird. It has been filing complaints for months, and the &ldquo;before&rdquo; photo everyone hates is the water stain nobody wants to admit they have seen before. The real &ldquo;after&rdquo; here is not the paint colour, it is a diagnosed and fixed moisture source: a regraded downspout, repaired weeping tile, a sump pump, or exterior waterproofing, depending on where the water is actually coming from. See ${A('blog/basement-waterproofing-before-renovation.html', 'basement waterproofing before renovation')} for how that gets diagnosed.</p>
+
+    <h2 id="low-light-to-office">3. Low Light to Home Office</h2>
+    ${U.sectionImage(depth, { file: 'basement-room-with-windows', alt: 'Basement room with windows and natural light', credit: 'Photo: Peter Vang on Pexels' })}
+    <p>Small, high basement windows are wonderful for one thing, which is making a room feel like a cellar. The transformation that changes this is usually a larger window, sometimes an ${A('blog/egress-windows-toronto-basements.html', 'egress window')}, paired with layered lighting so the room does not depend on daylight alone. Daylight and a safe exit are what turn a cellar into a home office people actually use.</p>
+
+    <h2 id="unused-to-suite">4. Unused Space to Legal Secondary Suite</h2>
+    <p>This is the transformation with the most paperwork behind the photo. ${X(SRC.ontario, "Ontario's guide to second units")} describes a separate, self-contained unit with its own kitchen and bathroom, fire separation and exits, not just a kettle and a bed. The &ldquo;after&rdquo; also usually includes its own entrance, whether that is a window well and stairwell or a full ${A('services/walkout-construction/', 'walkout')}, since a suite that shares the front door with the main house is a much harder sell to a tenant and a much harder approval from the City. See the ${SUITE} for what makes it legal rather than just lived-in.</p>
+
+    <h2 id="storage-to-gym">5. Storage Room to Home Gym</h2>
+    ${U.sectionImage(depth, { file: 'basement-family-room-fireplace', alt: 'Basement family room with wood paneling and a fireplace', credit: 'Photo: Peter Vang on Pexels' })}
+    <p>This one is less about finishes and more about surfaces and services. A home gym wants a floor that tolerates dropped weights and moisture from a workout, enough electrical for equipment, and sometimes a dedicated exhaust fan so the room does not become the &ldquo;before&rdquo; photo for a humidity problem. It is a smaller-scope transformation than a full family room finish, but it still starts with the same first question: is the slab dry.</p>
+
+    <h2 id="dated-to-modern">6. Dated Finishes to a Modern Space</h2>
+    <p>Sometimes nothing is technically wrong with a basement finished twenty years ago. It just feels off: dim lighting, worn carpet, panelling that has not aged well. A home evolves, and rooms that do not evolve with it feel wrong even when nothing is broken. This is often the least invasive transformation, limited to flooring, lighting and paint. See ${A('services/basement-flooring/', 'basement flooring options')} for what suits a below-grade slab.</p>
+
+    <h2 id="shortcut">The Shortcut That Ruins the After Photo</h2>
+    <p>Here is the hot take: most disappointing &ldquo;after&rdquo; basements were not badly designed. They were finished over an unresolved problem, usually moisture or a ceiling height nobody measured. Cosmetic is the most dangerous word in renovations, because cosmetic is code for &ldquo;I do not want to deal with this yet.&rdquo; The cheapest time to fix the underlying issue is the first time someone mentions it, before a single stud goes up.</p>
+    ${U.checkList([
+      'Confirm there is no unresolved moisture history before finishes are chosen.',
+      'Measure ceiling height against what insulation, a subfloor and a ceiling assembly will take away.',
+      'Decide early whether the space should stay flexible for a future suite conversion.',
+      `Check whether the work needs a ${X(SRC.permit, 'building permit')} before it starts, not after.`,
+      'Get quotes itemized, so the &ldquo;after&rdquo; you are picturing matches what is actually being priced.',
+    ])}
+    <p>Picture the result you actually want, then work backward to what has to be true first. That is the difference between a basement that looks good in photos and one that still looks good in five years.</p>
+
+    <h2 id="what-it-costs">What a Real Transformation Costs</h2>
+    <p>None of the five storylines above have the same price tag, because the cost driver is never the paint colour. It is moisture, ceiling height, plumbing and permits. See ${A('blog/basement-renovation-cost-toronto.html', 'basement renovation cost in Toronto')} for the full list of what actually moves the number, so you can compare quotes for like-for-like scope instead of comparing a &ldquo;before&rdquo; photo to someone else&rsquo;s &ldquo;after.&rdquo;</p>
+    ${U.notice('<p>The stock photos in this article are illustrative examples of common basement conditions and finished spaces. They are not before-and-after photos of a single project, and they are not Reno Rise work.</p>')}
+    ${U.backToTop()}
+`,
+    faq: [
+      ['What changes the most in a basement renovation before and after?', 'Light, moisture control, layout, ceiling finish and flooring change in almost every transformation. Which room the space becomes depends on the goal: family room, office, gym or legal suite.'],
+      ['Why do some basement renovations look worse after a few years?', 'Usually because finishes were installed over an unresolved problem, most often moisture or a ceiling height nobody measured. The finishes hide the problem instead of fixing it.'],
+      ['Do I need a permit to change a basement from storage to a family room?', 'It depends on the work. Toronto Building requires a permit for structural or material changes, new plumbing or heating, and other specific triggers. Paint and flooring on a safe layout generally do not need one.'],
+      ['Is turning a basement into a legal secondary suite the same as finishing it?', 'No. A finished basement is extra space for your own household. A legal secondary suite is a separate, self-contained unit built to the rules for a second dwelling unit, including its own kitchen, bathroom and exits.'],
+      ['How much does a basement renovation transformation cost?', 'There is no single number. Moisture work, ceiling height, plumbing, electrical, windows and finishes all move the total, so request itemized quotes for your specific basement rather than a photo-based estimate.'],
+    ],
+    related: [['Basement Renovation', 'services/basement-renovation/'], ['Basement Waterproofing', 'blog/basement-waterproofing-before-renovation.html'], ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Egress Windows', 'blog/egress-windows-toronto-basements.html']],
+  },
+
+  // ------------------------------------------------------------------ 9
+  {
+    file: 'basement-walkout-construction.html',
+    cats: 'planning permits suites',
+    tag: 'Basement Planning',
+    title: 'Basement Walkout Construction in Toronto: What It Involves',
+    metaTitle: 'Basement Walkout Construction in Toronto',
+    short: 'Basement Walkout Construction',
+    description: 'Basement walkout construction in Toronto: what it involves, lot and structural requirements, the permit steps, and how it fits a legal secondary suite.',
+    excerpt: 'A separate below-grade entrance is one of the more involved basement projects. Here is what actually goes into one.',
+    img: 'basement-staircase-brick-wall',
+    alt: 'Staircase down to a basement beside an exposed brick wall',
+    formType: 'Separate entrance or egress window',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('basement-staircase-brick-wall', 'Staircase down to a basement beside an exposed brick wall', 'Photo: Curtis Adams on Pexels')}
+    <p><strong>Basement walkout construction</strong> means cutting a new below-grade entrance into the foundation, usually with a stairwell and drainage, so the basement has its own door to the outside. It is one of the more structural basement projects there is: one wall now has an opening where load used to be carried, so it needs engineering, not just excavation. Here is what the process actually involves, in Toronto.</p>
+
+    ${U.toc([
+      ['what-it-is', 'What basement walkout construction is'],
+      ['benefits', 'What a walkout actually changes'],
+      ['lot-requirements', 'Lot and site requirements'],
+      ['process', 'How the construction process works'],
+      ['permits', 'Permits and who is responsible'],
+      ['cost-drivers', 'What drives the cost of a walkout'],
+      ['suite-connection', 'How a walkout fits a legal secondary suite'],
+      ['alternatives', 'Alternatives to a full walkout'],
+      ['questions', 'Questions to ask before you hire'],
+      ['faq', 'Frequently asked questions'],
+    ])}
+
+    <h2 id="what-it-is">What Basement Walkout Construction Is</h2>
+    <p>A walkout replaces a section of foundation wall with a doorway, stairwell and drainage system, giving the basement a direct, grade-level exit instead of only the interior stairs. Done well, it also brings in daylight through a full-height door rather than a small window. Done badly, it brings in water, which is the entire reason this is a specialist&rsquo;s project and not a weekend one. It is one part of a larger project; see ${A('blog/basement-renovation-steps.html', 'basement renovation steps in order')} for where it fits alongside framing, electrical and the rest.</p>
+    <p>It is different from a walk-up basement, where an existing grade change already lets a door sit close to ground level, and different again from a daylight basement, where the wall is exposed above grade but there is no separate door. A true walkout means a new opening, cut specifically for the purpose, with a stairwell built to carry people and shed water at the same time.</p>
+
+    <h2 id="benefits">What a Walkout Actually Changes</h2>
+    ${U.checkList([
+      '<strong>A second, independent exit.</strong> Useful on its own, and often required for a legal secondary suite.',
+      '<strong>Real daylight.</strong> A full-height door lets in far more light than a small basement window ever will.',
+      '<strong>Usable outdoor connection.</strong> A basement with its own door to a patio or yard functions differently than one accessed only through the house.',
+      '<strong>Resale flexibility.</strong> A basement with an independent entrance is easier to market as a rental or in-law suite later, even if that is not the plan today.',
+    ])}
+    <p>None of that is free, and it is not supposed to be. This is structural work with a permit attached, not a weekend project with a bigger door.</p>
+
+    <h2 id="lot-requirements">Lot and Site Requirements</h2>
+    ${U.sectionImage(depth, { file: 'toronto-residential-street', alt: 'Residential street with semi-detached homes in a Toronto neighbourhood', credit: 'Photo: Parvez Mogal on Pexels' })}
+    <p>A sloped lot makes a walkout simpler, because part of the foundation is already closer to grade. On a flat lot, the same result usually means more excavation, a full stairwell down to the door, and more drainage to manage. Soil type, groundwater and how close the property line sits to the new stairwell all factor into what a designer will recommend for your house specifically.</p>
+    <p>A stairwell close to a property line can also need a retaining wall or a City setback review, and a fence, deck or mature tree in the way can turn a straightforward dig into a more careful one. None of this is a reason to skip a walkout. It is a reason to have a designer look at the actual lot before anyone quotes a number.</p>
+
+    <h2 id="process">How the Construction Process Works</h2>
+    ${U.checkList([
+      'Engineering and drawings, since the opening removes load-bearing wall and needs a designed lintel and support.',
+      'Excavating the stairwell and exposing the section of foundation being cut.',
+      'Cutting the opening and framing the new doorway, with the lintel sized to the load above it.',
+      'Waterproofing the exposed foundation and stairwell walls, and installing drainage at the base of the stairwell so it does not become a bathtub.',
+      'Installing the door, finishing the stairwell, and restoring grading and landscaping around it.',
+    ])}
+    <p>That drainage step is not optional. A below-grade stairwell with nowhere for water to go is how a walkout turns into a basement flood with extra steps.</p>
+
+    <h2 id="permits">Permits and Who Is Responsible</h2>
+    <p>Toronto Building lists constructing a basement entrance among the work that needs a ${X(SRC.permit, 'building permit')}, and given the structural work involved, expect engineered drawings and inspections at more than one stage. As the property owner, compliance is yours even if a professional applies on your behalf, so get who does what in writing before excavation starts.</p>
+
+    <h2 id="cost-drivers">What Drives the Cost of a Walkout</h2>
+    <p>Reno Rise does not publish price ranges for the same reason a single number never fits a walkout: the site decides most of the cost, not the finishes. Ask each quote to itemize:</p>
+    ${U.checkList([
+      'How much excavation the stairwell needs, and whether equipment access to the site is easy or tight.',
+      'Engineering and stamped drawings for the new opening and lintel.',
+      'Waterproofing and drainage for the stairwell, including where that water actually goes.',
+      'The door itself, plus any framing, insulation and interior finishing around the new opening.',
+      'Landscaping, grading and any retaining wall needed to restore the yard afterward.',
+    ])}
+    <p>A quote that skips straight to a number without asking about your lot&rsquo;s slope or soil is a number without a foundation under it, so to speak. See ${A('blog/basement-renovation-cost-toronto.html', 'basement renovation cost in Toronto')} for how these same drivers apply to a project as a whole.</p>
+
+    <h2 id="suite-connection">How a Walkout Fits a Legal Secondary Suite</h2>
+    <p>${X(SRC.ontario, "Ontario's guide to second units")} describes a separate entrance as one of the requirements for a legal secondary suite, and a walkout is one common way to provide it without routing tenants through the main house. If a rental suite or an in-law unit is even a maybe, planning the walkout alongside the ${SUITE} from day one is far cheaper than adding one later.</p>
+
+    <h2 id="alternatives">Alternatives to a Full Walkout</h2>
+    <p>Not every basement needs the full excavation-and-stairwell version. A window well and an ${A('blog/egress-windows-toronto-basements.html', 'egress window')} can satisfy a safe-exit requirement for a bedroom without a new door. A walk-up basement, where the grade already brings part of the wall close to the surface, can sometimes reach a similar result with less digging. So can a smaller side-entrance stairwell rather than a full patio-width walkout, if daylight matters less than the exit itself. A designer can tell you which one your lot actually supports before anyone quotes the expensive version.</p>
+
+    <h2 id="questions">Questions to Ask Before You Hire</h2>
+    ${U.sectionImage(depth, { file: 'basement-room-with-windows', alt: 'Basement room with windows and natural light', credit: 'Photo: Peter Vang on Pexels' })}
+    ${U.checkList([
+      'Who is the engineer of record for the lintel and opening, and can I see the stamped drawings?',
+      'How will the stairwell drain, and what happens to that drain in a heavy storm?',
+      'Who applies for the permit and books each inspection?',
+      'What happens to the landscaping, fence or property line near the new stairwell?',
+    ])}
+    <p>Picture the result: a basement with its own front door, real daylight, and a stairwell that has never once needed to be pumped out. That is what the questions above are protecting.</p>
+    ${TB_NOTE}
+    ${U.backToTop()}
+`,
+    faq: [
+      ['What is a walkout basement?', 'A walkout basement has its own grade-level entrance, usually a stairwell and door cut into the foundation, instead of relying only on interior stairs. It typically also brings in more natural light.'],
+      ['Does every lot support a basement walkout?', 'No. Sloped lots make it easier because part of the foundation already sits closer to grade. A flat lot can still support one, but usually needs more excavation and drainage work.'],
+      ['Do I need a permit for basement walkout construction in Toronto?', 'Yes. Toronto Building lists constructing a basement entrance among the work that needs a building permit, and the structural nature of the opening usually means engineered drawings and inspections.'],
+      ['Does a walkout basement count toward a legal secondary suite?', 'Ontario&rsquo;s guide to second units describes a separate entrance as a requirement for a legal secondary suite, and a walkout is one common way to provide it. Confirm the rest of the requirements with the &lsquo;legal secondary suite guide&rsquo; below.'],
+      ['What is the difference between a walkout and an egress window?', 'A walkout is a full doorway and stairwell, built for daily use as an entrance. An egress window is a large enough window for emergency exit and daylight, without a full door. Which one you need depends on the room&rsquo;s use.'],
+      ['How does drainage work for a basement walkout stairwell?', 'A properly built stairwell has drainage at its base so rain and melt do not collect against the new door. Ask each professional how theirs drains before you approve the design.'],
+    ],
+    related: [['Walkout Construction', 'services/walkout-construction/'], ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Egress Windows', 'blog/egress-windows-toronto-basements.html'], ['Basement Renovation', 'services/basement-renovation/']],
+  },
 ];
 
 // Basement-flooring guides live in their own module (four articles, no more)

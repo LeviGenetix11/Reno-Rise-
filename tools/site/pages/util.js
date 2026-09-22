@@ -83,3 +83,28 @@ ${figs}
   </div>`;
 }
 module.exports.stockGallery = stockGallery;
+
+/** Table of contents for a long-form guide (1500+ words). Matches the pattern already used on the basement-flooring service page. */
+function toc(items) {
+  const li = items.map(([id, label]) => `        <li><a href="#${id}">${label}</a></li>`).join('\n');
+  return `<nav class="toc" aria-label="On this page">
+      <div class="toc-title">On This Page</div>
+      <ol>
+${li}
+      </ol>
+    </nav>`;
+}
+module.exports.toc = toc;
+
+/** Back-to-top control for a long-form guide. Visibility/behaviour is wired sitewide in js/script.js. */
+const backToTop = () => `<a href="#main-content" class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></a>`;
+module.exports.backToTop = backToTop;
+
+/** Stock photo placed above an H2, credited and labelled illustrative like every other stock image on the site. */
+function sectionImage(depth, { file, alt, credit }) {
+  return `<figure class="post-hero post-section-img">
+      <img src="${L.up(depth)}images/stock/${file}.webp" width="1200" height="800" loading="lazy" alt="${alt}">
+      <figcaption>${credit}. Stock photo, illustrative only. It is not a Reno Rise project.</figcaption>
+    </figure>`;
+}
+module.exports.sectionImage = sectionImage;
