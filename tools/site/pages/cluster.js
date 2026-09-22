@@ -26,6 +26,10 @@ const pages = [
     ],
     involves: ['Confirming the basement is dry and that any past moisture has been diagnosed and resolved.', 'Framing and insulation designed for below-grade walls, with a moisture-safe assembly.', 'Electrical layout, lighting and outlets, with the panel checked for spare capacity.', `Drywall, ceiling treatment, trim and a floor chosen for a below-grade slab (see ${link('basement-flooring', 'basement flooring options')}).`, 'Smoke and carbon monoxide alarm placement, and clear access to any mechanical equipment.'],
     permit: `Cosmetic finishing that changes nothing structural, adds no new plumbing and creates no additional dwelling unit may not need a permit, according to Toronto Building. ${PERMIT_NOTE}`,
+    timelineLede: 'A straightforward basement finish typically takes two to four weeks of active work once permits, where needed, are in hand.',
+    timeline: ['Permit review, where the scope needs one, adds time before framing can start.', 'A fire-rated ceiling assembly or additional insulation work extends the schedule versus a simple paint-and-flooring job.', 'Inspections between electrical rough-in and closing up the walls add scheduled pauses.', 'Material lead times for flooring or cabinetry can affect the finish date more than the labour itself.'],
+    mistakesLede: 'Basement finishing is the lighter-scope project, and homeowners still run into avoidable problems:',
+    mistakes: ['Finishing over a basement whose moisture history was never actually confirmed.', 'Assuming finishing alone creates a legal secondary suite.', 'Skipping a permit check because the work &ldquo;feels cosmetic.&rdquo;', 'Not checking electrical panel capacity before adding new circuits.', 'Choosing flooring before confirming it suits a below-grade concrete slab.'],
     ask: ['Has the moisture history of this basement been checked before finishing?', 'Which parts of the work need a permit, and who applies for it?', 'How will insulation and vapour control be handled on the foundation walls?', 'Is the electrical panel adequate for the added load?'],
     notFit: `If you plan to rent the space as a separate apartment, finishing alone will not make it a legal suite. Read the ${SUITE}. If water is entering, start with ${link('interior-waterproofing', 'interior waterproofing')} or ${link('wet-basement-repair', 'wet basement repair')}.`,
     faq: [['Is basement finishing the same as a renovation?', 'Finishing usually means completing a sound space: walls, flooring and lighting. A renovation is broader and can include waterproofing, height work, new bathrooms or bedrooms and layout changes.'], ['Does finishing a basement make it a legal apartment?', 'No. A legal secondary suite is a separate dwelling created with a building permit and built to Building Code and Fire Code requirements.']],
@@ -81,6 +85,10 @@ const pages = [
     ],
     involves: ['Reviewing where sound is likely to travel: ceiling, party walls, ducts and pipe penetrations.', 'Insulation chosen for sound as well as thermal performance.', 'Resilient channel or other isolation methods, and additional drywall layers where designed.', 'Sealing gaps, outlets and penetrations that leak sound.', 'Coordinating with any required fire-separation assemblies.'],
     permit: 'Soundproofing on its own may not need a permit, but it is usually part of a larger project, and in a secondary suite the ceiling assembly is also a fire-separation element. Ask your designer how the two fit together.',
+    timelineLede: 'Soundproofing is rarely a stand-alone timeline: it is built into the framing and ceiling stage of a larger project, typically adding a few days to that stage rather than running on its own schedule.',
+    timeline: ['Design coordination with the fire-separation assembly, where one is required, happens before framing, not after.', 'Additional drywall layers or resilient channel add installation time versus a standard assembly.', 'Sealing every duct, pipe and outlet penetration properly takes longer than it looks, and is easy to rush.', 'Verifying the assembly (or simply confirming it was built as designed) is usually a short final step.'],
+    mistakesLede: 'Sound control is one of those details that is cheap to plan for and expensive to fix afterward:',
+    mistakes: ['Waiting until after drywall is up to think about sound control.', 'Treating soundproofing and fire separation as two unrelated decisions in a secondary suite.', 'Leaving outlets, light fixtures or duct penetrations unsealed, which lets sound bypass the whole assembly.', 'Choosing insulation for thermal performance only, without checking its sound rating.', 'Not asking what level of sound reduction the design is actually aiming for.'],
     ask: ['Is sound control designed together with the fire-separation assembly?', 'How are ducts, pipes and lights sealed so they do not bypass the assembly?', 'What level of sound reduction is the design aiming for, and how is it verified?', 'What ceiling height is left after the assembly is built?'],
     notFit: `Soundproofing cannot fix a structural or moisture problem. Sort those out first: ${link('interior-waterproofing', 'interior waterproofing')}, and the ${SUITE}.`,
     faq: [['Should soundproofing be done before drywall?', 'Generally yes. Assemblies are far easier to build into open framing than to retrofit behind finished walls.']],
@@ -172,6 +180,10 @@ const pages = [
     ],
     involves: ['Reviewing the lot, grade, side yard width and property lines.', 'Structural design for the new opening and lintel.', 'Excavation, retaining walls or stair enclosure, and drainage at the bottom of the stairwell.', 'Door, framing, waterproofing and finishing.', 'Confirming zoning and permit requirements.'],
     permit: `Toronto Building lists constructing a basement entrance among the work that needs a permit, and zoning may affect where an entrance can go. ${PERMIT_NOTE}`,
+    timelineLede: 'A separate entrance or walkout typically takes one to three weeks of construction once permits are approved, depending on how much excavation and stairwell construction the lot requires.',
+    timeline: ['Structural design and stamped drawings for the new opening are prepared before excavation starts.', 'Permit review for a new basement entrance typically takes longer than for lighter renovation work, and zoning can add a step.', 'Excavation depth and stairwell length are the main construction-time drivers.', 'Weather affects exterior excavation and drainage work more than interior steps.'],
+    mistakesLede: 'Because this is structural, site-specific work, the mistakes here tend to be expensive ones:',
+    mistakes: ['Assuming an entrance location is allowed without checking zoning and side yard requirements first.', 'Underestimating drainage at the base of the stairwell, which is how a walkout becomes a flood risk.', 'Not confirming who provides the structural design and stamped drawings before excavation starts.', 'Building the entrance without connecting it to the overall exit plan for a secondary suite.', 'Skipping the permit because the work is framed as &ldquo;just a door and some stairs.&rdquo;'],
     ask: ['Is the entrance location allowed by zoning and does it work with my lot?', 'How is the stairwell drained so it does not flood?', 'Who provides the structural design and permit drawings?', 'How does this fit into the exit plan for the suite?'],
     notFit: `If you only need extra light or an emergency exit for a bedroom, an ${link('egress-windows', 'egress window')} may be enough.`,
     faq: [['Does a legal basement apartment need a separate entrance?', 'Ontario&rsquo;s guide describes separate exits as preferred and shared exits as possible with added fire separation. Zoning can also affect entrances, so ask a designer and Toronto Building.']],
@@ -190,6 +202,10 @@ const pages = [
     ],
     involves: ['Measuring ceiling height early, since older basements are more likely to be short.', 'Checking foundation condition and moisture history before finishing.', 'Reviewing the electrical service; older homes may still have outdated wiring. See ' + link('knob-and-tube-removal', 'knob-and-tube removal') + ' and ' + link('panel-upgrade', 'panel upgrades') + '.', 'Considering how narrow lots and shared walls affect access, entrances and windows.', 'Confirming permits with Toronto Building.'],
     permit: `Toronto Building requires permits for work such as underpinning, structural changes, new windows or doors, heating or plumbing changes, a basement entrance and adding a second dwelling unit. Finishing that involves none of those may not. ${'Confirm your project directly.'}`,
+    timelineLede: 'Older Toronto homes often add time versus a newer, previously updated house, mainly because more gets discovered once walls and ceilings open up.',
+    timeline: ['Underpinning or wiring replacement, where either is needed, extends the schedule the most in older homes.', 'Permit review, and City comments on older or non-standard construction, can take longer to resolve.', 'Narrow lots and shared walls can slow excavation-based work, such as a new entrance or exterior waterproofing.', 'Inspections at each stage (structural, electrical, plumbing) apply the same way regardless of the home&rsquo;s age, but older homes tend to need more of them.'],
+    mistakesLede: 'Homeowners in older Toronto neighbourhoods tend to run into the same few surprises:',
+    mistakes: ['Assuming ceiling height is fine without actually measuring it.', 'Not checking the electrical service for knob-and-tube wiring or panel capacity before planning new circuits.', 'Underestimating how a narrow lot or shared wall limits entrance or window options.', 'Budgeting for a straightforward finish without a contingency for what an older foundation or old wiring might reveal.', 'Assuming permit requirements are the same as for a newer home nearby.'],
     ask: ['Has ceiling height been measured, and is underpinning actually needed here?', 'What is the wiring and panel situation, and what would need to be updated?', 'How do neighbouring structures or a narrow lot affect access and entrances?', 'What will require a permit for this house, and who is responsible for it?'],
     notFit: `If your basement is already dry and tall enough, ${link('basement-finishing', 'basement finishing')} may be all you need.`,
     faq: [['Do older Toronto homes need underpinning?', 'Sometimes. Older basements are more likely to have low ceilings, but it varies house by house, so measure before assuming.'], ['Do I need a permit for a basement renovation in Toronto?', 'It depends on the work. Toronto Building lists structural changes, new windows or doors, plumbing or heating changes, underpinning, a basement entrance and a second unit as needing a permit.']],
@@ -210,6 +226,14 @@ for (const p of pages) {
 
     <h2>What the Work Typically Involves</h2>
     ${U.checkList(p.involves)}
+
+    <h2>Timeline Expectations</h2>
+    <p>${p.timelineLede}</p>
+    ${U.checkList(p.timeline)}
+
+    <h2>Common Mistakes Homeowners Make</h2>
+    <p>${p.mistakesLede}</p>
+    ${U.checkList(p.mistakes)}
 
     <h2>Permits and Approvals</h2>
     <p>${p.permit}</p>

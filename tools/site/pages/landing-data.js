@@ -74,6 +74,16 @@ const LANDINGS = [
         html: `<p>Searching for <strong>waterproofers in Toronto</strong> gives you plenty of names and very little clarity. A good professional starts with a diagnosis, not a sales pitch for whichever system is easiest to install. Ask what is causing the water, what options exist, and why the one being proposed fits your house.</p>
     ${list(['Ask how the water source was identified, and whether a smaller fix would work.', 'Ask what is warranted, for how long, and get it in writing.', 'Ask who handles permits and inspections, and for references you can call.', 'Be careful with paint-on products: they can seal a surface but do not fix where the water is coming from.'])}`,
       },
+      {
+        h2: 'Waterproofing Timeline Expectations',
+        html: `<p>Waterproofing timelines depend on which fix your house needs. As a general guide: a downspout, grading or crack-repair fix typically takes a day or two, while a full interior drainage system typically runs one to three days, and exterior excavation-based waterproofing typically takes one to two weeks depending on the length of wall involved.</p>
+    ${list(['Permit review, where the scope requires one, adds time before work can start.', 'Access issues, such as a deck, patio or mature landscaping over the dig area, can extend exterior work.', 'Weather and ground conditions affect exterior excavation more than interior work.', 'A drain permit and City inspection add a scheduled step if a backwater valve is part of the job.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Waterproofing is one of the easier places to overspend on the wrong fix. Homeowners commonly run into the same handful of problems:</p>
+    ${list(['Paying for a full system before the actual entry point has been diagnosed.', 'Choosing paint-on waterproofing to seal a surface without fixing where the water is coming from.', 'Assuming the cheapest quote covers the same scope as the others, without comparing itemized lists.', 'Skipping a test through a heavy rain or thaw before finishing over the fix.', 'Not asking who handles permits for the parts of the job that need one.'])}`,
+      },
     ],
     permitHeading: 'Permits and approvals',
     permit: `Toronto Building says installing a sump pump does not require a building permit. Excavation, new drains or structural repairs can be different, and a backwater valve needs a drain permit. Confirm your exact scope with ${X('https://www.toronto.ca/services-payments/building-construction/building-permit/forms-documents-additional-resources/toronto-building-contact-us/', 'Toronto Building')}.`,
@@ -136,6 +146,16 @@ const LANDINGS = [
     <p>Our guide to <a href="../../blog/basement-renovation-cost-toronto.html">basement renovation cost in Toronto</a> explains how to compare itemized quotes.</p>`,
       },
       {
+        h2: 'Timeline Expectations',
+        html: `<p>A basement renovation typically takes several weeks to a few months of active construction once permits are approved, not counting the permit wait itself. A finish-and-refresh scope is usually the fastest; a scope that adds a bathroom, underpinning or a full suite conversion takes longer because those steps largely have to happen in sequence.</p>
+    ${list(['Permit review adds time before structural, plumbing or second-unit work can start.', 'Structural changes, such as underpinning or a new entrance, extend the schedule the most.', 'Inspections between rough-in stages (electrical, plumbing, framing) each add a scheduled pause.', 'Older homes with unknown wiring or moisture can extend the schedule once walls are opened up.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Most basement renovation problems are not sudden. They are decisions made early that show up later:</p>
+    ${list(['Choosing finishes before the moisture history and ceiling height have been confirmed.', 'Picking the lowest quote without checking what scope it actually includes.', 'Starting work before permits are in hand, which can mean delays or removal of completed work.', 'Skipping a written schedule and assuming everyone agrees on the order of trades.', 'Treating &ldquo;it&rsquo;s just finishing&rdquo; as a reason to skip confirming what needs a permit.'])}`,
+      },
+      {
         h2: 'Choosing a Basement Contractor in Toronto',
         html: `<p>If you have been searching for <strong>basement contractors in Toronto</strong>, or <strong>basement renovation contractors near you</strong>, here is the direction. Reno Rise does not perform renovations or vet contractors on your behalf, so do the checking yourself. It is worth it.</p>
     ${list(['Ask for proof of liability insurance and WSIB status, and check licensing where required.', 'Ask for references you can actually call, and a written contract with a clear scope.', 'Compare itemized quotes: what is included, what is excluded, how changes are priced.', 'Ask who applies for permits and who books inspections.', 'Be careful with &ldquo;I can start tomorrow&rdquo; and &ldquo;cash is cheaper&rdquo;.'])}`,
@@ -195,6 +215,16 @@ const LANDINGS = [
         html: `<p>People search for <strong>sump pump replacement</strong>, <strong>backup sump pumps</strong> and <strong>battery backups</strong> for the same reason: the first pump did not survive its worst day. Ask any installer what happens during a power outage and during a very heavy rain, and how the pump, the check valve and the discharge line will be set up.</p>
     ${list(['Ask whether the existing pit can be reused, or should be replaced.', 'Ask how the backup is powered and how long it runs.', 'Ask how the pump will be tested and how you will know it has failed.', 'Ask what the warranty covers, in writing.'])}`,
       },
+      {
+        h2: 'Sump Pump Timeline Expectations',
+        html: `<p>Installing a sump pump where a pit already exists typically takes less than a day. Cutting a new pit into the slab, or adding a battery backup and testing the whole system, typically takes one to two days.</p>
+    ${list(['No permit is required for the pump itself, so this rarely adds a wait, unlike a backwater valve installed alongside it.', 'Breaking the slab for a new pit takes longer than reusing an existing one.', 'Subsidy paperwork, where it applies, is a separate step from the installation itself.', 'Testing through a real rainfall before considering the job fully proven can add a follow-up visit.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>A sump pump is a small job that people still get wrong in predictable ways:</p>
+    ${list(['Buying a pump sized for the pit rather than for how much water the basement actually sees.', 'Skipping a battery backup, then losing the pump in the exact storm that needed it.', 'Not checking where the discharge line actually goes, so water just recirculates back toward the foundation.', 'Forgetting to test the pump before storm season instead of finding out during one.', 'Missing the City subsidy paperwork window by not asking about it before the work starts.'])}`,
+      },
     ],
     permit: `Toronto Building says installing a sump pump does not require a building permit. Related work can be different: a backwater valve needs a drain permit, and digging or new drains may need approval. Confirm your exact scope with the City.`,
     ask: ['Is the pit and pump sized for how much water this basement sees?', 'Where does the discharge go, and is it far enough from the foundation?', 'What happens during a power outage?', 'Are you licensed to work in Toronto, and can you help with the subsidy paperwork?'],
@@ -248,6 +278,16 @@ const LANDINGS = [
         cream: true,
         html: `${list(['A crack that is getting longer or wider.', 'Horizontal cracks, or stair-step cracks in block walls.', 'A wall that bows or leans inward.', 'Doors or windows that stick, or gaps that appear around them.', 'Water or damp along a crack, especially after rain.'])}
     <p>Every house settles a little, and a hairline crack is often cosmetic. But ignoring one does not make it stop. That crack has a cousin, and they are both growing. Get it looked at.</p>`,
+      },
+      {
+        h2: 'Crack Repair Timeline Expectations',
+        html: `<p>Sealing a single stable crack by injection typically takes a few hours to a day. A repair that involves an engineer&rsquo;s assessment first, or that turns out to need exterior drainage work, typically extends to one to two weeks once that additional scope is confirmed.</p>
+    ${list(['An engineer&rsquo;s assessment, where the crack looks structural, is usually scheduled before any repair work starts.', 'Structural repair or underpinning triggers a permit and inspection, which adds time the same-day injection repair does not.', 'Weather can delay exterior access if drainage work turns out to be needed too.', 'Monitoring an active crack before repairing it can add weeks by design, since the point is to confirm it has stopped moving.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>The most common mistakes with foundation cracks come from treating every crack the same way:</p>
+    ${list(['Sealing a crack cosmetically without finding out whether it is still moving.', 'Skipping an engineer&rsquo;s opinion on a horizontal, stair-step or widening crack.', 'Assuming a sealed crack means the water source behind it is also fixed.', 'Not asking what the repair warranty actually covers if the crack reopens.', 'Ignoring a hairline crack for years without ever measuring whether it has changed.'])}`,
       },
     ],
     permit: 'Crack sealing on its own may not need a permit, but structural repair, excavation or underpinning can. Toronto Building lists underpinning and structural changes among work that needs one. Confirm your exact scope.',
@@ -303,6 +343,16 @@ const LANDINGS = [
     ${subsidyFacts}
     ${SUBSIDY_NOTE}`,
       },
+      {
+        h2: 'Repair Timeline Expectations',
+        html: `<p>A downspout, grading or drainage fix typically takes a day or two. A sump pump or crack repair typically takes one to two days. Excavation-based repairs, such as exterior waterproofing after a flood, typically take one to two weeks.</p>
+    ${list(['A backwater valve adds a scheduled drain permit and City inspection before it can be enclosed.', 'Insurance claims and adjuster visits, where they apply, can run alongside the repair but are a separate timeline.', 'Structural repairs uncovered once water damage is assessed can extend the original scope.', 'Weather affects exterior repair work more than interior fixes.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>After a flood, the pressure to fix things fast leads to some avoidable mistakes:</p>
+    ${list(['Repairing or finishing before the actual cause of the flooding has been confirmed.', 'Not documenting the damage for insurance before repairs start.', 'Choosing the fastest available contractor over one who explains the cause first.', 'Skipping prevention measures (grading, a backup sump pump, a backwater valve) that would reduce the risk next time.', 'Assuming a single fix (like a new sump pump) addresses every possible source of water.'])}`,
+      },
     ],
     permit: `Toronto Building says installing a sump pump does not require a permit, but a backwater valve needs a drain permit and City inspection. Repairs that involve excavation, new drains or structural changes can need approval too. ${'Confirm your exact scope with the City.'}`,
     ask: ['What do you believe caused this, and how did you confirm it?', 'Is there a lower-cost fix I should try first, such as downspouts or grading?', 'What is warranted, and what would void it?', 'How will you test that the repair worked?'],
@@ -357,6 +407,16 @@ const LANDINGS = [
     ${list(['How much of the perimeter is underpinned and how far the floor is lowered.', 'Soil and groundwater conditions, and access for equipment and material.', 'Engineering, drawings and permit fees.', 'New drainage, waterproofing and a new floor slab.', 'Related work afterwards: plumbing, electrical and finishes.'])}
     <p>More in <a href="../../blog/basement-underpinning-cost-and-when-needed.html">Basement Underpinning in Toronto: When It Is Needed and What Drives Cost</a>.</p>`,
       },
+      {
+        h2: 'Underpinning Timeline Expectations',
+        html: `<p>Underpinning is typically measured in weeks, not days, because it is done in small sequenced sections to keep the house supported throughout. A partial underpinning typically takes a few weeks; underpinning the full perimeter typically takes several weeks to a couple of months, followed by drainage, a new slab and finishing.</p>
+    ${list(['Engineering and stamped drawings are prepared before any excavation starts, which adds time up front.', 'Permit review for underpinning typically takes longer than for lighter renovation work.', 'Soil and groundwater conditions can slow sequenced digging.', 'Related work afterwards, such as plumbing, electrical and finishing, is scheduled once the structural work and inspections are complete.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Underpinning is structural work, and the mistakes homeowners make here are the expensive kind:</p>
+    ${list(['Choosing the cheapest quote without confirming it includes engineering, drawings and permits.', 'Skipping a proper measurement of ceiling height and assuming underpinning is needed when a bench footing or another option might work.', 'Not asking for a geotechnical or soil assessment when the contractor recommends one.', 'Misjudging how long permit review and inspections take, and scheduling other trades too early.', 'Hiring a contractor who is vague about how the excavation will be sequenced to protect the house and neighbouring properties.'])}`,
+      },
     ],
     permit: c('underpinning').permit,
     ask: c('underpinning').ask,
@@ -406,6 +466,16 @@ const LANDINGS = [
         cream: true,
         html: `<p>People search for <strong>egress window installation price</strong> and <strong>basement egress window cost</strong> because the range is wide. Reno Rise does not publish prices, but here is what moves the total:</p>
     ${list(['Whether it is a like-for-like replacement or a new, larger opening.', 'What is in the wall: structure, lintels, pipes and wiring.', 'The window well, its drainage and any stairs or ladder.', 'Permits, drawings and inspections where required.', 'Interior finishing and air sealing.'])}`,
+      },
+      {
+        h2: 'Window Timeline Expectations',
+        html: `<p>A like-for-like window replacement typically takes a day. Cutting a new or larger egress opening, building a window well and finishing the interior typically takes a few days to about a week, depending on what the wall turns out to contain.</p>
+    ${list(['A permit, where the scope requires one, is arranged before the foundation is cut.', 'Hitting structure, pipes or wiring inside the wall can extend the job once it is opened up.', 'Window well drainage work takes longer where the surrounding grade needs regrading too.', 'Weather can affect exterior excavation for a window well.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Basement window projects go wrong in a few predictable ways:</p>
+    ${list(['Assuming a like-for-like replacement and an egress window are the same job and the same price.', 'Not confirming the window well will actually drain before it is built.', 'Skipping a permit check for what looks like &ldquo;just a window.&rdquo;', 'Not asking what happens, and who pays, if the opening hits a structural element or a buried service.', 'Choosing a window and well based on looks alone, without confirming it meets the Code requirement for the room.'])}`,
       },
       {
         h2: 'Finding Basement Window Installers in Toronto',
@@ -461,6 +531,16 @@ const LANDINGS = [
     ${list(['How much of the perimeter needs work, and how deep the footing is.', 'Access: decks, patios, driveways, walkways, landscaping and neighbouring structures.', 'Soil and groundwater conditions.', 'Whether cleaning or repair is enough, or full replacement is needed.', 'The connection to a sump pit or discharge point.', 'Restoration of surfaces after digging, and any permits.'])}
     <p>Get itemized quotes and compare what each includes, including who restores the landscaping.</p>`,
       },
+      {
+        h2: 'Weeping Tile Timeline Expectations',
+        html: `<p>A camera inspection and cleaning typically takes half a day. A localized repair typically takes one to two days. Full weeping tile replacement around a section or the full perimeter typically takes one to two weeks, largely driven by excavation and restoration.</p>
+    ${list(['Access, such as a deck, patio or driveway over the dig area, can add time to remove and rebuild.', 'Permit review, where the scope requires one, adds a step before digging starts.', 'Soil and groundwater conditions affect how quickly sequenced sections can be excavated.', 'Restoring landscaping, walkways or hard surfaces afterward is often the last, and most visible, step.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Weeping tile problems are easy to misdiagnose, which leads to some common mistakes:</p>
+    ${list(['Assuming full replacement is needed before a camera inspection has confirmed cleaning or repair is not enough.', 'Not asking where the &ldquo;new&rdquo; drain actually connects to, and whether that connection is permitted.', 'Choosing a quote that does not say who restores the landscaping afterward.', 'Overlooking access constraints (decks, patios, neighbouring fences) that change the real scope.', 'Skipping a written warranty on drainage work that, by nature, cannot be checked again without digging.'])}`,
+      },
     ],
     permit: 'Excavation and drainage work can involve municipal requirements and may sit alongside other structural or waterproofing work. Confirm your exact scope with Toronto Building before starting.',
     ask: ['How was the weeping tile inspected, and what did you find?', 'Is cleaning or repair enough, or is replacement needed?', 'Where will the new drain connect, and is that permitted?', 'Who restores the surfaces, and what is warranted, in writing?'],
@@ -507,6 +587,16 @@ const LANDINGS = [
         h2: 'When Interior Waterproofing Fits, and When It Does Not',
         html: `<p>Interior waterproofing is often chosen when excavating outside is impractical: mature landscaping, an attached garage, a shared wall, or a deck over the problem area. It is less suited when the real issue is a single wall crack or grading that pushes water at the house. In those cases <a href="../foundation-crack-repair/">crack repair</a> or <a href="../exterior-waterproofing/">exterior waterproofing</a> may fit better.</p>`,
       },
+      {
+        h2: 'Interior Waterproofing Timeline Expectations',
+        html: `<p>Interior waterproofing for a typical basement perimeter typically takes one to three days, since the work happens inside and is not weather-dependent the way exterior digging is.</p>
+    ${list(['No permit is usually needed for the drainage system itself, so review rarely adds a wait.', 'Breaking and repouring the concrete floor along the perimeter is the main time driver.', 'A battery backup and full system test add a short additional step.', 'Coordinating around finished areas, storage or mechanical equipment already in the basement can add time.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Interior waterproofing gets chosen for the wrong reasons as often as the right ones:</p>
+    ${list(['Choosing interior drainage because it is less disruptive, without confirming it actually suits the entry point.', 'Not asking whether the sump pump and pit are sized for how much water the basement really sees.', 'Skipping the battery backup, then losing protection during the exact power outage a storm causes.', 'Finishing over the system without leaving access to the pit, pump and cleanouts.', 'Assuming interior waterproofing stops water at the source rather than managing water that has already arrived.'])}`,
+      },
     ],
     permit: c('interior-waterproofing').permit,
     ask: c('interior-waterproofing').ask,
@@ -548,6 +638,16 @@ const LANDINGS = [
       {
         h2: 'Is Exterior Waterproofing the Right Fit?',
         html: `<p>It suits cases where water is pressing against the wall and access allows digging. If access is limited or the problem is a single crack, <a href="../interior-waterproofing/">interior waterproofing</a> or <a href="../foundation-crack-repair/">crack repair</a> may be more practical. Ask any professional why exterior work is needed rather than a smaller fix, and how landscaping, patios or decks will be handled.</p>`,
+      },
+      {
+        h2: 'Exterior Waterproofing Timeline Expectations',
+        html: `<p>Exterior waterproofing typically takes one to two weeks for a standard section of wall, depending on length, depth and how much needs to be removed and restored above ground.</p>
+    ${list(['Access, such as decks, patios, walkways or mature landscaping over the dig area, is usually the biggest schedule factor.', 'Weather affects excavation directly, since wet or frozen ground slows digging.', 'Weeping tile replacement alongside the membrane adds time versus membrane work alone.', 'Restoration (backfill, grading, hard surfaces, landscaping) is often the last visible step and can be underestimated.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Because exterior waterproofing is disruptive and irreversible once buried, the mistakes here are costly to redo:</p>
+    ${list(['Agreeing to full exterior excavation without confirming a smaller interior or targeted fix would not do.', 'Not getting the restoration of decks, patios or landscaping written into the quote.', 'Skipping confirmation of what the membrane and drainage board warranty actually covers once backfilled.', 'Underestimating how access (fences, shared walls, narrow side yards) changes the real cost and timeline.', 'Not asking whether weeping tile will be replaced or only exposed and reused.'])}`,
       },
     ],
     permit: c('exterior-waterproofing').permit,
@@ -594,6 +694,16 @@ const LANDINGS = [
         html: `<p>Reno Rise does not publish prices, because they depend on the house. The drivers are:</p>
     ${list(['Where the sewer line enters the house and how hard it is to reach.', 'Whether the floor must be opened or an outside excavation is needed.', 'The valve type and how many are needed (some homes have more than one connection).', 'The permit and the City inspection before the valve is enclosed.', 'Restoration of the floor or landscaping afterwards.'])}
     <p>Compare itemized quotes, and check whether the subsidy below applies before you decide.</p>`,
+      },
+      {
+        h2: 'Backwater Valve Timeline Expectations',
+        html: `<p>Installing a backwater valve typically takes a day when the sewer line is easy to reach, and one to two days when the floor must be opened or an exterior excavation is needed.</p>
+    ${list(['A standalone drain permit and City inspection are required before the valve can be enclosed, which sets the schedule.', 'Opening the floor slab versus excavating outside changes how much restoration follows.', 'Subsidy paperwork, where it applies, is a separate administrative step from the installation.', 'Access to the sewer line location (finished floors, landscaping) can add time to reach it.'])}`,
+      },
+      {
+        h2: 'Common Mistakes Homeowners Make',
+        html: `<p>Backwater valve installations run into a specific set of avoidable problems:</p>
+    ${list(['Hiring a contractor without a valid Toronto business licence, which affects both the permit and the subsidy eligibility.', 'Installing a valve type the City does not approve for the connection involved.', 'Enclosing the valve before the City inspection, which can mean opening it back up.', 'Assuming one valve protects every fixture, when some homes need more than one.', 'Missing the subsidy application window because paperwork was not confirmed before the work started.'])}`,
       },
       {
         h2: 'Toronto Permit and Subsidy for Backwater Valves',

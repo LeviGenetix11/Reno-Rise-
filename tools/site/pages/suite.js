@@ -181,6 +181,17 @@ ${TOC.map(([id, label], i) => `        <li><a href="#${id}"><span class="toc-num
       'Weather, if exterior excavation or a new entrance is involved.',
     ])}
 
+    <h2 id="mistakes">Common Mistakes Homeowners Make</h2>
+    <p>A legal secondary suite has more moving parts than a straightforward finish, and that is where homeowners most often trip up:</p>
+    ${U.checkList([
+      'Starting drawings or construction before zoning and permit requirements for the specific lot are confirmed.',
+      'Assuming a finished basement with a kitchen and a lock on the door already counts as a legal suite.',
+      'Underestimating ceiling height requirements and only measuring after underpinning has been ruled out or in.',
+      'Treating the separate entrance as a late decision rather than part of the original design.',
+      'Not confirming who is responsible for fire-separation, alarms and exit requirements in writing before work starts.',
+      'Choosing a contractor without secondary-suite experience specifically, not just general renovation experience.',
+    ])}
+
     <h2 id="questions">Questions to ask legal basement contractors</h2>
     <p>Reno Rise introduces homeowners to independent professionals but does not vet their credentials on your behalf. Ask directly:</p>
     ${U.checkList([
