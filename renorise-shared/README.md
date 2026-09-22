@@ -11,7 +11,7 @@ exactly as before and are separate from this sequence.
 
 Three follow-ups, sent on **Day 1, Day 3 and Day 7** (delays of 1, 2 and 4
 days), counted from the recorded call date (callers) or the inquiry date
-(website leads). Times are 9:00–17:00 America/Toronto; everything is stored in UTC.
+(website leads). Times are 8:00–20:00 America/Toronto (Reno Rise's hours of operation); everything is stored in UTC.
 
 | For a website inquiry on Sep 19, 2026 | Planned |
 |---|---|

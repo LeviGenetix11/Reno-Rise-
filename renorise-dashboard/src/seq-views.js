@@ -151,7 +151,7 @@ export function settingsPage({ settings, csrf }) {
   <h2>Sending limits</h2>
   <div class="row">${num('followup_daily_cap', 'Follow-up recipients per day', 'Default 50', 'min="1"')}${num('account_daily_cap', 'Account emails per day', 'Resend Free plan: 100 (UTC day)', 'min="1"')}${num('account_monthly_cap', 'Account emails per month', 'Resend Free plan: 3,000', 'min="1"')}</div>
   <div class="row">${num('confirmation_reserve', 'Daily reserve for confirmations', 'Kept free so confirmations are never squeezed out', 'min="0"')}${num('monthly_reserve', 'Monthly reserve', '', 'min="0"')}</div>
-  <div class="row">${num('window_start_hour', 'Send from (Toronto hour)', '9 = 9:00 a.m.', 'min="0" max="23"')}${num('window_end_hour', 'Send until (Toronto hour)', '17 = 5:00 p.m.', 'min="1" max="24"')}</div>
+  <div class="row">${num('window_start_hour', 'Send from (Toronto hour)', '8 = 8:00 a.m.', 'min="0" max="23"')}${num('window_end_hour', 'Send until (Toronto hour)', '20 = 8:00 p.m.', 'min="1" max="24"')}</div>
   <p class="hint">Verify these against your Resend plan; Resend can change its limits. Do not enable a paid plan without deciding it separately.</p>
   <button type="submit">Save settings</button>
 </form>`;

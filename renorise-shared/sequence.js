@@ -41,8 +41,8 @@ export const DEFAULT_SETTINGS = {
   account_monthly_cap: '3000', // Resend Free plan: 3,000 emails/month
   confirmation_reserve: '10', // daily capacity held back for confirmations/notifications
   monthly_reserve: '150', // monthly capacity held back for confirmations/notifications
-  window_start_hour: '9', // Toronto time; emails go out from this hour...
-  window_end_hour: '17', // ...until (not including) this hour
+  window_start_hour: '8', // Toronto time; emails go out from this hour... (matches Reno Rise's 8am-8pm hours of operation)
+  window_end_hour: '20', // ...until (not including) this hour
   business_legal_name: '',
   business_mailing_address: '',
   unsubscribe_base_url: 'https://renorise-forms.levi-gene-ous.workers.dev',
@@ -59,7 +59,7 @@ export function getVersion(id) {
 export function windowHours(settings) {
   const start = Number(settings.window_start_hour);
   const end = Number(settings.window_end_hour);
-  return { start: Number.isFinite(start) ? start : 9, end: Number.isFinite(end) ? end : 17 };
+  return { start: Number.isFinite(start) ? start : 8, end: Number.isFinite(end) ? end : 20 };
 }
 
 /** True when `now` is inside the Toronto daytime sending window. */
