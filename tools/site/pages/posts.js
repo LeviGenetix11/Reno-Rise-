@@ -25,6 +25,8 @@ const SRC = {
   fire: 'https://www.toronto.ca/community-people/public-safety-alerts/safety-tips-prevention/home-high-rise-school-workplace-safety/low-rise-small-multi-unit-residential-fire-safety/two-dwelling-unit-houses-basement-apartments/',
   statcan: 'https://www150.statcan.gc.ca/n1/daily-quotidien/250318/dq250318c-eng.htm',
   subsidy: 'https://www.toronto.ca/services-payments/water-environment/managing-rain-melted-snow/basement-flooding/basement-flooding-protection-subsidy-program/',
+  humidity: 'https://www.canada.ca/en/health-canada/services/publications/healthy-living/addressing-moisture-mould-your-home.html',
+  nrcan: 'https://natural-resources.canada.ca/energy-efficiency/home-energy-efficiency/keeping-heat-section-6-basement-insulation-floors-walls-crawl-spaces',
 };
 
 const hero = (file, alt, credit) => `<figure class="post-hero">
@@ -665,6 +667,252 @@ const POSTS = [
       ['How does drainage work for a basement walkout stairwell?', 'A properly built stairwell has drainage at its base so rain and melt do not collect against the new door. Ask each professional how theirs drains before you approve the design.'],
     ],
     related: [['Walkout Construction', 'services/walkout-construction/'], ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/'], ['Egress Windows', 'blog/egress-windows-toronto-basements.html'], ['Basement Renovation', 'services/basement-renovation/']],
+  },
+
+  // ------------------------------------------------------------------ 10
+  {
+    file: 'basement-staircase-ideas.html',
+    cats: 'planning permits',
+    tag: 'Basement Planning',
+    title: 'Basement Staircase Ideas, Railings and Code Basics',
+    metaTitle: 'Basement Staircase Ideas & Code Basics',
+    short: 'Basement Staircase Ideas & Code Basics',
+    description: 'Basement staircase ideas, railing options, and the rise, run, headroom and handrail basics a Toronto code review checks before you build or replace one.',
+    excerpt: 'Design ideas for a basement staircase, and the code review a designer runs before any of them get built.',
+    img: 'basement-staircase-brick-wall',
+    alt: 'Staircase down to a basement beside an exposed brick wall',
+    formType: 'General basement renovation',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('basement-staircase-brick-wall', 'Staircase down to a basement beside an exposed brick wall', 'Photo: Curtis Adams on Pexels')}
+    <p>A <strong>basement staircase</strong> gets less design attention than almost any other feature in a renovation, right up until someone hits their head on a duct or a guest asks why the stairs feel steeper than the ones upstairs. The short answer: basement stairs are held to the same rise, run, headroom, handrail and guard rules as any other stair in the house, and the ideas below only work once those basics check out.</p>
+    <p>Everyone wants to talk about railing style first. A code review talks about headroom first. Both conversations matter, but only one of them keeps a moving box from becoming a story about the emergency room.</p>
+
+    ${U.toc([
+      ['what-is-different', 'What makes a basement staircase different'],
+      ['the-basics', 'Rise, run, headroom and handrails: what gets checked'],
+      ['guards-vs-handrails', 'Guards vs. handrails, and why basements mix them up'],
+      ['railing-ideas', 'Basement stair railing ideas'],
+      ['permit', 'Does a basement staircase need a permit in Toronto?'],
+      ['mistakes', 'Common basement staircase mistakes'],
+      ['questions', 'Questions to ask before you renovate one'],
+      ['faq', 'Frequently asked questions'],
+    ])}
+
+    <h2 id="what-is-different">What Makes a Basement Staircase Different</h2>
+    <p>Structurally, nothing. A basement stair follows the same Building Code chapter as the stair to the second floor. What is different is the room it lands in. Basement ceiling height is often the tightest in the house, so a basement stair is the one most likely to run into a duct, a beam or a low spot that was never a problem upstairs. If a ${A('blog/basement-underpinning-cost-and-when-needed.html', 'ceiling height project')} is already on the table, the stairwell is usually where that conversation starts, because a lowered floor changes the stair run along with everything else.</p>
+    <p>The other difference is traffic. An unfinished basement stair often doubles as the route for a water heater, a sofa or a stack of moving boxes. A design that looks great and refuses to let anything wider than a person through it is a design that gets fought with for years.</p>
+
+    <h2 id="the-basics">Rise, Run, Headroom and Handrails: What Gets Checked</h2>
+    <p>Every jurisdiction sets its own exact numbers for tread depth, riser height, headroom clearance and handrail height, and Ontario is no exception. Those numbers do change between Code editions, which is exactly why this article will not print a table of them and ask you to trust it years from now. The rule that actually matters is simpler and does not expire: before a basement staircase gets rebuilt, widened, relocated or has its opening changed, a designer or the ${X(SRC.permit, 'City')} confirms the current figures against your specific stair, not a blog post.</p>
+    ${U.checkList([
+      '<strong>Rise and run.</strong> Every step in a flight needs to match the others closely. A basement stair that was patched together over the years, with one riser taller than the rest, is a tripping hazard even if nobody has tripped on it yet.',
+      '<strong>Headroom.</strong> Measured from the sloped line of the stair nosings straight up to whatever is overhead, including ducts and beams that were not there when the house was built. This is the single most common basement stair failure, because it is invisible until someone six feet tall walks down for the first time.',
+      '<strong>Tread depth.</strong> Deep enough for a full foot. A shallow, narrow tread is how a basement stair earns the nickname "the ladder."',
+      '<strong>Handrail height and graspability.</strong> A rail you can actually close a hand around, mounted at a height a code review confirms for your stair.',
+    ])}
+    <p>If any of those four are already off on an existing staircase, that is worth fixing on its own, whether or not the rest of the basement is being touched.</p>
+
+    <h2 id="guards-vs-handrails">Guards vs. Handrails, and Why Basements Mix Them Up</h2>
+    ${U.sectionImage(depth, { file: 'room-under-renovation', alt: 'Room under renovation with a ladder and drywall', credit: 'Photo: Valentin Ivantsov on Pexels' })}
+    <p>A handrail is what you hold going up and down. A guard is what stops you from falling off an open side of the stair or a landing. Basements confuse the two constantly, because an open-stringer stair down to an unfinished space often has neither, and that gap does not become a problem until the space gets finished and someone is standing at the top with a coffee. Both a handrail and a guard, sized to the specific stair, are what a designer checks for during a renovation, not an optional upgrade for later.</p>
+
+    <h2 id="railing-ideas">Basement Stair Railing Ideas</h2>
+    <p>Once the numbers behind a rail are settled, the look is where a basement staircase gets to stop looking like an afterthought. A few directions that work well in a below-grade space:</p>
+    ${U.checkList([
+      '<strong>Wood top rail with metal balusters.</strong> A warm handrail with slim black metal spindles reads as intentional, not leftover, and it is forgiving of a basement that already has a mix of finishes.',
+      '<strong>Cable railing.</strong> Horizontal steel cables keep sightlines open, which helps a stair that doubles as the only source of borrowed light from the floor above.',
+      '<strong>Painted risers.</strong> On an open-stringer stair, painting the risers a contrast colour, or leaving them open for a look that reads industrial, is one of the cheapest changes with the biggest visual effect.',
+      '<strong>Tempered glass panels.</strong> A cleaner, more modern look that keeps the stairwell feeling wide, at a higher material cost than metal balusters.',
+      '<strong>A removable or bolted section.</strong> Worth asking for specifically if this stair is also how large items get into the basement. A panel that unbolts for a delivery, then goes back exactly where it was, saves the railing from being the thing that has to be rebuilt every time furniture moves.',
+    ])}
+    <p>None of these decisions happen in a vacuum. If a future ${SUITE} is even a maybe, the stair also needs to work as a shared or separate route for a tenant, which can change where it lands and how wide it needs to be.</p>
+
+    <h2 id="permit">Does a Basement Staircase Need a Permit in Toronto?</h2>
+    <p>It depends on what is actually changing. Toronto Building lists structural or material changes, and relocating or enclosing existing spaces, among the work that needs a ${X(SRC.permit, 'building permit')}. Refinishing an existing stair in the same location, with the same layout, is a different conversation from moving the stair, changing the opening in the floor above it, or widening it into a wall. Describe the exact scope before assuming either way.</p>
+
+    <h2 id="mistakes">Common Basement Staircase Mistakes</h2>
+    ${U.checkList([
+      'Choosing a railing style before confirming headroom and rise and run, then having to redesign it once the code review comes back.',
+      'Forgetting that a duct, sprinkler line or beam relocated for an unrelated reason can eat the headroom a stair was already tight on.',
+      'Boxing a stairwell in with drywall before checking whether it is still wide enough to move a washer, dryer or sofa through later.',
+      'Treating an open-stringer basement stair as "temporary" for years after the rest of the basement gets finished around it, so the one hazard nobody fixed is the one people use every day.',
+      'Skipping a guard on an open landing because "it is just the basement," right up until it is not just storage anymore.',
+    ])}
+
+    <h2 id="questions">Questions to Ask Before You Renovate One</h2>
+    ${U.checkList([
+      'Has headroom been measured against the current ceiling plan, including anything being added above the stair?',
+      'Does this stair still need to fit a washer, dryer or other large item through it after the railing goes in?',
+      'Who confirms the current rise, run, handrail and guard figures for this specific stair?',
+      'If a legal secondary suite is a future possibility, does the stair layout still support that?',
+    ])}
+    <p>Picture the result: a basement staircase nobody thinks twice about using, which is exactly the point. The best stair is the one that disappears into the rest of the house.</p>
+    ${TB_NOTE}
+    ${U.backToTop()}
+`,
+    faq: [
+      ['What is the minimum headroom for a basement staircase?', 'Headroom minimums are set by the Building Code and are measured from the sloped line of the tread nosings to anything overhead, including ducts and beams. The exact figure can change between Code editions, so confirm the current number with a designer or Toronto Building for your specific stair.'],
+      ['Does a basement staircase need a handrail?', 'Yes, stairs generally need a handrail on at least one side, sized so it can actually be gripped, at a height a code review confirms. An open side of the stair or a landing also typically needs a guard, which is a different requirement from a handrail.'],
+      ['What is the difference between a handrail and a guard on a basement stair?', 'A handrail is what you hold while using the stairs. A guard is a barrier that prevents a fall off an open side of the stair or a landing. Basements with open-stringer or unfinished stairs are the most likely place to have one without the other.'],
+      ['Do I need a permit to renovate a basement staircase in Toronto?', 'It depends on the scope. Toronto Building lists structural or material changes among the work that needs a permit. Refinishing a stair in its existing location and layout is different from relocating it or changing the opening around it, so confirm your exact scope before starting.'],
+      ['What are good basement stair railing ideas that are still code-compliant?', 'Wood top rails with metal balusters, cable railing, tempered glass panels and painted or open risers are all popular looks. Any of them can meet the Code as long as the opening sizes, height and graspability are confirmed for the specific stair.'],
+      ['Can I leave a basement staircase open, without risers?', 'Sometimes, depending on the design and what is below. An open-riser stair still needs to meet the same rise, run and guard requirements as a closed one, so confirm the specific rules for that configuration with a designer.'],
+    ],
+    related: [['Basement Renovation Steps', 'blog/basement-renovation-steps.html'], ['Underpinning', 'services/underpinning/'], ['Walkout Construction', 'services/walkout-construction/'], ['Legal Secondary Suites', 'services/legal-basement-apartment-toronto/']],
+  },
+
+  // ------------------------------------------------------------------ 11
+  {
+    file: 'basement-office-renovation.html',
+    cats: 'planning',
+    tag: 'Basement Planning',
+    title: 'Basement Office Renovation: What to Plan Before You Build',
+    metaTitle: 'Basement Office Renovation: What to Plan',
+    short: 'Basement Office Renovation',
+    description: 'Basement office renovation planning: lighting, humidity, soundproofing, electrical and permits, so a below-grade office actually works for a full workday.',
+    excerpt: 'A basement makes a quiet, private home office. Here is what to get right before the desk goes in.',
+    img: 'finished-basement-sofa-room',
+    alt: 'Finished basement sitting room with a leather sofa and bright windows',
+    formType: 'General basement renovation',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('finished-basement-sofa-room', 'Finished basement sitting room with a leather sofa and bright windows', 'Photo: Michael Gault Photos on Pexels')}
+    <p>A <strong>basement office renovation</strong> can be the quietest, most private workspace in the house, as long as four things get solved before the desk shows up: light, humidity, sound and power. Skip any one of them and the room still looks like an office. It just does not work like one by 2pm on a Tuesday.</p>
+    <p>Basements are excellent at privacy and terrible at daylight. The trick is not fighting that. It is planning around it on purpose, instead of discovering it the first week you try to work down there.</p>
+
+    <h2>Is a Basement a Good Place for a Home Office?</h2>
+    <p>Usually, yes, for the reasons people already suspect. It is physically separated from the rest of the house, which matters more for a video call than most people admit before their first one gets interrupted. It is often the coolest room in summer. And unlike a spare bedroom, converting a basement corner does not take a bedroom away from anyone else in the house. The trade-off is natural light and, in an older house, humidity, and both are solvable with planning rather than willpower.</p>
+
+    <h2>Lighting: How to Beat the Lack of Natural Light</h2>
+    <p>Small, high basement windows are wonderful for one thing, which is making a room feel like a cellar. An office does not need a wall of glass to feel alright, but it does need layers: ambient overhead lighting so the room is not dim, a task light at the desk so eyes are not straining by mid-afternoon, and a warmer accent light somewhere in the room so the whole space is not lit like an operating theatre. If more daylight is genuinely on the table, an ${A('blog/egress-windows-toronto-basements.html', 'egress window')} does double duty: it is a safe exit and it is real daylight, not a simulation of it.</p>
+
+    <h2>Moisture, Humidity and Protecting Your Equipment</h2>
+    <p>A below-grade room runs more humid than the rest of the house, and it does not announce itself the way a leak does. Health Canada recommends keeping indoor relative humidity ${X(SRC.humidity, 'between 30% and 50%')}, both for comfort and to keep mould from getting a foothold, and a basement is the room in the house most likely to drift outside that range on its own. A dehumidifier sized to the space, and flooring suited to a below-grade slab rather than anything that traps moisture underneath it, protect the room and the equipment sitting in it. See ${A('services/basement-flooring/', 'basement flooring for a below-grade slab')} for what holds up down there.</p>
+    <p>If the basement has any history of dampness, that gets diagnosed and fixed before an office goes in, not after a laptop has already had a bad week. See ${A('blog/basement-waterproofing-before-renovation.html', 'basement waterproofing before renovation')} for how that diagnosis works.</p>
+
+    <h2>Soundproofing for Video Calls and Focus</h2>
+    <p>A basement office is naturally quieter than one upstairs, but "naturally quieter" is not the same as "soundproof." Footsteps overhead, a furnace cycling on, and a dishwasher two floors up all travel down more than people expect. A solid-core door instead of a hollow one, insulation in the ceiling assembly rather than an open joist bay, and a rug or acoustic panel to break up hard surfaces all help, especially for anyone on calls for a living. See ${A('services/basement-soundproofing/', 'basement soundproofing')} for how far that can go.</p>
+
+    <h2>Electrical, Internet and Outlets</h2>
+    <p>This is the step people regret skipping most, because it is invisible until the walls are closed. Decide where the desk actually goes, then plan outlets, a dedicated circuit if the equipment load calls for it, and a hardwired data line to that spot before drywall goes up, rather than running an extension cord across the room for the next five years. Panel capacity matters here too, particularly in an older house; see ${A('services/panel-upgrade/', 'panel upgrades')} if the existing panel is already tight.</p>
+
+    <h2>Layout and Design Ideas</h2>
+    <p>Once the four fundamentals above are settled, the look is the fun part. A few directions that work well below grade: a minimalist layout with light-toned walls to bounce around whatever light there is; sectioning off a corner with a half-wall or shelving rather than boxing off a full room, which keeps the rest of the basement feeling open; or a dedicated closed room if the goal is genuine privacy from the rest of the house during work hours. Which one fits depends on how much of the basement the office needs to claim.</p>
+
+    <h2>Does a Basement Office Renovation Need a Permit in Toronto?</h2>
+    <p>It depends on the scope, same as any other basement work. Toronto Building requires a permit for structural or material changes and for new electrical or plumbing work, according to its ${X(SRC.permit, 'building permit guidance')}. A closed-off office room, a new dedicated circuit, or a wall coming down to open up the layout are all in that category. Paint, flooring, shelving and lighting on an existing, safe layout generally are not, but confirm your exact plan before assuming.</p>
+
+    <h2>What to Ask Before You Hire</h2>
+    ${U.checkList([
+      'Has the basement been checked for a moisture history before finishes go in?',
+      'Is there a dedicated circuit and a hardwired data line planned to the desk location, before the walls close up?',
+      'What is being done for sound, specifically, not just "we will insulate it"?',
+      'Does the plan need a permit, and who is applying for it?',
+    ])}
+    <p>Get those four right and the office stops being a basement with a desk in it, and starts being the room you actually want to work in. If you would like Reno Rise to review your basement office plans, the form below takes a few minutes.</p>
+    ${TB_NOTE}
+`,
+    faq: [
+      ['Is a basement a good place for a home office?', 'Usually. Basements offer privacy and quiet that upstairs rooms rarely match, and converting one does not take a bedroom away from the rest of the household. The main trade-offs, natural light and humidity, are both solvable with planning.'],
+      ['How do you deal with the lack of natural light in a basement office?', 'Layered lighting helps most: ambient overhead light, a task light at the desk, and a warmer accent light elsewhere in the room. An egress window is the closest thing to real daylight if a larger window is part of the plan.'],
+      ['What humidity level is healthy for a basement office?', 'Health Canada recommends keeping indoor relative humidity between 30% and 50%. Basements tend to run higher than the rest of the house, so a properly sized dehumidifier is worth planning for.'],
+      ['How do you soundproof a basement office?', 'A solid-core door, insulation in the ceiling assembly, and soft surfaces such as a rug or acoustic panels all reduce sound from the rest of the house. How far to take it depends on how much of the day is spent on calls.'],
+      ['Do I need a permit for a basement office renovation in Toronto?', 'It depends on the work. Structural changes, new electrical circuits or new plumbing generally need a permit under Toronto Building rules. Paint, flooring and lighting on an existing, safe layout generally do not.'],
+      ['Should I run a dedicated internet line to a basement office?', 'A hardwired data line to the desk location is more reliable than relying on Wi-Fi through several floors and walls. It is far easier to plan and install before the walls close up than after.'],
+    ],
+    related: [['Basement Soundproofing', 'services/basement-soundproofing/'], ['Basement Flooring', 'services/basement-flooring/'], ['Egress Windows', 'blog/egress-windows-toronto-basements.html'], ['Basement Renovation', 'services/basement-renovation/']],
+  },
+
+  // ------------------------------------------------------------------ 12
+  {
+    file: 'insulating-basement-walls-with-rigid-foam.html',
+    cats: 'planning',
+    tag: 'Basement Planning',
+    title: 'Insulating Basement Walls With Rigid Foam: How It Actually Works',
+    metaTitle: 'Insulating Basement Walls With Rigid Foam',
+    short: 'Insulating Basement Walls With Rigid Foam',
+    description: 'Insulating basement walls with rigid foam in a Toronto basement: how much insulation you need, where the vapour barrier goes, and how framing works next.',
+    excerpt: 'Rigid foam is the standard way to insulate a basement wall without trapping moisture behind it. Here is how the layers actually go together.',
+    img: 'room-under-renovation',
+    alt: 'Room under renovation with a ladder and drywall',
+    formType: 'General basement renovation',
+    dateLong: 'September 22, 2026',
+    date: '2026-09-22',
+    body: () => `
+    ${hero('room-under-renovation', 'Room under renovation with a ladder and drywall', 'Photo: Valentin Ivantsov on Pexels')}
+    <p><strong>Insulating basement walls with rigid foam</strong> means adhering or fastening rigid foam board directly to the concrete or block foundation, sealing every seam, and then, in most finished basements, framing a stud wall in front of it. Done in that order, it insulates and controls moisture in a single layer. Done out of order, usually by framing first and stuffing batts against bare concrete, it is one of the more common ways a finished basement grows mould behind the drywall within a few years.</p>
+    <p>None of this is exotic. It is one of the most-documented parts of a basement renovation, which also means it is one of the easiest to get wrong by following advice written for a wall that is not touching cold, damp concrete.</p>
+
+    ${U.toc([
+      ['why-rigid-foam', 'Why basement walls get rigid foam instead of just batts'],
+      ['the-layers', 'The two real methods, and how the layers stack'],
+      ['how-much', 'How much insulation a basement wall actually needs'],
+      ['vapour-barrier', 'The vapour barrier rule most DIYers get backwards'],
+      ['framing', 'Framing a basement wall in front of the foam'],
+      ['mistakes', 'Common mistakes when insulating and framing a basement wall'],
+      ['permit', 'Does insulating a basement wall need a permit in Toronto?'],
+      ['questions', 'Questions to ask before you start'],
+      ['faq', 'Frequently asked questions'],
+    ])}
+
+    <h2 id="why-rigid-foam">Why Basement Walls Get Rigid Foam Instead of Just Batts</h2>
+    <p>A basement wall is not like an above-grade wall. It is touching soil, it runs colder than the rest of the house, and moisture moves through concrete more than most homeowners expect. Fibreglass batts stapled straight to bare concrete or into a stud wall with an air gap behind it let warm, humid indoor air reach that cold surface and condense, which is exactly the recipe for mould growth behind drywall that looks perfectly fine from the room side. Rigid foam, installed directly against the concrete with sealed seams, closes that gap. It insulates and it keeps the air away from the cold surface at the same time.</p>
+
+    <h2 id="the-layers">The Two Real Methods, and How the Layers Stack</h2>
+    <p>Most basement wall insulation comes down to two approaches, plus a third for irregular walls:</p>
+    ${U.checkList([
+      '<strong>Continuous rigid foam, on its own.</strong> One or two layers of rigid foam board, sealed at every seam and fastened to the concrete, with the staggered second layer used where a single board will not reach the needed thickness. This works best on a flat, even wall, typically poured concrete or block.',
+      '<strong>Rigid foam plus a stud wall.</strong> The same foam layer against the concrete, with a 2x4 or 1x4 strapped wall built in front of it to carry drywall and, if needed, additional cavity insulation between the studs. This is the more common approach in a fully finished basement, since it gives a standard wall to run wiring and mount fixtures on.',
+      '<strong>Closed-cell spray foam.</strong> Better suited to uneven or stone-and-mortar foundations where rigid board cannot sit flush against the wall. It is applied between framing and the foundation and costs more than board insulation.',
+    ])}
+    <p>Whichever method is used, the goal is the same: a continuous layer of insulation against the cold surface, with no gap where air can meet concrete and condense.</p>
+
+    <h2 id="how-much">How Much Insulation a Basement Wall Actually Needs</h2>
+    <p>Exact minimums are set by the Building Code and vary by climate zone, the efficiency of the home&rsquo;s heating system, and whether the insulation is continuous foam or a mix of foam and cavity insulation, so this article will not guess a single number for your specific house. As a general, federally published benchmark, Natural Resources Canada&rsquo;s ${X(SRC.nrcan, "&ldquo;Keeping the Heat In&rdquo; guide")} points to a minimum of roughly RSI 2.1 (R-12) for interior rigid board insulation on a basement wall, with the exact figure for a given project confirmed against the current Ontario Building Code. Treat that as a floor to plan around, not a number to build to without checking.</p>
+
+    <h2 id="vapour-barrier">The Vapour Barrier Rule Most DIYers Get Backwards</h2>
+    ${U.sectionImage(depth, { file: 'unfinished-basement-block-walls-joists', alt: 'Unfinished basement with block walls and exposed floor joists', credit: 'Photo: Curtis Adams on Pexels' })}
+    <p>Here is the mistake that undoes an otherwise correct insulation job: adding a sheet of poly vapour barrier between the rigid foam and the concrete, or behind the drywall on the room side of a foam-insulated wall. Natural Resources Canada is explicit that the vapour barrier belongs on the warm side of the insulation, and rigid foam against concrete is already acting as that control layer. A second barrier trapped against cold concrete does not add protection. It traps whatever moisture is already there, which is how a technically well-insulated wall still ends up growing something nobody wants to find.</p>
+    <p>The seams matter as much as the barrier question. Every joint between foam boards gets taped or sealed, because an unsealed seam is a small, quiet gap where indoor air can still reach the cold wall behind the foam.</p>
+
+    <h2 id="framing">Framing a Basement Wall in Front of the Foam</h2>
+    <p>Once the foam is up and sealed, a stud wall goes in front of it, either full 2x4 framing if cavity insulation or extra depth is wanted, or thinner strapping if the foam alone already meets the target thickness. Toronto Building requires that rigid foam facing a room be covered with a fire-resistant finish, typically ½-inch drywall, mechanically fastened to the framing, so the foam is never left exposed as the finished surface. This is also the stage in the sequence described in ${A('blog/basement-renovation-steps.html', 'basement renovation steps in order')}, where insulation and framing happen together, before electrical and plumbing rough-ins go in against the new wall.</p>
+
+    <h2 id="mistakes">Common Mistakes When Insulating and Framing a Basement Wall</h2>
+    ${U.checkList([
+      'Framing a stud wall first, then stuffing batts against bare concrete with an air gap behind them, instead of insulating the concrete directly.',
+      'Adding a plastic vapour barrier between the foam and the concrete, or on both sides of the assembly, which traps moisture instead of managing it.',
+      'Leaving foam board seams untaped, which quietly undoes the air-sealing benefit of using foam in the first place.',
+      `Insulating over a wall with an unresolved moisture history, instead of diagnosing and fixing the source first. See ${A('services/basement-waterproofing/', 'basement waterproofing')} before finishes go up.`,
+      'Skipping the fire-resistant drywall layer over exposed rigid foam, which is both a code issue and a real fire-safety one.',
+    ])}
+
+    <h2 id="permit">Does Insulating a Basement Wall Need a Permit in Toronto?</h2>
+    <p>Insulating and framing a basement wall is usually part of a larger finishing scope, and Toronto Building requires a permit once that scope includes structural or material changes, according to its ${X(SRC.permit, 'building permit guidance')}. Confirm your exact plan with the City or a designer rather than assuming insulation alone is exempt, since it is rarely done in isolation from the rest of a finishing project.</p>
+
+    <h2 id="questions">Questions to Ask Before You Start</h2>
+    ${U.checkList([
+      'Has any history of dampness on this wall been diagnosed and fixed already?',
+      'What thickness and type of rigid foam is being used, and does it meet the current Code minimum for this house?',
+      'How are the seams being sealed, and is a second vapour barrier being added anywhere it should not be?',
+      'What covers the foam where it faces the room, and does it meet the fire-resistance requirement?',
+    ])}
+    <p>Get the layers in the right order and a basement wall stops being the weak link in the renovation. It just quietly does its job for the next several decades.</p>
+    ${TB_NOTE}
+    ${U.backToTop()}
+`,
+    faq: [
+      ['Why use rigid foam instead of just batt insulation in a basement?', 'Rigid foam, sealed against the concrete, keeps warm indoor air from reaching the cold foundation wall and condensing there. Batts alone, especially with an air gap behind them, are more prone to trapping moisture against the wall and growing mould.'],
+      ['How thick does rigid foam need to be on a basement wall?', 'It depends on climate zone, the home’s heating system and the assembly used, so the exact figure should be confirmed against the current Ontario Building Code. Natural Resources Canada points to roughly RSI 2.1 (R-12) as a general benchmark for interior rigid board insulation.'],
+      ['Do I need a vapour barrier behind the drywall if I already used rigid foam?', 'Generally no additional poly vapour barrier is added on the room side when rigid foam is already acting as the vapour control layer against the concrete. Adding a second barrier can trap moisture instead of managing it.'],
+      ['Can I frame a basement wall directly against bare concrete without foam?', 'That is the setup most likely to trap moisture against cold concrete, since a stud wall and batts alone do not stop humid indoor air from reaching the cold surface. Rigid foam directly against the concrete is the standard way to avoid that.'],
+      ['Does rigid foam insulation need to be covered before it is finished?', 'Yes. Rigid foam facing into a room generally needs a fire-resistant covering, typically ½-inch drywall, mechanically fastened over it, rather than being left exposed.'],
+      ['Do I need a permit to insulate a basement wall in Toronto?', 'Insulating a wall is usually part of a larger finishing project, and Toronto Building requires a permit once the scope includes structural or material changes. Confirm the exact scope with the City or a designer.'],
+    ],
+    related: [['Basement Renovation Steps', 'blog/basement-renovation-steps.html'], ['Basement Finishing', 'services/basement-finishing/'], ['Basement Waterproofing', 'services/basement-waterproofing/'], ['Basement Renovation', 'services/basement-renovation/']],
   },
 ];
 

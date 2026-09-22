@@ -531,7 +531,7 @@ const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) =
 {
   const { ctx, page } = await open('/blog/', 1440);
   const all = await visibleCards(page);
-  t('blog: all guides shown once each (' + all.length + ' cards, no duplicates)', all.length === 19 && new Set(all).size === 19, all.length + ' / ' + new Set(all).size);
+  t('blog: all guides shown once each (' + all.length + ' cards, no duplicates)', all.length === 22 && new Set(all).size === 22, all.length + ' / ' + new Set(all).size);
   const cats = await page.$$eval('.post-card', (cs) => cs.map((c) => [c.querySelector('a.readmore').getAttribute('href'), c.dataset.category.split(' ')]));
   const keys = await page.$$eval('.filter-bar button', (bs) => bs.map((b) => b.dataset.filter));
   t('blog: filter buttons include Flooring and every earlier category', ['all', 'planning', 'suites', 'costs', 'permits', 'waterproofing', 'underpinning', 'flooring', 'general'].every((k) => keys.includes(k)), keys.join(','));
@@ -547,10 +547,10 @@ const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) =
   t('blog filter: the pressed button is announced (aria-pressed)', (await page.locator('.filter-bar button[data-filter="flooring"]').getAttribute('aria-pressed')) === 'true' && (await page.locator('.filter-bar button[data-filter="all"]').getAttribute('aria-pressed')) === 'false');
   // keyboard
   await page.locator('.filter-bar button[data-filter="all"]').focus(); await page.keyboard.press('Enter');
-  t('blog filter (keyboard): Enter on "All Guides" restores all 19', (await visibleCards(page)).length === 19);
+  t('blog filter (keyboard): Enter on "All Guides" restores all 22', (await visibleCards(page)).length === 22);
   await page.locator('.filter-bar button[data-filter="waterproofing"]').focus(); await page.keyboard.press('Space');
   const wp = await visibleCards(page);
-  t('blog filter (keyboard): Space on "Waterproofing" filters, and no flooring-only guide leaks in', wp.length >= 1 && wp.length < 19 && wp.every((h) => cats.find(([x]) => x === h)[1].includes('waterproofing')));
+  t('blog filter (keyboard): Space on "Waterproofing" filters, and no flooring-only guide leaks in', wp.length >= 1 && wp.length < 22 && wp.every((h) => cats.find(([x]) => x === h)[1].includes('waterproofing')));
   await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); await page.keyboard.press('Tab');
   t('blog filter (keyboard): the buttons are reachable in order with Tab', await page.evaluate(() => !!document.activeElement.closest('.filter-bar')));
   t('blog: the Basement Planning Centre stays basement-focused (flooring is one filter of nine, not the lead)', (await page.locator('.planning-centre .pc-card').count()) === 3 && !/flooring/i.test(await page.locator('.planning-centre').innerText()));
@@ -561,7 +561,7 @@ const visibleCards = (page) => page.$$eval('.post-card', (cs) => cs.filter((c) =
   await page.locator('.filter-bar button[data-filter="flooring"]').tap();
   t('blog filter (touch): tapping Flooring shows four guides', (await visibleCards(page)).length === 4);
   await page.locator('.filter-bar button[data-filter="all"]').tap();
-  t('blog filter (touch): tapping All Guides shows nineteen', (await visibleCards(page)).length === 19);
+  t('blog filter (touch): tapping All Guides shows twenty-two', (await visibleCards(page)).length === 22);
   t('blog @390px: no horizontal overflow', !(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)));
   await ctx.close();
 }
