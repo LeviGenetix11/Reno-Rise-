@@ -251,7 +251,7 @@ ok(!/\b(we|reno rise) (perform|do|carry out|complete)s? (the )?(construction|ins
   const site = (vercel.headers || []).find((h) => h.source === '/(.*)');
   ok(!!site, 'vercel.json needs a header rule matching every page');
   const val = (key) => (site.headers.find((x) => x.key === key) || {}).value || '';
-  ok(/max-age=\d{7,}/.test(val('Strict-Transport-Security')), 'HSTS max-age missing or too short');
+  ok(/max-age=\d{7,}/.test(val('Strict-Transport-Security')) && /includeSubDomains/.test(val('Strict-Transport-Security')) && /preload/.test(val('Strict-Transport-Security')), 'HSTS should have a 1y+ max-age, includeSubDomains and preload');
   ok(val('Cross-Origin-Opener-Policy') === 'same-origin', 'COOP should be same-origin');
   const csp = val('Content-Security-Policy');
   ok(!!csp, 'Content-Security-Policy header is missing');
